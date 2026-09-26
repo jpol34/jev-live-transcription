@@ -7,6 +7,7 @@ dependencies = [
     "openai",
     "typesafe-sdk",
     "gliner>=0.2.28",
+    "torch",
     "rich",
     "pytest",
     "protobuf>=7.36.2",

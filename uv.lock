@@ -328,6 +328,7 @@ dependencies = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "rich" },
+    { name = "torch" },
     { name = "typesafe-sdk" },
 ]
 
@@ -339,6 +340,7 @@ requires-dist = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "rich" },
+    { name = "torch" },
     { name = "typesafe-sdk" },
 ]
 

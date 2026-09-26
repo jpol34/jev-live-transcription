@@ -13,6 +13,7 @@ consumes.
 from __future__ import annotations
 
 import asyncio
+import logging
 import threading
 import time
 
@@ -20,6 +21,8 @@ import torch
 from gliner import GLiNER
 
 from . import config
+
+_LOGGER = logging.getLogger(__name__)
 
 PII_MODEL_NAME = "knowledgator/gliner-stream-pii-v1.0"
 ZERO_SHOT_MODEL_NAME = "urchade/gliner_medium-v2.1"
@@ -99,7 +102,9 @@ def _get_pii_model() -> GLiNER:
     if _pii_model is None:
         with _singleton_load_lock:
             if _pii_model is None:
-                _pii_model = GLiNER.from_pretrained(PII_MODEL_NAME, map_location=_resolve_device())
+                device = _resolve_device()
+                _LOGGER.info("Loading %s onto device=%s", PII_MODEL_NAME, device)
+                _pii_model = GLiNER.from_pretrained(PII_MODEL_NAME, map_location=device)
     return _pii_model
 
 
@@ -108,9 +113,9 @@ def _get_zero_shot_model() -> GLiNER:
     if _zero_shot_model is None:
         with _singleton_load_lock:
             if _zero_shot_model is None:
-                _zero_shot_model = GLiNER.from_pretrained(
-                    ZERO_SHOT_MODEL_NAME, map_location=_resolve_device()
-                )
+                device = _resolve_device()
+                _LOGGER.info("Loading %s onto device=%s", ZERO_SHOT_MODEL_NAME, device)
+                _zero_shot_model = GLiNER.from_pretrained(ZERO_SHOT_MODEL_NAME, map_location=device)
     return _zero_shot_model
 
 
