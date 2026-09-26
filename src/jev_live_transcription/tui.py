@@ -14,6 +14,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 
@@ -30,15 +31,20 @@ _PIPELINE_COLUMN_TITLES = {
 
 
 def _format_cell(value_confidence: tuple[str, float] | None) -> str:
-    """Render one pipeline's committed value/confidence for one field as a table cell."""
+    """Render one pipeline's committed value/confidence for one field as a table cell.
+
+    `value` is extracted from live caller speech, so it may itself contain characters (`[`, `]`)
+    that Rich would otherwise interpret as markup -- `escape()` keeps it literal.
+    """
     if value_confidence is None:
         return "[dim]—[/dim]"
     value, confidence = value_confidence
-    return f"{value}  [dim]({confidence:.2f})[/dim]"
+    return f"{escape(value)}  [dim]({confidence:.2f})[/dim]"
 
 
 class _TuiState:
-    """Latest per-tick snapshot to render. Mutated only from the `on_tick` callback."""
+    """Latest per-tick snapshot to render. Mutated from the `on_tick` callback each tick, and
+    once more directly (`done`) when the replay finishes."""
 
     def __init__(self, call_id: int, scenario: dict) -> None:
         self.call_id = call_id
