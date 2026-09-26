@@ -307,10 +307,16 @@ async def test_run_call_on_tick_callback_fires_every_tick_with_committed_snapsho
     ]
     monkeypatch.setattr(pipeline_core, "iter_batch_ticks", lambda call_pacer: iter(ticks_script))
 
-    extract_candidates_mock = AsyncMock(
-        return_value={"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]}
+    extract_candidates_timed_mock = AsyncMock(
+        return_value=(
+            {"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]},
+            10.0,
+            20.0,
+        )
     )
-    monkeypatch.setattr(pipeline_core.gliner_pipeline, "extract_candidates", extract_candidates_mock)
+    monkeypatch.setattr(
+        pipeline_core.gliner_pipeline, "extract_candidates_timed", extract_candidates_timed_mock
+    )
     monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
     monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", Mock())
 
