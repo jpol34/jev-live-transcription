@@ -3,8 +3,9 @@
 Runs two GLiNER models against the transcript-so-far on every tick: a streaming
 PII checkpoint (`knowledgator/gliner-stream-pii-v1.0`) that reuses its decoder
 KV cache incrementally per call for `caller_name`/`email`/`phone_number`, and a
-standard zero-shot checkpoint (`urchade/gliner_medium-v2.1`) that fully
-re-encodes the transcript-so-far for the remaining 8 domain fields.
+standard zero-shot checkpoint (`urchade/gliner_medium-v2.1`) that re-encodes a
+bounded trailing window of the transcript-so-far (`config.GLINER_ZERO_SHOT_WINDOW_CHARS`) for the
+remaining 8 domain fields, keeping its latency flat regardless of call length.
 `extract_candidates` is the single entry point the jev resolver stage
 consumes.
 """
@@ -16,6 +17,8 @@ import threading
 import time
 
 from gliner import GLiNER
+
+from . import config
 
 PII_MODEL_NAME = "knowledgator/gliner-stream-pii-v1.0"
 ZERO_SHOT_MODEL_NAME = "urchade/gliner_medium-v2.1"
@@ -145,15 +148,39 @@ def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict
     return _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
 
 
+def _zero_shot_window(transcript_snapshot: str) -> tuple[str, int]:
+    """Return the trailing slice of `transcript_snapshot` fed to the standard zero-shot model this
+    tick -- its last `config.GLINER_ZERO_SHOT_WINDOW_CHARS` characters -- along with that slice's
+    start offset within the full snapshot, so callers can translate entity spans the model reports
+    (relative to the slice) back into full-snapshot character offsets.
+    """
+    window_start = max(0, len(transcript_snapshot) - config.GLINER_ZERO_SHOT_WINDOW_CHARS)
+    return transcript_snapshot[window_start:], window_start
+
+
 def _run_zero_shot_tick(transcript_snapshot: str) -> dict[str, list[dict]]:
-    """Re-encode `transcript_snapshot` in full against the zero-shot domain labels."""
+    """Re-encode a bounded trailing window of `transcript_snapshot` against the zero-shot domain
+    labels, instead of the full growing transcript, so latency stays flat regardless of call
+    length. Candidate spans are translated back to full-snapshot character offsets before being
+    returned, since every downstream consumer (jev's context window) indexes into the full
+    snapshot, not the windowed slice actually fed to the model.
+    """
     model = _get_zero_shot_model()
+    window_text, window_start = _zero_shot_window(transcript_snapshot)
     entities = model.predict_entities(
-        transcript_snapshot,
+        window_text,
         list(ZERO_SHOT_FIELD_LABELS.values()),
         multi_label=True,
     )
-    return _entities_to_candidates(entities, _ZERO_SHOT_LABEL_TO_FIELD)
+    candidates = _entities_to_candidates(entities, _ZERO_SHOT_LABEL_TO_FIELD)
+    if window_start:
+        for spans in candidates.values():
+            for span in spans:
+                if span["start"] is not None:
+                    span["start"] += window_start
+                if span["end"] is not None:
+                    span["end"] += window_start
+    return candidates
 
 
 async def _timed_to_thread(func, *args):
@@ -189,11 +216,13 @@ async def extract_candidates(transcript_snapshot: str, call_id: str) -> dict[str
 
     Runs the streaming PII checkpoint (`caller_name`/`email`/`phone_number`,
     cached incrementally per `call_id`) and the zero-shot domain checkpoint
-    (the other 8 fields, fully re-encoded every call) concurrently via
-    `asyncio.to_thread`, so wall-clock latency is the max of the two rather
-    than their sum. The result covers all 11 fields; each maps to a list of
-    candidate spans shaped `{"text", "score", "start", "end"}`, empty when no
-    candidate was found this tick.
+    (the other 8 fields, re-encoding only a bounded trailing window of the
+    transcript-so-far) concurrently via `asyncio.to_thread`, so wall-clock
+    latency is the max of the two rather than their sum. The result covers
+    all 11 fields; each maps to a list of candidate spans shaped
+    `{"text", "score", "start", "end"}`, empty when no candidate was found
+    this tick. Every span's offsets are in full-transcript coordinates
+    regardless of which model found it.
 
     A thin wrapper over `extract_candidates_timed` for callers that only need the merged
     candidates, not each model's individual latency.

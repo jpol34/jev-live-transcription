@@ -1,7 +1,7 @@
 import asyncio
 import time
 
-from jev_live_transcription import gliner_pipeline
+from jev_live_transcription import config, gliner_pipeline
 
 
 class FakePIIModel:
@@ -152,6 +152,96 @@ def test_entities_with_unrecognized_labels_are_dropped(monkeypatch):
     result = asyncio.run(gliner_pipeline.extract_candidates("xyz text", "call-4"))
 
     assert all(spans == [] for spans in result.values())
+
+
+def test_zero_shot_model_receives_only_the_trailing_window(monkeypatch):
+    # A snapshot much longer than the configured window -- if the model still received the whole
+    # thing, its input size (and therefore latency) would keep growing with call length, which is
+    # exactly the unbounded-latency behavior this window bounds.
+    long_snapshot = "x" * (config.GLINER_ZERO_SHOT_WINDOW_CHARS * 5)
+    _pii_model, zero_shot_model = _install_fakes(
+        monkeypatch, pii_responses=[[]], zero_shot_responses=[[]]
+    )
+
+    asyncio.run(gliner_pipeline.extract_candidates(long_snapshot, "call-window"))
+
+    sent_text = zero_shot_model.calls[0]["text"]
+    assert len(sent_text) == config.GLINER_ZERO_SHOT_WINDOW_CHARS
+    assert sent_text == long_snapshot[-config.GLINER_ZERO_SHOT_WINDOW_CHARS :]
+
+
+def test_zero_shot_window_latency_stays_flat_as_transcript_grows(monkeypatch):
+    # Proxy for "latency stays flat regardless of transcript length": since the model always
+    # receives a fixed-size window, a fake standard model whose processing time scales with its
+    # *input* size (not the full snapshot) takes the same time on a short and a very long
+    # snapshot.
+    class TimingZeroShotModel:
+        def predict_entities(self, text, labels, multi_label=False):
+            time.sleep(len(text) * 1e-6)
+            return []
+
+    monkeypatch.setattr(gliner_pipeline, "_pii_sent_length", {})
+    monkeypatch.setattr(gliner_pipeline, "_pii_model", FakePIIModel([[], []]))
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", TimingZeroShotModel())
+
+    _candidates, _pii_ms, short_latency_ms = asyncio.run(
+        gliner_pipeline.extract_candidates_timed("short call so far.", "call-flat-1")
+    )
+    long_snapshot = "word " * (config.GLINER_ZERO_SHOT_WINDOW_CHARS * 10 // len("word "))
+    _candidates, _pii_ms, long_latency_ms = asyncio.run(
+        gliner_pipeline.extract_candidates_timed(long_snapshot, "call-flat-2")
+    )
+
+    assert long_latency_ms < short_latency_ms + 50  # ms of slack for scheduling jitter
+
+
+def test_zero_shot_candidate_offsets_are_translated_to_full_snapshot_coordinates(monkeypatch):
+    window_chars = config.GLINER_ZERO_SHOT_WINDOW_CHARS
+    prefix = "a" * (window_chars + 100)
+    candidate_text = "unit 204"
+    snapshot = prefix + candidate_text
+    window_start = len(snapshot) - window_chars
+    # The offsets GLiNER would report are relative to the windowed slice actually fed to the
+    # model, not the full snapshot.
+    start_in_window = len(snapshot) - window_start - len(candidate_text)
+    end_in_window = start_in_window + len(candidate_text)
+    _pii_model, _zero_shot_model = _install_fakes(
+        monkeypatch,
+        pii_responses=[[]],
+        zero_shot_responses=[
+            [
+                {
+                    "start": start_in_window,
+                    "end": end_in_window,
+                    "text": candidate_text,
+                    "label": "apartment unit number",
+                    "score": 0.8,
+                }
+            ]
+        ],
+    )
+
+    result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-offset"))
+
+    span = result["unit_number"][0]
+    assert span["start"] == len(snapshot) - len(candidate_text)
+    assert span["end"] == len(snapshot)
+    assert snapshot[span["start"] : span["end"]] == candidate_text
+
+
+def test_zero_shot_offsets_unchanged_when_snapshot_shorter_than_window(monkeypatch):
+    snapshot = "Jane called about unit 204"
+    _pii_model, _zero_shot_model = _install_fakes(
+        monkeypatch,
+        pii_responses=[[]],
+        zero_shot_responses=[
+            [{"start": 18, "end": 26, "text": "unit 204", "label": "apartment unit number", "score": 0.8}]
+        ],
+    )
+
+    result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-short"))
+
+    assert result["unit_number"] == [{"text": "unit 204", "score": 0.8, "start": 18, "end": 26}]
 
 
 def test_reset_call_clears_tracked_length_and_model_session(monkeypatch):

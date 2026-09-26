@@ -17,6 +17,16 @@ JEV_COMMIT_THRESHOLD = 0.6
 # ticks, so gating on a settled set avoids re-confirming jev on every one of them.
 JEV_RECONFIRM_SETTLE_TICKS = 2
 
+# Maximum trailing character count of the transcript-so-far fed to the standard zero-shot GLiNER
+# model per tick. Bounding it to a recent sliding window, rather than the full growing transcript,
+# keeps its per-tick latency flat regardless of call length. Sized (measured against real
+# transcript text on the benchmark machine) to keep that model's own latency consistently under
+# the 400ms/tick target -- its forward pass scales roughly linearly with input length, so this is
+# deliberately smaller than a "few turns" of raw transcript might suggest. The streaming PII model
+# is unaffected by this constant -- it already processes only the delta since the last tick via
+# its own incremental caching.
+GLINER_ZERO_SHOT_WINDOW_CHARS = 200
+
 # This machine's installed RAM, used to size call-level concurrency: reserve
 # 4GB headroom for the OS/other sessions and budget ~4GB per concurrent call.
 RAM_GB = 16
