@@ -10,13 +10,17 @@ writer thread and each `sqlite3.connect(":memory:")` call gets its own unshared,
 
 Fully public and unauthenticated by design (viewer-triggered jev calls cost trivial, already-
 established amounts) -- `MAX_CONCURRENT_SESSIONS` bounds concurrent replay load/cost instead, so
-one visitor can't degrade the demo for everyone else.
+one visitor can't degrade the demo for everyone else. `ActiveCallGuard` separately prevents two
+viewers from replaying the *same* call_id at once: `gliner_pipeline`'s streaming-PII state is
+keyed only by call_id at module scope, so two concurrent sessions for the same call_id would race
+on (and, on cleanup, destroy) each other's streaming state.
 """
 
 from __future__ import annotations
 
 import asyncio
 import logging
+import shutil
 import tempfile
 from collections import defaultdict
 from contextlib import asynccontextmanager
@@ -62,15 +66,37 @@ class SessionLimiter:
             self._count -= 1
 
 
+class ActiveCallGuard:
+    """Tracks which call_ids currently have a live replay session, so a second viewer can't start
+    a concurrent replay of the same call_id -- see module docstring for why that would corrupt
+    shared `gliner_pipeline` state."""
+
+    def __init__(self) -> None:
+        self._active: set[int] = set()
+        self._lock = asyncio.Lock()
+
+    async def try_acquire(self, call_id: int) -> bool:
+        async with self._lock:
+            if call_id in self._active:
+                return False
+            self._active.add(call_id)
+            return True
+
+    async def release(self, call_id: int) -> None:
+        async with self._lock:
+            self._active.discard(call_id)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     secrets.load_typesafe_key()
     app.state.calls = corpus.load_all()
     app.state.session_limiter = SessionLimiter(MAX_CONCURRENT_SESSIONS)
+    app.state.active_call_guard = ActiveCallGuard()
     # Warms up both GLiNER checkpoints now, same as batch_runner does for the benchmark harness,
     # so the first real viewer's replay doesn't silently stall through the one-time model-load
     # cost before any tick is sent.
-    await batch_runner._warm_up_gliner()
+    await batch_runner.warm_up_gliner()
     yield
 
 
@@ -108,13 +134,14 @@ def _serialize_committed(committed: dict[tuple[str, str], tuple[str, float]]) ->
     return dict(by_pipeline)
 
 
-async def _run_replay_session(websocket: WebSocket, call_id: int) -> None:
-    calls: dict[int, dict] = websocket.app.state.calls
-    queue: asyncio.Queue = asyncio.Queue()
+async def _run_replay(websocket: WebSocket, call_id: int, calls: dict, queue: asyncio.Queue) -> None:
+    """Runs `run_call` to completion (or until cancelled by `_run_replay_session` on a send
+    failure), always leaving a `_DONE` sentinel on `queue` so `_consume` below can't block
+    forever waiting for one more item that will never arrive."""
 
     def on_tick(tick_number: int, total_ticks: int, committed: dict) -> None:
         # Called synchronously from inside run_call's async tick loop -- queue.put_nowait is the
-        # sync-safe way to hand a tick off to the consumer task below, which does the actual
+        # sync-safe way to hand a tick off to the consumer task, which does the actual
         # (necessarily async) websocket.send_json.
         queue.put_nowait(
             {
@@ -124,15 +151,12 @@ async def _run_replay_session(websocket: WebSocket, call_id: int) -> None:
             }
         )
 
-    async def consume() -> None:
-        while True:
-            item = await queue.get()
-            if item is _DONE:
-                return
-            await websocket.send_json(item)
-
-    consumer_task = asyncio.create_task(consume())
-    with tempfile.TemporaryDirectory(prefix="jlt-webapp-") as tmp_dir:
+    # tempfile.TemporaryDirectory's own __exit__ can raise on Windows if a WAL/SHM sidecar file's
+    # handle briefly outlives store.close() -- using mkdtemp/rmtree directly instead means that
+    # cleanup failure can never be mistaken for run_call itself having failed (rmtree's errors are
+    # swallowed below, after the replay's own success/failure is already determined).
+    tmp_dir = tempfile.mkdtemp(prefix="jlt-webapp-")
+    try:
         tmp_db_path = Path(tmp_dir) / f"call_{call_id}.sqlite3"
         try:
             await pipeline_core.run_call(
@@ -140,7 +164,44 @@ async def _run_replay_session(websocket: WebSocket, call_id: int) -> None:
             )
         finally:
             queue.put_nowait(_DONE)
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+async def _run_replay_session(websocket: WebSocket, call_id: int) -> None:
+    calls: dict[int, dict] = websocket.app.state.calls
+    queue: asyncio.Queue = asyncio.Queue()
+
+    async def consume() -> None:
+        while True:
+            item = await queue.get()
+            if item is _DONE:
+                return
+            await websocket.send_json(item)
+
+    run_task = asyncio.create_task(_run_replay(websocket, call_id, calls, queue))
+    consumer_task = asyncio.create_task(consume())
+    try:
+        done, _pending = await asyncio.wait(
+            {run_task, consumer_task}, return_when=asyncio.FIRST_EXCEPTION
+        )
+        for task in done:
+            exc = task.exception()
+            if exc is not None:
+                raise exc
+        if not consumer_task.done():
+            # run_task finished first (the ordinary case): let the consumer drain whatever's left
+            # in the queue, including the _DONE sentinel run_task's own finally always enqueues.
             await consumer_task
+    finally:
+        # A viewer disconnecting mid-replay fails consumer_task's websocket.send_json above, which
+        # is re-raised out of the `try` -- run_task must be cancelled here rather than left running
+        # to completion, or a closed tab keeps consuming one of MAX_CONCURRENT_SESSIONS slots and
+        # triggering paid jev calls for the rest of the call's (multi-minute) simulated duration.
+        for task in (run_task, consumer_task):
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(run_task, consumer_task, return_exceptions=True)
     await websocket.send_json({"type": "done"})
 
 
@@ -152,6 +213,7 @@ async def replay(websocket: WebSocket, call_id: int) -> None:
         return
 
     limiter: SessionLimiter = websocket.app.state.session_limiter
+    active_calls: ActiveCallGuard = websocket.app.state.active_call_guard
     await websocket.accept()
 
     if not await limiter.try_acquire():
@@ -160,14 +222,24 @@ async def replay(websocket: WebSocket, call_id: int) -> None:
         return
 
     try:
-        await _run_replay_session(websocket, call_id)
-    except WebSocketDisconnect:
-        _LOGGER.info("viewer disconnected mid-replay for call_id=%r", call_id)
-    except Exception:
-        _LOGGER.exception("replay session failed for call_id=%r", call_id)
+        if not await active_calls.try_acquire(call_id):
+            await websocket.send_json(
+                {"type": "busy", "message": "This call is already being viewed -- try again shortly."}
+            )
+            await websocket.close(code=1013, reason="call already active")
+            return
+
         try:
-            await websocket.close(code=1011, reason="internal error")
+            await _run_replay_session(websocket, call_id)
+        except WebSocketDisconnect:
+            _LOGGER.info("viewer disconnected mid-replay for call_id=%r", call_id)
         except Exception:
-            pass
+            _LOGGER.exception("replay session failed for call_id=%r", call_id)
+            try:
+                await websocket.close(code=1011, reason="internal error")
+            except Exception:
+                pass
+        finally:
+            await active_calls.release(call_id)
     finally:
         await limiter.release()

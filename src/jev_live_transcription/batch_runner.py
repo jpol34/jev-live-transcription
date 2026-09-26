@@ -43,7 +43,7 @@ class BatchResult:
     failed: list[tuple[int, BaseException]] = field(default_factory=list)
 
 
-async def _warm_up_gliner() -> None:
+async def warm_up_gliner() -> None:
     """Force both GLiNER checkpoints to load now, on a throwaway snapshot.
 
     GLiNER's first inference call in a process pays a one-time model-load cost (observed at
@@ -111,7 +111,7 @@ async def run_batch(
     Every call replays in `"batch"` pacer mode (no sleeping) against one shared `CaptureStore` at
     `db_path` and one shared `JevFieldResolver`, both constructed here and closed once at the end.
     `calls` defaults to `corpus.load_all()`, loaded once and passed to every call rather than
-    re-read per call. `warm_up` (default `True`) runs `_warm_up_gliner` before any call starts;
+    re-read per call. `warm_up` (default `True`) runs `warm_up_gliner` before any call starts;
     callers that already warmed up GLiNER in this process, or tests exercising this function
     without real models, pass `warm_up=False`.
 
@@ -138,7 +138,7 @@ async def run_batch(
         call_ids = sorted(calls)
 
     if warm_up:
-        await _warm_up_gliner()
+        await warm_up_gliner()
 
     call_semaphore = asyncio.Semaphore(call_concurrency)
     gliner_semaphore = asyncio.Semaphore(gliner_concurrency)

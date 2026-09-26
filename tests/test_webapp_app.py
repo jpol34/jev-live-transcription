@@ -1,5 +1,7 @@
 """Mocked tests for the webapp -- no real GLiNER/jev/Strongbox calls (kept fast/offline)."""
 
+import asyncio
+import time
 from unittest.mock import AsyncMock
 
 import pytest
@@ -53,10 +55,21 @@ async def test_session_limiter_blocks_past_max_and_releases():
     assert await limiter.try_acquire() is True  # slot freed
 
 
+async def test_active_call_guard_blocks_same_call_id_until_released():
+    guard = app_module.ActiveCallGuard()
+
+    assert await guard.try_acquire(1) is True
+    assert await guard.try_acquire(1) is False  # same call_id, still active
+    assert await guard.try_acquire(2) is True  # different call_id unaffected
+
+    await guard.release(1)
+    assert await guard.try_acquire(1) is True  # freed
+
+
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setattr(app_module.secrets, "load_typesafe_key", lambda: None)
-    monkeypatch.setattr(app_module.batch_runner, "_warm_up_gliner", AsyncMock())
+    monkeypatch.setattr(app_module.batch_runner, "warm_up_gliner", AsyncMock())
     with TestClient(app_module.app) as test_client:
         app_module.app.state.calls = _calls_fixture()
         yield test_client
@@ -104,3 +117,40 @@ def test_websocket_replay_sends_busy_when_over_session_cap(client, monkeypatch):
         message = websocket.receive_json()
 
     assert message["type"] == "busy"
+
+
+def test_websocket_replay_sends_busy_when_call_id_already_active(client, monkeypatch):
+    async def slow_run_call(call_id, db_path, *, pacer_mode, calls, on_tick):
+        on_tick(1, 5, {})
+        await asyncio.sleep(0.3)
+
+    monkeypatch.setattr(app_module.pipeline_core, "run_call", slow_run_call)
+
+    with client.websocket_connect("/ws/1") as first_ws:
+        first_ws.receive_json()  # confirms the first session is actually running
+        with client.websocket_connect("/ws/1") as second_ws:
+            message = second_ws.receive_json()
+        assert message["type"] == "busy"
+
+
+def test_websocket_disconnect_cancels_the_underlying_replay(client, monkeypatch):
+    ticks_emitted = []
+    finished_normally = False
+
+    async def fake_run_call(call_id, db_path, *, pacer_mode, calls, on_tick):
+        nonlocal finished_normally
+        for tick in range(1, 20):
+            on_tick(tick, 20, {})
+            ticks_emitted.append(tick)
+            await asyncio.sleep(0.05)
+        finished_normally = True
+
+    monkeypatch.setattr(app_module.pipeline_core, "run_call", fake_run_call)
+
+    with client.websocket_connect("/ws/1") as websocket:
+        websocket.receive_json()  # first tick only, then the client goes away
+
+    time.sleep(0.5)  # give the server-side task a moment to notice the cancellation
+
+    assert finished_normally is False
+    assert len(ticks_emitted) < 19
