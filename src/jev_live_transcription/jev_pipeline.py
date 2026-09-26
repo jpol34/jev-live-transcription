@@ -17,6 +17,12 @@ form) accumulate across ticks and never shrink:
   caller self-corrects (a phone number restated, for example).
 - Exactly 1 distinct candidate, already committed: nothing new to resolve, so no call is made.
 
+Each distinct candidate's own context snippet is cached the first time it is detected, keyed by
+its normalized value, and reused for every later call involving that candidate -- including once
+the candidate-extraction stage stops re-detecting it on later ticks. A Noul question uses its one
+candidate's cached snippet; a Choice question's context is the concatenation of every distinct
+candidate's own cached snippet, not just whatever text the triggering tick's own candidates cover.
+
 Failures (after retries are exhausted) are raised as `JevResolutionError` rather than degraded to
 `None` -- this benchmark needs jev failures visible as data, unlike a best-effort production
 caller that would rather fall back silently.
@@ -151,6 +157,11 @@ class JevFieldResolver:
         # visible retry/timeout budget per call instead of two overlapping ones.
         self._client = client or AsyncTypeSafeClient(retry=RetryPolicy(max_retries=0))
         self._candidates: dict[tuple[CallId, str], dict[str, str]] = {}
+        # Each distinct candidate's own context snippet, cached the first time it is detected and
+        # never overwritten afterward -- keyed the same way as `_candidates` (per (call_id,
+        # field_name), then by normalized candidate value) so it survives a candidate aging out of
+        # whatever the extraction stage reports on later ticks.
+        self._contexts: dict[tuple[CallId, str], dict[str, str]] = {}
         self._committed: dict[tuple[CallId, str], bool] = {}
         # Serializes resolve_field calls per (call_id, field_name): each call reads then awaits a
         # jev round-trip before writing self._committed, so concurrent calls for the same key
@@ -164,8 +175,17 @@ class JevFieldResolver:
         field_name: str,
         candidates: list[str],
         context_window: str,
+        *,
+        candidate_context_windows: dict[str, str] | None = None,
     ) -> JevResolution | None:
         """Fold this tick's `candidates` into the field's dedup set and resolve if warranted.
+
+        `candidate_context_windows`, when given, maps each raw string in `candidates` to its own
+        individually-sliced context snippet (the text surrounding just that candidate's span,
+        distinct from any other candidate's). The first time a candidate is seen, its snippet --
+        from `candidate_context_windows`, or `context_window` when the map omits it or is not
+        given at all -- is cached under its normalized value and reused for every later call
+        involving that candidate, regardless of what either argument holds on a later tick.
 
         Returns `None` when no jev call is warranted this tick (no candidates seen yet, or a
         single already-committed candidate with nothing new to resolve).
@@ -174,13 +194,19 @@ class JevFieldResolver:
         lock = self._locks.setdefault(key, asyncio.Lock())
         async with lock:
             seen = self._candidates.setdefault(key, {})
+            contexts = self._contexts.setdefault(key, {})
+            per_candidate = candidate_context_windows or {}
             for raw in candidates:
                 value = raw.strip()
                 if not value:
                     continue
                 normalized = normalize_candidate(field_name, value)
-                if normalized and normalized not in seen:
+                if not normalized:
+                    continue
+                if normalized not in seen:
                     seen[normalized] = value
+                if normalized not in contexts:
+                    contexts[normalized] = per_candidate.get(raw, context_window)
 
             distinct = list(seen.values())
             if not distinct:
@@ -189,14 +215,36 @@ class JevFieldResolver:
             if len(distinct) == 1:
                 if self._committed.get(key, False):
                     return None
+                candidate_context = contexts.get(
+                    normalize_candidate(field_name, distinct[0]), context_window
+                )
                 result = await self._resolve_noul(
-                    call_id, field_name, distinct[0], context_window
+                    call_id, field_name, distinct[0], candidate_context
                 )
             else:
-                result = await self._resolve_choice(call_id, field_name, distinct, context_window)
+                combined_context = self._combined_context(field_name, distinct, contexts, context_window)
+                result = await self._resolve_choice(call_id, field_name, distinct, combined_context)
 
             self._committed[key] = result.is_committed
             return result
+
+    @staticmethod
+    def _combined_context(
+        field_name: str, distinct: list[str], contexts: dict[str, str], fallback: str
+    ) -> str:
+        """Join every distinct candidate's own cached context snippet into one Choice-call context.
+
+        Snippets are kept in first-seen order and deduplicated by exact text, so two candidates
+        whose spans landed in the same sentence (sharing an identical cached snippet) don't repeat
+        it, while a genuinely older candidate's snippet still appears alongside a newer one's even
+        when they were detected many ticks apart.
+        """
+        ordered: list[str] = []
+        for value in distinct:
+            snippet = contexts.get(normalize_candidate(field_name, value), fallback)
+            if snippet not in ordered:
+                ordered.append(snippet)
+        return "\n\n".join(ordered)
 
     async def _resolve_noul(
         self, call_id: CallId, field_name: str, candidate: str, context_window: str

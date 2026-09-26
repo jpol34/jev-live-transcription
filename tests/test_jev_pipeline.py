@@ -211,6 +211,108 @@ def test_commit_threshold_matches_config():
     assert config.JEV_COMMIT_THRESHOLD == 0.6
 
 
+# --- per-candidate context caching ------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_noul_uses_candidates_own_context_window_not_field_fallback():
+    system_one = AsyncMock(return_value=_noul_response(0.9))
+    resolver = _resolver(system_one)
+
+    await resolver.resolve_field(
+        call_id=1,
+        field_name="caller_name",
+        candidates=["Lindsey Perkins"],
+        context_window="unrelated fallback text",
+        candidate_context_windows={"Lindsey Perkins": "My name is Lindsey Perkins."},
+    )
+
+    _, kwargs = system_one.call_args
+    assert kwargs["state"]["context_window"] == "My name is Lindsey Perkins."
+
+
+@pytest.mark.asyncio
+async def test_choice_context_includes_each_candidates_own_cached_snippet_after_aging_out():
+    # Simulates ticket #19's GLiNER windowing: the only tick that ever reports "555-3212" is the
+    # first one -- by the time "555-4321" is detected many ticks later, the candidate-extraction
+    # stage's bounded window no longer covers "555-3212"'s original mention, so that later tick's
+    # own candidate list and per-candidate context map only ever include "555-4321". The Choice
+    # call must still see "555-3212"'s original justifying text, cached from the first tick.
+    system_one = AsyncMock(
+        side_effect=[
+            _noul_response(0.9),
+            _choice_response("555-4321", 0.85),
+        ]
+    )
+    resolver = _resolver(system_one)
+
+    first = await resolver.resolve_field(
+        call_id=1,
+        field_name="phone_number",
+        candidates=["555-3212"],
+        context_window="fallback tick 1",
+        candidate_context_windows={"555-3212": "Caller: my number is 555-3212."},
+    )
+    assert first is not None and first.question_type == "noul"
+
+    # Many ticks later: "555-3212" has aged out of GLiNER's window and is no longer reported at
+    # all this tick -- only the genuinely new candidate is.
+    result = await resolver.resolve_field(
+        call_id=1,
+        field_name="phone_number",
+        candidates=["555-4321"],
+        context_window="fallback tick N",
+        candidate_context_windows={"555-4321": "Caller: actually it's 555-4321."},
+    )
+
+    assert result is not None
+    assert result.question_type == "choice"
+    assert set(result.distinct_candidates) == {"555-3212", "555-4321"}
+
+    _, kwargs = system_one.call_args
+    combined_context = kwargs["state"]["context_window"]
+    assert "Caller: my number is 555-3212." in combined_context
+    assert "Caller: actually it's 555-4321." in combined_context
+
+
+@pytest.mark.asyncio
+async def test_candidate_context_cached_on_first_sighting_is_not_overwritten_later():
+    system_one = AsyncMock(
+        side_effect=[_noul_response(0.3), _noul_response(0.9)]
+    )
+    resolver = _resolver(system_one)
+    key_kwargs = dict(call_id=1, field_name="caller_name")
+
+    await resolver.resolve_field(
+        candidates=["Someone"],
+        context_window="first tick fallback",
+        candidate_context_windows={"Someone": "original justifying sentence"},
+        **key_kwargs,
+    )
+    await resolver.resolve_field(
+        candidates=["Someone"],
+        context_window="second tick fallback",
+        candidate_context_windows={"Someone": "a different sentence entirely"},
+        **key_kwargs,
+    )
+
+    _, kwargs = system_one.call_args
+    assert kwargs["state"]["context_window"] == "original justifying sentence"
+
+
+@pytest.mark.asyncio
+async def test_missing_candidate_context_map_falls_back_to_field_context_window():
+    system_one = AsyncMock(return_value=_noul_response(0.9))
+    resolver = _resolver(system_one)
+
+    await resolver.resolve_field(
+        call_id=1, field_name="caller_name", candidates=["Someone"], context_window="ctx"
+    )
+
+    _, kwargs = system_one.call_args
+    assert kwargs["state"]["context_window"] == "ctx"
+
+
 # --- retries and failures -------------------------------------------------------------------
 
 
