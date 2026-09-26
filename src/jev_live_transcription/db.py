@@ -16,10 +16,13 @@ rather than just being queued and forgotten.
 """
 
 import concurrent.futures
+import logging
 import queue
 import sqlite3
 import threading
 from pathlib import Path
+
+_LOGGER = logging.getLogger(__name__)
 
 DEFAULT_BATCH_SIZE = 100
 DEFAULT_BATCH_INTERVAL_SECONDS = 0.1
@@ -42,7 +45,8 @@ CREATE TABLE IF NOT EXISTS ticks (
     tick_number INTEGER NOT NULL,
     wall_clock_ts REAL NOT NULL,
     transcript_char_offset INTEGER NOT NULL,
-    transcript_snapshot TEXT NOT NULL
+    transcript_snapshot TEXT NOT NULL,
+    UNIQUE (call_id, tick_number)
 );
 CREATE INDEX IF NOT EXISTS idx_ticks_call_id ON ticks(call_id);
 
@@ -100,9 +104,12 @@ def init_schema(db_path: str | Path) -> None:
 
 
 class _WriteJob:
-    __slots__ = ("sql", "params", "future")
+    __slots__ = ("table", "sql", "params", "future")
 
-    def __init__(self, sql: str, params: dict, future: "concurrent.futures.Future"):
+    def __init__(
+        self, table: str, sql: str, params: dict, future: "concurrent.futures.Future"
+    ):
+        self.table = table
         self.sql = sql
         self.params = params
         self.future = future
@@ -156,6 +163,18 @@ class CaptureStore:
         "is_committed",
     )
 
+    # Maps table name to its insert columns, so the four enqueue_* methods
+    # below share one implementation instead of each hand-rolling the same
+    # two lines. Each tuple is still declared as its own class attribute
+    # (rather than only living in this dict) so `test_db.py` can assert it
+    # matches the table's real columns and catch drift from SCHEMA_SQL.
+    _TABLE_COLUMNS = {
+        "calls": CALL_COLUMNS,
+        "ticks": TICK_COLUMNS,
+        "pipeline_runs": PIPELINE_RUN_COLUMNS,
+        "field_extractions": FIELD_EXTRACTION_COLUMNS,
+    }
+
     def __init__(
         self,
         db_path: str | Path,
@@ -168,15 +187,23 @@ class CaptureStore:
         self._batch_size = batch_size
         self._batch_interval = batch_interval
         self._queue: "queue.Queue[_WriteJob | object]" = queue.Queue()
+        # Guards _closed so close() and _enqueue() agree on whether a job is
+        # queued strictly before or after the _STOP sentinel — otherwise a
+        # write racing a close() could land behind _STOP and its future would
+        # never be resolved.
+        self._closed_lock = threading.Lock()
+        self._closed = False
         self._thread = threading.Thread(
             target=self._run, name="capture-store-writer", daemon=True
         )
         self._thread.start()
 
     def _run(self) -> None:
-        # Owns the sole write connection; created here so it is only ever
-        # touched from this thread (sqlite3 connections default to
-        # single-thread affinity).
+        # Owns the sole write connection; created here (not in __init__) so
+        # it's only ever touched from this thread. connect() passes
+        # check_same_thread=False, so sqlite3 itself won't stop another
+        # thread from using conn — the single-writer invariant is just "no
+        # other code holds a reference to it," enforced by convention here.
         conn = connect(self.db_path)
         try:
             stopping = False
@@ -202,7 +229,20 @@ class CaptureStore:
                             break
                         batch.append(job)
                 if batch:
-                    self._commit_batch(conn, batch)
+                    try:
+                        self._commit_batch(conn, batch)
+                    except Exception:
+                        # Last-resort guard: _commit_batch already handles
+                        # per-row and commit failures internally, but if
+                        # something still escapes, the writer thread must
+                        # keep running rather than die silently and strand
+                        # every write queued after it.
+                        _LOGGER.exception("capture store writer batch failed unexpectedly")
+                        for failed_job in batch:
+                            if not failed_job.future.done():
+                                failed_job.future.set_exception(
+                                    RuntimeError("capture store writer batch failed")
+                                )
         finally:
             conn.close()
 
@@ -216,19 +256,36 @@ class CaptureStore:
         for job in batch:
             try:
                 cur = conn.execute(job.sql, job.params)
-                outcomes.append((job, cur.lastrowid, None))
+                outcomes.append([job, cur.lastrowid, None])
             except Exception as exc:
-                outcomes.append((job, None, exc))
-        conn.commit()
+                outcomes.append([job, None, exc])
+        try:
+            conn.commit()
+        except Exception as commit_exc:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            # A failed commit rolls back every execute() in this batch, even
+            # ones that succeeded individually — attach the commit failure to
+            # any job that doesn't already have its own per-row exception.
+            for outcome in outcomes:
+                if outcome[2] is None:
+                    outcome[2] = commit_exc
         for job, rowid, exc in outcomes:
             if exc is not None:
+                _LOGGER.error("capture store write to %s failed: %s", job.table, exc)
                 job.future.set_exception(exc)
             else:
                 job.future.set_result(rowid)
 
-    def _enqueue(self, sql: str, params: dict) -> "concurrent.futures.Future":
+    def _enqueue(self, table: str, sql: str, params: dict) -> "concurrent.futures.Future":
         future: concurrent.futures.Future = concurrent.futures.Future()
-        self._queue.put(_WriteJob(sql, params, future))
+        with self._closed_lock:
+            if self._closed:
+                future.set_exception(RuntimeError("CaptureStore is closed"))
+                return future
+            self._queue.put(_WriteJob(table, sql, params, future))
         return future
 
     @staticmethod
@@ -247,23 +304,22 @@ class CaptureStore:
             raise TypeError(f"unknown column(s): {', '.join(extra)}")
         return fields
 
+    def _enqueue_row(self, table: str, fields: dict) -> "concurrent.futures.Future":
+        columns = self._TABLE_COLUMNS[table]
+        row = self._row(columns, fields)
+        return self._enqueue(table, self._row_sql(table, columns), row)
+
     def enqueue_call(self, **fields) -> "concurrent.futures.Future":
-        row = self._row(self.CALL_COLUMNS, fields)
-        return self._enqueue(self._row_sql("calls", self.CALL_COLUMNS), row)
+        return self._enqueue_row("calls", fields)
 
     def enqueue_tick(self, **fields) -> "concurrent.futures.Future":
-        row = self._row(self.TICK_COLUMNS, fields)
-        return self._enqueue(self._row_sql("ticks", self.TICK_COLUMNS), row)
+        return self._enqueue_row("ticks", fields)
 
     def enqueue_pipeline_run(self, **fields) -> "concurrent.futures.Future":
-        row = self._row(self.PIPELINE_RUN_COLUMNS, fields)
-        return self._enqueue(self._row_sql("pipeline_runs", self.PIPELINE_RUN_COLUMNS), row)
+        return self._enqueue_row("pipeline_runs", fields)
 
     def enqueue_field_extraction(self, **fields) -> "concurrent.futures.Future":
-        row = self._row(self.FIELD_EXTRACTION_COLUMNS, fields)
-        return self._enqueue(
-            self._row_sql("field_extractions", self.FIELD_EXTRACTION_COLUMNS), row
-        )
+        return self._enqueue_row("field_extractions", fields)
 
     def insert_call(self, **fields) -> int:
         """Insert a `calls` row and block until it has committed.
@@ -276,8 +332,17 @@ class CaptureStore:
         return self.enqueue_call(**fields).result()
 
     def close(self, timeout: float = 5.0) -> None:
-        self._queue.put(_STOP)
+        with self._closed_lock:
+            if self._closed:
+                return
+            self._closed = True
+            self._queue.put(_STOP)
         self._thread.join(timeout=timeout)
+        if self._thread.is_alive():
+            raise RuntimeError(
+                f"CaptureStore writer thread did not stop within {timeout}s; "
+                "queued writes may not have been flushed"
+            )
 
     def __enter__(self) -> "CaptureStore":
         return self

@@ -159,6 +159,73 @@ def test_full_row_chain_commits_successfully(tmp_path):
         conn.close()
 
 
+def test_duplicate_tick_number_for_same_call_raises_integrity_error(tmp_path):
+    store = db.CaptureStore(tmp_path / "capture.db")
+    try:
+        store.insert_call(**_make_call_fields(1))
+        store.enqueue_tick(
+            call_id=1,
+            tick_number=0,
+            wall_clock_ts=0.0,
+            transcript_char_offset=0,
+            transcript_snapshot="first",
+        ).result(timeout=5)
+
+        future = store.enqueue_tick(
+            call_id=1,
+            tick_number=0,
+            wall_clock_ts=1.0,
+            transcript_char_offset=5,
+            transcript_snapshot="duplicate",
+        )
+        with pytest.raises(sqlite3.IntegrityError):
+            future.result(timeout=5)
+    finally:
+        store.close()
+
+
+def test_enqueue_after_close_fails_fast_instead_of_hanging(tmp_path):
+    store = db.CaptureStore(tmp_path / "capture.db")
+    store.insert_call(**_make_call_fields(1))
+    store.close()
+
+    future = store.enqueue_tick(
+        call_id=1,
+        tick_number=0,
+        wall_clock_ts=0.0,
+        transcript_char_offset=0,
+        transcript_snapshot="after close",
+    )
+    with pytest.raises(RuntimeError):
+        future.result(timeout=5)
+
+
+def test_table_columns_match_actual_schema_columns(tmp_path):
+    # Guards against CaptureStore.*_COLUMNS drifting from SCHEMA_SQL, since
+    # each is a hand-maintained list of the same columns.
+    db_path = tmp_path / "capture.db"
+    db.init_schema(db_path)
+    conn = db.connect(db_path)
+    try:
+        autoincrement_pk = {
+            "calls": None,
+            "ticks": "tick_id",
+            "pipeline_runs": "run_id",
+            "field_extractions": "id",
+        }
+        for table, columns in db.CaptureStore._TABLE_COLUMNS.items():
+            actual = {
+                row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()
+            }
+            expected = set(columns)
+            pk = autoincrement_pk[table]
+            if pk is not None:
+                expected = expected | {pk}
+            assert actual == expected, f"{table}: schema={actual} vs COLUMNS+pk={expected}"
+    finally:
+        conn.close()
+
+
 def test_concurrent_producers_no_lock_errors_and_no_lost_writes(tmp_path):
     store = db.CaptureStore(tmp_path / "capture.db")
     n_threads = 20

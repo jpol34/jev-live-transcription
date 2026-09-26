@@ -8,14 +8,22 @@ import argparse
 import sqlite3
 from pathlib import Path
 
+from jev_live_transcription import db
+
 TABLES = ("calls", "ticks", "pipeline_runs", "field_extractions")
 
 
 def _connect(db_path: Path) -> sqlite3.Connection:
-    conn = sqlite3.connect(db_path)
-    conn.execute("PRAGMA foreign_keys = ON")
+    conn = db.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def _positive_int(value: str) -> int:
+    n = int(value)
+    if n < 1:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return n
 
 
 def row_counts(conn: sqlite3.Connection) -> dict[str, int]:
@@ -37,9 +45,15 @@ def main() -> None:
         "--call-id", type=int, default=None, help="Show recent ticks for this call_id."
     )
     parser.add_argument(
-        "--limit", type=int, default=10, help="Number of recent ticks to show (default 10)."
+        "--limit",
+        type=_positive_int,
+        default=10,
+        help="Number of recent ticks to show (default 10).",
     )
     args = parser.parse_args()
+
+    if not args.db_path.exists():
+        parser.error(f"database file not found: {args.db_path}")
 
     conn = _connect(args.db_path)
     try:
