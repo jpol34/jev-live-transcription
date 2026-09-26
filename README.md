@@ -77,6 +77,32 @@ committed value and confidence for all 11 fields, updating roughly once per simu
 Requires `OPENAI_API_KEY` and `TYPESAFE_API_KEY` (loaded from Strongbox, same as above). Writes
 its capture DB to `output/tui_captures/call_<id>.db` by default (`--db-path` overrides this).
 
+## Running the full corpus benchmark
+
+```
+uv run jlt gpu-run --ssh-key ~/.ssh/<key>
+```
+
+Creates a RunPod GPU pod, runs `jlt batch` against the full 100-call corpus on it (GLiNER on
+CUDA, sequential by default), copies the resulting capture DB back to `data/benchmark.sqlite3`,
+and tears the pod down. `--ssh-key` must point at the private half of a key pair registered on
+the RunPod account; `--subset N` limits the run to the first N calls, and `--keep-pod` skips
+teardown for debugging. GPU is the canonical device for this benchmark's numbers -- a local,
+CPU-only run remains available via `jlt batch` directly, but its latency is not representative.
+
+On an NVIDIA A100-SXM4-80GB, GLiNER's forward pass averages ~30-50ms/tick per model (both the
+streaming PII checkpoint and the zero-shot checkpoint), against a ~226ms/tick CPU baseline for
+the same models.
+
+Score per-field recall against the corpus's ground truth from any capture DB:
+
+```
+uv run python scripts/score_recall.py data/benchmark.sqlite3
+```
+
+`--save <path>` writes a JSON snapshot for a later `--baseline <path>` comparison, which exits
+non-zero if any field's recall drops by more than `--tolerance` (default 5%).
+
 ## Stakeholder demo web page
 
 A separate, hosted web page that replays a corpus call tick-by-tick over a WebSocket, rendered as
