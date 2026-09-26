@@ -276,7 +276,7 @@ async def test_run_batch_warms_up_gliner_before_dispatching_calls(monkeypatch):
     ):
         events.append(f"call-{call_id}")
 
-    monkeypatch.setattr(batch_runner, "_warm_up_gliner", fake_warm_up)
+    monkeypatch.setattr(batch_runner, "warm_up_gliner", fake_warm_up)
     monkeypatch.setattr(batch_runner.pipeline_core, "run_call", fake_run_call)
 
     calls = {1: {}, 2: {}}
@@ -290,7 +290,7 @@ async def test_run_batch_warms_up_gliner_before_dispatching_calls(monkeypatch):
 async def test_run_batch_skips_warm_up_when_disabled(monkeypatch):
     _patch_store_and_resolver(monkeypatch)
     warm_up_mock = AsyncMock()
-    monkeypatch.setattr(batch_runner, "_warm_up_gliner", warm_up_mock)
+    monkeypatch.setattr(batch_runner, "warm_up_gliner", warm_up_mock)
     monkeypatch.setattr(batch_runner.pipeline_core, "run_call", AsyncMock())
 
     calls = {1: {}}

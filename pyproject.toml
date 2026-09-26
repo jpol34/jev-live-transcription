@@ -12,6 +12,9 @@ dependencies = [
     "pytest",
     "protobuf>=7.36.2",
     "pytest-asyncio",
+    "fastapi",
+    "uvicorn[standard]",
+    "httpx",
 ]
 
 [project.scripts]
