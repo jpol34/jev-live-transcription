@@ -34,11 +34,42 @@ _REMOTE_EXIT_MARKER = "/root/gpu-run.exit"
 _POD_READY_TIMEOUT_S = 600.0
 _POD_READY_POLL_S = 5.0
 _COMPLETION_POLL_S = 15.0
-# 120s wasn't enough, confirmed live: sshd on our heavier custom image (full CUDA dev toolkit,
-# GLiNER checkpoints already baked in) still refused connections for the entire 120s window after
-# ssh.direct first appeared in the pod's metadata.
+# Generous headroom for the pod image's own startup script to generate SSH host keys and start
+# sshd after `ssh.direct` first appears in the pod's metadata -- that field is populated once
+# RunPod's control plane assigns the port mapping, which can briefly precede the container's own
+# startup script actually finishing. A `PUBLIC_KEY` env var missing from the pod entirely (see
+# `_read_public_key`) produces the same symptom -- connection refused for the whole window -- so a
+# timeout here does not by itself mean this is a slow-startup race; check the pod's own container
+# logs before assuming a longer timeout is the fix.
 _SSH_CONNECT_TIMEOUT_S = 300.0
 _SSH_CONNECT_POLL_S = 5.0
+
+
+def _read_public_key(ssh_key: str | None) -> str:
+    """Return the contents of `<ssh_key>.pub`, the counterpart to the private key path this
+    project's SSH/scp calls already use.
+
+    The pod image's own startup script only creates `~/.ssh/authorized_keys`, generates SSH host
+    keys, and starts sshd at all when a `PUBLIC_KEY` environment variable is present in the pod's
+    environment -- confirmed by reading that script directly inside a live pod, after `startSsh`
+    alone (with no `PUBLIC_KEY` env var passed) left the pod running with no sshd process and
+    nothing listening on port 22, which is indistinguishable from the outside from a slow-starting
+    sshd (both look like a connection refused during the readiness wait). RunPod's REST API does
+    not inject this on its own the way pod creation through the web console does, so this project
+    must supply it explicitly on every pod creation.
+    """
+    if not ssh_key:
+        raise ValueError(
+            "--ssh-key is required: its matching <ssh-key>.pub file's contents are injected into "
+            "the pod as PUBLIC_KEY, which the pod image's startup script requires to start sshd "
+            "at all -- without it the pod comes up with no sshd running and every SSH attempt "
+            "gets a connection refused for the entire wait window, indistinguishable from a slow "
+            "startup."
+        )
+    pub_key_path = Path(f"{ssh_key}.pub")
+    if not pub_key_path.exists():
+        raise FileNotFoundError(f"no public key found at {pub_key_path} (expected alongside --ssh-key)")
+    return pub_key_path.read_text().strip()
 
 
 def _load_state(state_path: Path) -> dict:
@@ -87,11 +118,11 @@ def _wait_for_pod_ready(pod_id: str) -> dict:
 
 
 def _wait_for_ssh_connectable(ssh_direct: dict, ssh_key: str | None) -> None:
-    """Retries a trivial SSH command until it succeeds. `ssh.direct` in the pod's metadata is
-    populated by RunPod slightly before sshd is actually accepting connections -- confirmed live,
-    where a preflight run immediately after `_wait_for_pod_ready` returned hit "Connection
-    refused" -- so readiness has to be confirmed by an actual successful connection, not just the
-    field's presence in the API response."""
+    """Retries a trivial SSH command until it succeeds. `ssh.direct` in the pod's metadata reflects
+    RunPod's port mapping, not whether sshd inside the container is actually up yet, so readiness
+    has to be confirmed by an actual successful connection rather than the field's mere presence in
+    the API response. A connection refused for the entire timeout window most likely means sshd
+    never started at all (see `_read_public_key`), not that this loop needs more time."""
     deadline = time.monotonic() + _SSH_CONNECT_TIMEOUT_S
     last_result: subprocess.CompletedProcess | None = None
     while time.monotonic() < deadline:
@@ -184,7 +215,10 @@ def run_gpu(
     hangar.init(os.environ[secrets.RUNPOD_ENV_VAR])
 
     state = _load_state(pod_state_path)
-    extra_env = {"TYPESAFE_API_KEY": os.environ[secrets.TYPESAFE_ENV_VAR]}
+    extra_env = {
+        "TYPESAFE_API_KEY": os.environ[secrets.TYPESAFE_ENV_VAR],
+        "PUBLIC_KEY": _read_public_key(ssh_key),
+    }
     if enable_llm_baseline:
         extra_env["OPENAI_API_KEY"] = os.environ[secrets.OPENAI_ENV_VAR]
 

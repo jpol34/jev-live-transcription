@@ -126,8 +126,13 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     gpu_run_parser.add_argument(
         "--ssh-key",
-        default=None,
-        help="Path to the SSH private key matching a key registered on the RunPod account (default: let ssh resolve it itself, e.g. via ssh-agent or ~/.ssh/config).",
+        required=True,
+        help=(
+            "Path to the SSH private key matching a key registered on the RunPod account. "
+            "The matching `<ssh-key>.pub` file's contents are injected into the pod as "
+            "`PUBLIC_KEY`, which the pod image's own startup script requires to start sshd at "
+            "all -- required, not optional, since the pod is otherwise never SSH-reachable."
+        ),
     )
     gpu_run_parser.add_argument(
         "--keep-pod",

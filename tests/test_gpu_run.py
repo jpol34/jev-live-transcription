@@ -13,6 +13,14 @@ import pytest
 from jev_live_transcription import gpu_run
 
 
+def _fake_ssh_key(tmp_path) -> str:
+    """Writes a fake `<key>.pub` file and returns the private-key path `run_gpu` expects -- it
+    reads the public key's contents to inject as the pod's `PUBLIC_KEY` env var."""
+    key_path = tmp_path / "test_key"
+    (tmp_path / "test_key.pub").write_text("ssh-ed25519 AAAAtestkey test@example.com\n")
+    return str(key_path)
+
+
 def _patch_secrets(monkeypatch):
     monkeypatch.setattr(gpu_run.secrets, "load_typesafe_key", Mock())
     monkeypatch.setattr(gpu_run.secrets, "load_openai_key", Mock())
@@ -67,7 +75,7 @@ def test_run_gpu_happy_path_terminates_pod_and_returns_remote_exit_code(monkeypa
         gliner_concurrency=1,
         enable_llm_baseline=False,
         pod_state_path=tmp_path / "state.json",
-        ssh_key=None,
+        ssh_key=_fake_ssh_key(tmp_path),
         keep_pod=False,
     )
 
@@ -96,7 +104,7 @@ def test_run_gpu_terminates_pod_even_when_preflight_fails(monkeypatch, tmp_path)
             gliner_concurrency=1,
             enable_llm_baseline=False,
             pod_state_path=tmp_path / "state.json",
-            ssh_key=None,
+            ssh_key=_fake_ssh_key(tmp_path),
             keep_pod=False,
         )
 
@@ -115,7 +123,7 @@ def test_run_gpu_keep_pod_skips_termination(monkeypatch, tmp_path):
         gliner_concurrency=1,
         enable_llm_baseline=False,
         pod_state_path=tmp_path / "state.json",
-        ssh_key=None,
+        ssh_key=_fake_ssh_key(tmp_path),
         keep_pod=True,
     )
 
@@ -135,7 +143,7 @@ def test_run_gpu_persists_pod_id_to_state_file(monkeypatch, tmp_path):
         gliner_concurrency=1,
         enable_llm_baseline=False,
         pod_state_path=state_path,
-        ssh_key=None,
+        ssh_key=_fake_ssh_key(tmp_path),
         keep_pod=False,
     )
 
@@ -156,7 +164,7 @@ def test_run_gpu_resumes_pod_id_from_existing_state_file(monkeypatch, tmp_path):
         gliner_concurrency=1,
         enable_llm_baseline=False,
         pod_state_path=state_path,
-        ssh_key=None,
+        ssh_key=_fake_ssh_key(tmp_path),
         keep_pod=False,
     )
 
@@ -176,13 +184,71 @@ def test_run_gpu_only_forwards_openai_key_when_llm_baseline_enabled(monkeypatch,
         gliner_concurrency=1,
         enable_llm_baseline=True,
         pod_state_path=tmp_path / "state.json",
-        ssh_key=None,
+        ssh_key=_fake_ssh_key(tmp_path),
         keep_pod=False,
     )
 
     spec = gpu_run.hangar.start_pod.call_args[0][0]
     assert spec.extra_env["OPENAI_API_KEY"] == "openai-test-key"
     assert spec.extra_env["TYPESAFE_API_KEY"] == "typesafe-test-key"
+
+
+def test_run_gpu_injects_public_key_from_ssh_key_pub_file(monkeypatch, tmp_path):
+    _patch_secrets(monkeypatch)
+    _patch_hangar(monkeypatch)
+    _patch_ssh_flow(monkeypatch)
+
+    gpu_run.run_gpu(
+        subset=None,
+        db_path=tmp_path / "out.sqlite3",
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+        pod_state_path=tmp_path / "state.json",
+        ssh_key=_fake_ssh_key(tmp_path),
+        keep_pod=False,
+    )
+
+    spec = gpu_run.hangar.start_pod.call_args[0][0]
+    assert spec.extra_env["PUBLIC_KEY"] == "ssh-ed25519 AAAAtestkey test@example.com"
+
+
+def test_run_gpu_raises_clear_error_without_ssh_key(monkeypatch, tmp_path):
+    _patch_secrets(monkeypatch)
+    _patch_hangar(monkeypatch)
+
+    with pytest.raises(ValueError, match="--ssh-key is required"):
+        gpu_run.run_gpu(
+            subset=None,
+            db_path=tmp_path / "out.sqlite3",
+            call_concurrency=1,
+            gliner_concurrency=1,
+            enable_llm_baseline=False,
+            pod_state_path=tmp_path / "state.json",
+            ssh_key=None,
+            keep_pod=False,
+        )
+
+    gpu_run.hangar.start_pod.assert_not_called()
+
+
+def test_run_gpu_raises_clear_error_when_pub_file_missing(monkeypatch, tmp_path):
+    _patch_secrets(monkeypatch)
+    _patch_hangar(monkeypatch)
+
+    with pytest.raises(FileNotFoundError, match="no public key found"):
+        gpu_run.run_gpu(
+            subset=None,
+            db_path=tmp_path / "out.sqlite3",
+            call_concurrency=1,
+            gliner_concurrency=1,
+            enable_llm_baseline=False,
+            pod_state_path=tmp_path / "state.json",
+            ssh_key=str(tmp_path / "nonexistent_key"),
+            keep_pod=False,
+        )
+
+    gpu_run.hangar.start_pod.assert_not_called()
 
 
 def test_wait_for_pod_ready_polls_until_ssh_direct_available(monkeypatch):

@@ -151,14 +151,14 @@ def test_gpu_run_defaults(monkeypatch, tmp_path):
     run_gpu_mock = Mock(return_value=0)
     monkeypatch.setattr(real_gpu_run, "run_gpu", run_gpu_mock)
 
-    cli.main(["gpu-run"])
+    cli.main(["gpu-run", "--ssh-key", "/path/to/key"])
 
     _, kwargs = run_gpu_mock.call_args
     assert kwargs["subset"] is None
     assert kwargs["call_concurrency"] == 1
     assert kwargs["gliner_concurrency"] == 1
     assert kwargs["enable_llm_baseline"] is False
-    assert kwargs["ssh_key"] is None
+    assert kwargs["ssh_key"] == "/path/to/key"
     assert kwargs["keep_pod"] is False
 
 
