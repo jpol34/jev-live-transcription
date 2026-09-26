@@ -207,7 +207,7 @@ wheels = [
 [[package]]
 name = "hangar"
 version = "0.1.0"
-source = { git = "https://github.com/jpol34/hangar#153c5db2728236fb89e3e914459432bf68f5084d" }
+source = { git = "https://github.com/jpol34/hangar#64b867f97960943bcfcc5a56df2fe8be4a30c777" }
 dependencies = [
     { name = "httpx" },
 ]
