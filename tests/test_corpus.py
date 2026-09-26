@@ -52,3 +52,23 @@ def test_load_all_returns_one_entry_per_call(tmp_path):
     calls = corpus.load_all(transcripts_dir=transcripts_dir, metadata_dir=metadata_dir)
 
     assert len(calls) == 3
+
+
+def test_parse_transcript_appends_embedded_line_break_to_current_turn():
+    text = (
+        "# Call 001 — resident / test_subtype\n"
+        "\n"
+        "Agent: Can you read that back to me?\n"
+        "Caller: Sure, it's:\n"
+        "unit B-207\n"
+        "555-4321\n"
+        "Agent: Great, thanks.\n"
+    )
+
+    turns = corpus._parse_transcript(text)
+
+    assert turns == [
+        {"speaker": "Agent", "text": "Can you read that back to me?"},
+        {"speaker": "Caller", "text": "Sure, it's:\nunit B-207\n555-4321"},
+        {"speaker": "Agent", "text": "Great, thanks."},
+    ]

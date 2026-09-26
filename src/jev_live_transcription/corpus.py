@@ -14,16 +14,22 @@ TRANSCRIPTS_DIR = ROOT / "output" / "transcripts"
 METADATA_DIR = ROOT / "output" / "metadata"
 
 
+_SPEAKERS = ("Agent", "Caller")
+
+
 def _parse_transcript(text: str) -> list[dict]:
-    turns = []
+    turns: list[dict] = []
     for line in text.splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
             continue
-        speaker, sep, content = line.partition(": ")
-        if not sep:
-            continue
-        turns.append({"speaker": speaker, "text": content})
+        speaker, sep, content = stripped.partition(": ")
+        if sep and speaker in _SPEAKERS:
+            turns.append({"speaker": speaker, "text": content})
+        elif turns:
+            # A line break inside a turn's text (no "Speaker: " prefix) —
+            # append it to the turn in progress instead of dropping it.
+            turns[-1]["text"] += "\n" + stripped
     return turns
 
 

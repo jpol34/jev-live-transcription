@@ -21,12 +21,15 @@ def load_secret(env_var: str, secret_name: str | None = None) -> None:
     if os.environ.get(env_var):
         return
     name = secret_name or env_var
+    # Escape for PowerShell's single-quoted string literal: a literal quote
+    # is written as two quotes in a row.
+    escaped_name = name.replace("'", "''")
     result = subprocess.run(
         [
             "pwsh", "-NoProfile", "-Command",
             "$WarningPreference = 'SilentlyContinue'; "
             "Import-Module Strongbox -WarningAction SilentlyContinue; "
-            f"Get-Secret -Name '{name}' -Vault Strongbox -AsPlainText",
+            f"Get-Secret -Name '{escaped_name}' -Vault Strongbox -AsPlainText",
         ],
         capture_output=True,
         text=True,

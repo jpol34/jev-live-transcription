@@ -8,13 +8,15 @@ transcript + its structured metadata to disk as soon as it completes.
 import asyncio
 import json
 import os
-import subprocess
 import sys
 import time
 from pathlib import Path
 
 from openai import AsyncOpenAI
 from scenarios import COMPANY, PROPERTY, build_scenarios
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+from jev_live_transcription.secrets import load_openai_key  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT_TRANSCRIPTS = ROOT / "output" / "transcripts"
@@ -25,31 +27,6 @@ LOG_PATH = ROOT / "output" / "generation_log.txt"
 MODEL = os.environ.get("TRANSCRIPT_MODEL", "gpt-4o")
 CONCURRENCY = int(os.environ.get("TRANSCRIPT_CONCURRENCY", "8"))
 MAX_RETRIES = 4
-
-
-def load_openai_key() -> None:
-    if os.environ.get("OPENAI_API_KEY"):
-        return
-    result = subprocess.run(
-        [
-            "pwsh", "-NoProfile", "-Command",
-            "$WarningPreference = 'SilentlyContinue'; "
-            "Import-Module Strongbox -WarningAction SilentlyContinue; "
-            "Get-Secret -Name 'OPENAI_API_KEY' -Vault Strongbox -AsPlainText",
-        ],
-        capture_output=True,
-        text=True,
-    )
-    # Defensive: only take the last non-blank line, in case any module output
-    # still leaks onto stdout ahead of the secret.
-    lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
-    key = lines[-1].strip() if lines else ""
-    if result.returncode != 0 or not key:
-        raise RuntimeError(
-            "Could not retrieve OPENAI_API_KEY from Strongbox: "
-            f"rc={result.returncode} stderr={result.stderr.strip()[:200]}"
-        )
-    os.environ["OPENAI_API_KEY"] = key
 
 
 SYSTEM_PROMPT = f"""You generate realistic synthetic phone call transcripts between a caller \
