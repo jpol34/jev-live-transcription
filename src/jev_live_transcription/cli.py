@@ -95,6 +95,47 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
 
+    gpu_run_parser = subparsers.add_parser(
+        "gpu-run", help="Run the benchmark on a real RunPod GPU pod (creates and tears down the pod)."
+    )
+    gpu_run_parser.add_argument(
+        "--subset",
+        type=int,
+        default=None,
+        help="Only run the first N calls (by call_id) instead of the full corpus.",
+    )
+    gpu_run_parser.add_argument(
+        "--db-path",
+        type=Path,
+        default=DEFAULT_DB_PATH,
+        help=f"Local path to copy the pod's capture DB back to (default: {DEFAULT_DB_PATH}).",
+    )
+    gpu_run_parser.add_argument("--call-concurrency", type=int, default=1)
+    gpu_run_parser.add_argument("--gliner-concurrency", type=int, default=1)
+    gpu_run_parser.add_argument(
+        "--enable-llm-baseline",
+        action="store_true",
+        default=False,
+        help="Also run the GPT-5.1 comparison arm -- same real-money caveat as `jlt batch`.",
+    )
+    gpu_run_parser.add_argument(
+        "--pod-state-path",
+        type=Path,
+        default=Path(".jlt_gpu_state.json"),
+        help="Where to persist the pod id so a re-run resumes the same pod instead of creating a new one.",
+    )
+    gpu_run_parser.add_argument(
+        "--ssh-key",
+        default=None,
+        help="Path to the SSH private key matching a key registered on the RunPod account (default: let ssh resolve it itself, e.g. via ssh-agent or ~/.ssh/config).",
+    )
+    gpu_run_parser.add_argument(
+        "--keep-pod",
+        action="store_true",
+        default=False,
+        help="Don't terminate the pod on exit (debugging only -- the pod keeps billing).",
+    )
+
     return parser
 
 
@@ -140,6 +181,21 @@ def _run_tui(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_gpu_run(args: argparse.Namespace) -> int:
+    from . import gpu_run
+
+    return gpu_run.run_gpu(
+        subset=args.subset,
+        db_path=args.db_path,
+        call_concurrency=args.call_concurrency,
+        gliner_concurrency=args.gliner_concurrency,
+        enable_llm_baseline=args.enable_llm_baseline,
+        pod_state_path=args.pod_state_path,
+        ssh_key=args.ssh_key,
+        keep_pod=args.keep_pod,
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     parser = _build_parser()
@@ -148,6 +204,8 @@ def main(argv: list[str] | None = None) -> int:
         return _run_batch(args)
     if args.command == "tui":
         return _run_tui(args)
+    if args.command == "gpu-run":
+        return _run_gpu_run(args)
     parser.error(f"unknown command: {args.command!r}")
     return 2
 
