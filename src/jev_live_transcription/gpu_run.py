@@ -34,7 +34,10 @@ _REMOTE_EXIT_MARKER = "/root/gpu-run.exit"
 _POD_READY_TIMEOUT_S = 600.0
 _POD_READY_POLL_S = 5.0
 _COMPLETION_POLL_S = 15.0
-_SSH_CONNECT_TIMEOUT_S = 120.0
+# 120s wasn't enough, confirmed live: sshd on our heavier custom image (full CUDA dev toolkit,
+# GLiNER checkpoints already baked in) still refused connections for the entire 120s window after
+# ssh.direct first appeared in the pod's metadata.
+_SSH_CONNECT_TIMEOUT_S = 300.0
 _SSH_CONNECT_POLL_S = 5.0
 
 

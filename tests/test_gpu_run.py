@@ -239,10 +239,10 @@ def test_wait_for_ssh_connectable_raises_on_timeout(monkeypatch):
     refused = Mock(returncode=255, stdout="", stderr="Connection refused")
     monkeypatch.setattr(gpu_run.subprocess, "run", Mock(return_value=refused))
     monkeypatch.setattr(gpu_run.time, "sleep", Mock())
-    # Deterministic timeout: deadline = 100.0 + _SSH_CONNECT_TIMEOUT_S (default 120.0) = 220.0.
-    # First while-check (100.0) passes, runs one attempt; second while-check (300.0) exceeds the
-    # deadline and exits the loop. Controlling time.monotonic() directly avoids a real-clock race
-    # that a near-zero timeout would have.
+    monkeypatch.setattr(gpu_run, "_SSH_CONNECT_TIMEOUT_S", 120.0)
+    # Deterministic timeout: deadline = 100.0 + 120.0 = 220.0. First while-check (100.0) passes,
+    # runs one attempt; second while-check (300.0) exceeds the deadline and exits the loop.
+    # Controlling time.monotonic() directly avoids a real-clock race a near-zero timeout would have.
     monkeypatch.setattr(gpu_run.time, "monotonic", Mock(side_effect=[100.0, 100.0, 300.0]))
 
     with pytest.raises(TimeoutError, match="Connection refused"):
