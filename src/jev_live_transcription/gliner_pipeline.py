@@ -49,7 +49,6 @@ ZERO_SHOT_FIELD_LABELS: dict[str, str] = {
 }
 
 _PII_LABEL_TO_FIELD = {label: field for field, label in PII_FIELD_LABELS.items()}
-_ZERO_SHOT_LABEL_TO_FIELD = {label: field for field, label in ZERO_SHOT_FIELD_LABELS.items()}
 
 # Module-level singletons, lazily loaded on first use and reused for the rest
 # of the process's lifetime. Lazy (rather than eager at import time) so that
@@ -73,14 +72,17 @@ _pii_sent_length: dict[str, int] = {}
 _pii_call_locks: dict[str, threading.Lock] = {}
 _pii_call_locks_guard = threading.Lock()
 
-# The streaming PII checkpoint keeps its own per-session KV-cache/decoder state inside the model
-# object, keyed by session_id -- unlike a stateless forward pass, there is no upstream guarantee
-# that calling `model.inference(...)` concurrently from multiple threads with *different*
-# session_ids is safe against that shared internal state. The per-call_id lock above only
-# serializes ticks for the *same* call; this lock serializes the actual inference call itself
-# across every call_id, so batch_runner's call_concurrency/gliner_concurrency > 1 can never send
-# two calls' inferences into the model at once.
-_pii_inference_lock = threading.Lock()
+# No project-level lock guards the streaming PII model's `inference()` call itself (only the
+# per-call_id lock above, serializing ticks for the *same* call): GLiNER's own streaming execution
+# path already holds an internal lock around each call's cache read, forward pass, and cache
+# write-back, fully serializing calls across every session_id/call_id at the library level.
+
+# Guards `model.predict_entities(...)` for the zero-shot model below. Unlike the streaming PII
+# path, GLiNER's stateless inference has no internal lock of its own -- only `torch.no_grad()`, no
+# serialization -- so without this, concurrent zero-shot ticks for different calls (once
+# call_concurrency/gliner_concurrency are ever raised above their current default of 1) would race
+# on the shared `_zero_shot_model` singleton with nothing guarding it on either side.
+_zero_shot_inference_lock = threading.Lock()
 
 
 def _resolve_device() -> str:
@@ -159,13 +161,12 @@ def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict
             # chunk per call, so there's nothing to feed the session; report
             # no candidates rather than re-querying stale state.
             return {field: [] for field in PII_FIELD_LABELS}
-        with _pii_inference_lock:
-            entities = model.inference(
-                [delta],
-                list(PII_FIELD_LABELS.values()),
-                session_id=[call_id],
-                threshold=0.5,
-            )[0]
+        entities = model.inference(
+            [delta],
+            list(PII_FIELD_LABELS.values()),
+            session_id=[call_id],
+            threshold=0.5,
+        )[0]
         _pii_sent_length[call_id] = len(transcript_snapshot)
     return _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
 
@@ -197,15 +198,21 @@ def _run_zero_shot_tick(transcript_snapshot: str) -> dict[str, list[dict]]:
     length. Candidate spans are translated back to full-snapshot character offsets before being
     returned, since every downstream consumer (jev's context window) indexes into the full
     snapshot, not the windowed slice actually fed to the model.
+
+    `ZERO_SHOT_FIELD_LABELS` is passed directly as a label-description mapping: GLiNER prompts the
+    model with each value (the descriptive text) but reports the corresponding key (this project's
+    field name) back in each entity's `label`, so no separate label-to-field lookup is needed here.
     """
     model = _get_zero_shot_model()
     window_text, window_start = _zero_shot_window(transcript_snapshot)
-    entities = model.predict_entities(
-        window_text,
-        list(ZERO_SHOT_FIELD_LABELS.values()),
-        multi_label=True,
-    )
-    candidates = _entities_to_candidates(entities, _ZERO_SHOT_LABEL_TO_FIELD)
+    with _zero_shot_inference_lock:
+        entities = model.predict_entities(
+            window_text,
+            ZERO_SHOT_FIELD_LABELS,
+            multi_label=True,
+            threshold=config.GLINER_ZERO_SHOT_THRESHOLD,
+        )
+    candidates = _entities_to_candidates(entities, {field: field for field in ZERO_SHOT_FIELD_LABELS})
     if window_start:
         for spans in candidates.values():
             for span in spans:

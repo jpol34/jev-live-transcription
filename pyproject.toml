@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
     "openai",
     "typesafe-sdk",
-    "gliner>=0.2.28",
+    "gliner>=0.2.29",
     "torch",
     "rich",
     "pytest",
