@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 18,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.9,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Samantha Robertson",
+    "phone_number": "555-0193",
+    "unit_number": "302",
+    "work_order_issue": "Leak under kitchen sink and noise when cold water is turned on",
+    "permission_to_enter": "call_first",
+    "pet_info": "no pets",
+    "outcome": "work order created for maintenance issue",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 235
+  }
+}

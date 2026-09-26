@@ -1,0 +1,31 @@
+# Call 075 — resident / edge_irate_legal_threat
+# edge_case=True  target_minutes=5.0  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. My name is Sarah, how can I assist you today?
+Caller: Uh, hello, this is, um, Brian. I... I'm having a serious issue here, and I need to speak to someone about it right now!
+Agent: Of course, Brian, I'm here to help. Can you tell me a bit more about what's going on?
+Caller: It's... it's about my last maintenance request. You guys have really messed this up, and I'm honestly considering legal action!
+Agent: I'm really sorry to hear that, Brian. Let me see if I can help resolve this for you. Can you tell me when you made the request?
+Caller: It was, uh, two weeks ago. My heat's been out since then! This is absolutely unacceptable.
+Agent: Oh my, I'm sorry to hear you've been without heat. Can I get your unit number to check on the status of your request?
+Caller: It's unit 204, but I'm sure you have it all on file. I need this fixed now, not yesterday!
+Agent: Yes, I'll definitely look into that. And just to confirm, you're in building C, correct?
+Caller: Yes, yes, that's right.
+Agent: Thank you for verifying that, Brian. Let me place you on a quick hold while I check the system, okay?
+Caller: Fine, go ahead.
+Agent: Thank you so much. I'll be right back.
+Agent: [background noise of typing] Thank you for holding, Brian.
+Caller: Alright.
+Agent: It looks like there was a work order logged, but it's marked as incomplete. I completely understand the urgency here, and I'm sorry this wasn't resolved sooner.
+Caller: Incomplete? What does that even mean? I need action now, not an explanation.
+Agent: It means our maintenance team is aware of the issue but hasn't updated the status. I will escalate this to ensure your heat is fixed as soon as possible.
+Caller: It better be fixed today, or I'll be speaking to my lawyer. I've had enough of this madness.
+Agent: Absolutely, I'll make sure they prioritize this. Could I confirm your phone number in case we need to reach you with updates?
+Caller: Yes, it's... uh, it's 555-0144, but make sure your guys show up and don't just call me with excuses.
+Agent: Understood, Brian. I genuinely apologize for the trouble. I'll flag this as urgent in our system and send a note to the maintenance supervisor. Is there anything else I should note down?
+Caller: Just get it done today. I'm really fed up here.
+Agent: I’m making sure it’s escalated right now. Can I help with anything else today?
+Caller: No, just... you know, fix it.
+Agent: We'll take care of it, Brian. Thank you for bringing this to our attention and for your patience.
+Caller: Alright, thanks. But remember, this is the last chance. Goodbye.
+Agent: Absolutely, Brian. Have a good day, and we'll get this resolved for you. Goodbye.

@@ -1,0 +1,25 @@
+# Call 020 — prospect / application_status_check
+# edge_case=False  target_minutes=3.8  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jennifer speaking. How may I assist you today?
+Caller: Hi, yeah, I'm calling to check on the status of my application for the Willow Creek Apartment Homes. I submitted it about, um, two weeks ago, I think?
+Agent: Alright, let me pull up the application records for you. Could I have your name, please?
+Caller: It's uh, Sarah... um, Geller. S-A-R-A-H G-E-L-L-E-R.
+Agent: Got it, thank you, Sarah. Now, just to confirm, what email address did you use on the application?
+Caller: Oh, right, it should be sgeller789@example.com.
+Agent: Perfect, thank you. I'll just put you on a brief hold while I pull up your application. It should only take a moment.
+Caller: Sure, no problem.
+Agent: Alright, thanks for holding, Sarah. I see your application here, and it seems we're just waiting on your background check to clear, which usually takes about two to three weeks in total. So, you should hear back from us very soon.
+Caller: Oh, okay. I thought I gave you everything—uh, wait, was it the background check or the credit report? I get them mixed up sometimes.
+Agent: It’s actually both that we verify, but the note here specifically mentions the background check is pending. The credit part came back fine.
+Caller: Alright, that makes sense. Um, is there anything else I need to do in the meantime?
+Agent: Nope, you're all set from your side. Just keep an eye on your email and we'll update you as soon as we have more information.
+Caller: Got it. And if I don't hear back, should I call again?
+Agent: You can definitely give us a call if you haven't heard anything in another week. But we aim to notify applicants once everything is finalized.
+Caller: Great. Also, just to double-check, you have my phone number on file as, uh, 555-0167?
+Agent: Let me confirm that... Ah, it actually shows as 555-2167. Is that correct?
+Caller: Oh gosh, yes, sorry, you're right. That's my current number.
+Agent: No worries at all. Thanks for confirming that. Is there anything else I can help you with?
+Caller: No, that's all for now. Thanks for your help!
+Agent: You're welcome, Sarah. Have a great day!
+Caller: You too, bye!

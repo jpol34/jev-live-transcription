@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 13,
+    "category": "resident",
+    "subtype": "amenity_access_issue",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark",
+    "email": null,
+    "phone_number": "555-0132",
+    "unit_number": "307",
+    "amenities_requested": [
+      "gym"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": "keycard issue with gym access",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "call to confirm gym access resolved",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "amenities_requested"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 132
+  }
+}

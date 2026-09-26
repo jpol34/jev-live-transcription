@@ -1,0 +1,42 @@
+{
+  "scenario": {
+    "id": 41,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.4,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Tom Johnson",
+    "email": null,
+    "phone_number": "555-123-7890",
+    "unit_number": "507",
+    "amenities_requested": null,
+    "pet_info": "no pets",
+    "permission_to_enter": "yes",
+    "work_order_issue": "kitchen faucet dripping",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "work order created",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "pet_info",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 204
+  }
+}

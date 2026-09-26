@@ -1,0 +1,27 @@
+# Call 025 — prospect / pricing_specials_negotiation
+# edge_case=False  target_minutes=3.3  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Alice, how can I assist you today?
+Caller: Uh, hi Alice, um, I’m looking, uh, for some information about renting an apartment. Do you, uh, have any specials right now?
+Agent: Sure! We do have a few specials at Willow Creek Apartment Homes. Could I first get your name, please?
+Caller: Oh, uh, yeah, it's... it’s Jake. Jake Morgan.
+Agent: Okay, Jake. Thanks for that. So, are you looking—um—do you have a specific move-in date in mind? Or is this just a bit more general?
+Caller: Uh, I’m not exactly sure yet, maybe next month? I, uh, haven’t really pinpointed a date.
+Agent: That’s no problem. So let me pull up the current specials while we, uh, talk. Do you have a budget range you're working within?
+Caller: Uh, I guess... well, maybe around, hmm, $1,200? But, uh, it kind of depends.
+Agent: Alright, $1,200 is a good starting point. Just so we’re on the same page, are you flexible if—uh—if there’s something a little above that or?
+Caller: Yeah, maybe a bit. I just need to see, you know, um, what's available.
+Agent: Got it. Hold on a quick moment while I check the system for our latest info. Just—give me a sec here.
+Caller: Sure, take your time.
+Agent: Okay, thanks for waiting. So right now, we have a special for new leases signed by end of this month where you get the first month free. And we have some one-bedroom units around $1,250.
+Caller: Hmm, that's kind of close to what I’m thinking. Is, um, is there any wiggle room on that price, or, like, other discounts?
+Agent: Let me double-check with my manager, but typically those are the best offers. If you don't mind holding for a moment, I can—uh—see what's possible. Can you hold?
+Caller: Yeah, yeah, I can hold.
+Agent: Thanks, one moment.
+Agent: Alright, I just spoke with my manager and unfortunately, that’s the current best rate. But, the first free month brings you some savings initially.
+Caller: Okay, um, I might be able to make that work. Can I, uh, come by and see the place or do a tour online or?
+Agent: Absolutely, we’d love for you to visit or take a virtual tour. How about I email you some links and more details? Do you have an email address I can send this to?
+Caller: Uh, I do, but... maybe I can give it to you later? I need to check with my partner.
+Agent: Of course, no rush. Feel free to call us back when you're ready to set something up, okay?
+Caller: Will do. Thanks, Alice, uh, for all your help.
+Agent: My pleasure, Jake! Have a great day and I hope to hear from you soon.

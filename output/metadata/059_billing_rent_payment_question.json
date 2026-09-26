@@ -1,0 +1,38 @@
+{
+  "scenario": {
+    "id": 59,
+    "category": "resident",
+    "subtype": "billing_rent_payment_question",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Michael Evans",
+    "email": "m.evans1980@gmail.com",
+    "phone_number": null,
+    "unit_number": "4D",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Caller to email receipt for fee adjustment.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 210
+  }
+}

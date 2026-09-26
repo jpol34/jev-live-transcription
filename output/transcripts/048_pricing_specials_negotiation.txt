@@ -1,0 +1,26 @@
+# Call 048 — prospect / pricing_specials_negotiation
+# edge_case=False  target_minutes=4.3  disclosure_style=rushed
+
+Agent: Hello, thank you for calling Willow Creek Property Management, home of the Willow Creek Apartment Homes. My name is Lisa, how can I help you today?
+Caller: Hi! Uh yeah, I'm calling 'cause I wanted to ask about any special prices or promotions you have right now. I'm thinking of moving pretty soon.
+Agent: Sure, I can help with that. May I have your name, please?
+Caller: Oh, uh, it’s Jake. Jake Sanders.
+Agent: Thank you, Jake. So, are you looking for a specific move-in date, or are you flexible on that?
+Caller: I’m aiming for, uh, sometime next month. But if there’s a deal, I can probably shift that a bit, you know? Uh, maybe mid-November?
+Agent: Got it. Let me check here... okay, we do have a couple of promotions running for mid-November move-ins.
+Caller: Great! And, uh, what kind of prices and units are we talking about here?
+Agent: We have one-bedrooms starting at $1,250 and two-bedrooms at $1,500. There's a special of $150 off the first month if you sign a 12-month lease. Does that sound like something you’re interested in?
+Caller: Hmmm. That's a bit on the higher end. Do you have anything, like, more budget-friendly? I mean around $1,100 or so?
+Agent: Let me see... unfortunately, for November, the pricing we have is fixed. The $1,250 is our lowest currently for that timeframe, but um, we can offer a waived application fee if that helps.
+Caller: Uh, okay, that helps a bit, yeah. Uh, might have to adjust things. My budget was closer to the $1,100 mark, but I’ll, uh, consider it.
+Agent: I understand, Jake. It's worth mentioning that these are updated every month, so you may want to check back if your timing changes. Do you want me to put you on our list to notify you about any changes or promotions?
+Caller: Yeah, that could work. Uh, do you need my, uh, email or something for updates?
+Agent: Yes, your email would be perfect.
+Caller: Okay, it’s uh, j.sanders... with an ‘s’ at the end... at... uh, gmail.com.
+Agent: Got it, j.sanders@gmail.com. I’ll add you to our list. Would you like to come by for a tour, or are you just gathering information for now?
+Caller: I think I'll just, uh, get info for now. I’m pretty busy but will try to make time, maybe next week.
+Agent: Okay, just let us know when you're ready to schedule a tour. We’re here to help. Do you have any other questions right now?
+Caller: Um, I think that’s it. Uh, thanks, Lisa. I’ll have to take a look at my budget again, but it sounds like a nice place.
+Agent: You're welcome, Jake. Feel free to reach out anytime. Have a great day, and good luck with your planning!
+Caller: Thanks! Bye!
+Agent: Bye now!

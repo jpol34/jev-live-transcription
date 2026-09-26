@@ -1,0 +1,24 @@
+# Call 082 — prospect / schedule_tour
+# edge_case=False  target_minutes=3.0  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Hi, uh, I'm interested in setting up a tour of the Willow Creek Apartments.
+Agent: Great! I'd be happy to help with that. Do you have a specific date in mind for the tour?
+Caller: Well, I'm thinking sometime next week, but I need to check my schedule... uh, maybe Wednesday?
+Agent: Okay, let me check our availability for Wednesday. Can you hold on for just a moment?
+Caller: Sure, no problem.
+Agent: Thanks for holding. It looks like we have slots at 10 AM and 2 PM on Wednesday. Do either of those work for you?
+Caller: Hmmm, the 2 PM one sounds doable. Could you pencil me in for that?
+Agent: Absolutely! I'll go ahead and reserve that spot for you. May I have your name, please?
+Caller: Yeah, it's Sarah... uh, Thompson.
+Agent: Thanks, Sarah. And could you provide a number we can reach you at just in case we need to contact you regarding the tour?
+Caller: Uh, let's see... it’s 555-0199.
+Agent: Got it, 555-0199. And Sarah, just to make sure we keep you in the loop, do you have an email address you could share?
+Caller: Um, I'd prefer to keep it to just my phone for now. If that's okay?
+Agent: No worries, that's perfectly fine. Before we wrap up, are there any specific amenities or features you're looking to check out during your visit?
+Caller: Uh, not anything specific, just... I guess a standard tour would be fine for now.
+Agent: Alright, we'll make sure to give you a comprehensive look at everything. And, do you have an idea of when you're hoping to move?
+Caller: I mean, hoping to move by... let's say early December. But, uh, it's a bit flexible.
+Agent: Great, noted that down. Thanks, Sarah, for all the info. We look forward to seeing you on Wednesday at 2 PM. Don't hesitate to reach out if anything changes!
+Caller: Alright, thank you! Bye.
+Agent: Bye, take care!

@@ -1,0 +1,22 @@
+# Call 002 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.0  disclosure_style=rushed
+
+Agent: Good afternoon, Willow Creek Property Management, this is Lisa. How can I help you today?
+Caller: Hi, um, I'm looking for some information on your apartment homes? Specifically about availability and prices, if you have any right now.
+Agent: Sure thing! Can I get your name first?
+Caller: Oh, yeah, it's Jacob, just Jacob. And, um, do you need my phone number right now?
+Agent: It could be helpful if we get disconnected, but it's up to you.
+Caller: I'll just, it's (555) 239-8420. Anyway—apartment availability?
+Agent: Thanks, Jacob. So what size apartment are you interested in?
+Caller: Uh, just a one-bedroom. I'm also curious about, um, amenities.
+Agent: Got it. Let me check on that one sec—uh, can you hold?
+Caller: Sure, that's fine.
+Agent: Thanks for holding! So, we do have a couple of one-bedrooms available. They're $1,200 to $1,400 a month, depending on the floor level and view. Are you looking within that range?
+Caller: Yeah, that could work. Are utilities included?
+Agent: Utilities are separate, except for water, which is included. Amenities, we, um, we've got a pool, a gym, and a small coffee bar. Is that what you’re looking for?
+Caller: Yeah, especially that gym... And what would be the soonest move-in date?
+Agent: The earliest we have right now would be November 15th. Would that suit your timeline?
+Caller: Uh, I was hoping for something early. But let me see if I can manage that.
+Agent: Alright, great. Can I help with anything else, like scheduling a tour or sending you more info?
+Caller: No, that's okay for now. I'll get back to you if needed. Thanks, Lisa.
+Agent: You're welcome, Jacob! Feel free to call back anytime. Have a good day.

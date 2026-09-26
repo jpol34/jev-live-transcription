@@ -1,0 +1,29 @@
+# Call 064 — prospect / pricing_specials_negotiation
+# edge_case=False  target_minutes=4.4  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management, how can I assist you today?
+Caller: Hi, um, I'm trying to get some info, er, about moving into the, you know, um, Willow Creek Apartments? I'm a bit all over the place, sorry.
+Agent: No worries at all. I can help with that. Are you looking for information about availability or, uh, maybe pricing specials we might have?
+Caller: Yeah, yeah, the pricing, that's it. Uh, someone mentioned there’s a discount or something for moving in soon, but I’m not quite sure of the details.
+Agent: Got it. Let me check on that for you. Could you hold on for just a moment, please?
+Caller: Sure, yeah.
+Agent: Thanks, just a moment.
+Agent: (hold music)
+Agent: Thanks for holding. Currently, we have a move-in special where you receive $200 off your first month's rent if you move in before the end of next month. Does that sound like what you heard?
+Caller: Oh, um, maybe? I thought it was, like, $300 off or something... but maybe I'm mixing it up.
+Agent: I understand, sometimes offers change. But right now, I'm seeing it's $200. And that’s applicable for our one-bedroom units. Do you know what size you're interested in?
+Caller: Hmm, I'm not really sure. Maybe a one-bedroom, unless, um, what's the price difference for, uh, a two-bedroom?
+Agent: Typically, our one-bedroom units start around $1,000 a month, while the two-bedroom ones generally start at $1,250. Does that fit within your budget, or were you thinking something else?
+Caller: Uh, honestly, I'm aiming for under, um, $1,200, if possible. But I suppose I could stretch a bit, maybe.
+Agent: Totally understandable! So it sounds like maybe the one-bedroom could work better for right now, budget-wise. Should I, uh, pencil you in for a tour?
+Caller: Yeah, probably a good idea. Um, when's available? I mean, what times do you have open soon?
+Agent: We can slot you in, let's see, uh, how about this Wednesday or Thursday at either 10 AM or 4 PM?
+Caller: 10 AM on Thursday works, I think. Wait, is that the 15th or, um, the 16th?
+Agent: I believe that's the 16th.
+Caller: Okay, yep, let's do that.
+Agent: Great, I'll just need your name and a good contact number to confirm the tour.
+Caller: Sure, it’s, uh, Morgan, K-A-N-D-L-E-S. And my number is 323-555-0187.
+Agent: Thank you, Morgan. That’s K-A-N-D-L-E-S, right? Okay, confirmed. We’ll see you on Thursday, the 16th, at 10 AM. If you have any questions before then, feel free to call us back.
+Caller: Thanks, I really appreciate it. Hopefully, I won't get any more, um, details mixed up.
+Agent: No problem at all, happy to help! You take care, Morgan.
+Caller: You too, bye!

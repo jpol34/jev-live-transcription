@@ -1,0 +1,44 @@
+{
+  "scenario": {
+    "id": 92,
+    "category": "resident",
+    "subtype": "edge_dispute_never_completed",
+    "edge_case": true,
+    "target_minutes": 5.6,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "David Peters",
+    "email": null,
+    "phone_number": "555-0413",
+    "unit_number": "2737",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "Shrubs need trimming, possible dampness in living room, check window seals.",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Work order initiated with a call-first request.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "move_in_date",
+      "price_quoted",
+      "budget_amount"
+    ],
+    "estimated_call_seconds": 330
+  }
+}

@@ -1,0 +1,23 @@
+# Call 026 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.5  disclosure_style=guarded
+
+Agent: Willow Creek Property Management, this is Hannah speaking. How can I help you today?
+Caller: Uh, hi. This is, um, David. I just wanted to check on a, uh, work order I put in a few days ago.
+Agent: Of course. I can help with that. Can I get your full name, just to look it up in our system?
+Caller: Uh, it's David... uh, Kline. K-L-I-N-E.
+Agent: Alright, David Kline. Could you also provide your unit number?
+Caller: Oh, um, I think it's, uh, 2B? Yeah, 2B.
+Agent: Let me just verify that for you... Give me a moment here, please.
+Caller: Sure, no rush.
+Agent: [Typing] Okay, thank you for holding, David. I see an order here for, let see, some... plumbing issues? Is that correct?
+Caller: Right, right. It's, um, the kitchen sink. It's been... leaking a lot, actually.
+Agent: Ah, yes, got it here. Our records show it was reported last Thursday. Have the maintenance team been by yet?
+Caller: Uh, no, not yet. That’s why I called, actually.
+Agent: I understand. Let me check on the current status... If you could just hold on for another minute.
+Caller: Yeah, okay.
+Agent: [Background noise of typing] Thanks for your patience, David. So, it looks like the team is scheduled to come by tomorrow afternoon. Do you remember your availability around that time?
+Caller: Uh, tomorrow? Yeah, I think I'm... I can be home after 1 PM. Is that okay?
+Agent: They can definitely accommodate that. I'll note it down to remind them. Anything else I can do for you today?
+Caller: No, uh, that's pretty much it. Thanks for the help.
+Agent: You're welcome, David. Thanks for calling Willow Creek, and have a great day!
+Caller: You, too. Bye.

@@ -1,0 +1,25 @@
+# Call 017 — prospect / pet_policy_inquiry
+# edge_case=False  target_minutes=2.5  disclosure_style=guarded
+
+Agent: Good afternoon! Thank you for calling Willow Creek Property Management. This is Sarah speaking. How can I help you today?
+Caller: Hi, uh, I'm looking into your apartments, the Willow Creek Apartment Homes, and I was wondering about your pet policies?
+Agent: Absolutely, can I start by getting your name?
+Caller: Sure, it's Kevin. Um, Kevin Mills.
+Agent: Thank you, Kevin. So, regarding our pet policy, we are pet-friendly. We do have a few restrictions and a pet fee. Are you looking for details on specific types of pets?
+Caller: Yeah, I have a dog. Uh, a small one. You know, kind of worried about those breed restrictions?
+Agent: I understand. Could you let me know the breed? That way I can give you accurate info.
+Caller: Uh, it's a French Bulldog.
+Agent: Oh, French Bulldogs are typically fine. We do have a weight limit around 30 pounds. Does that sound okay for your dog?
+Caller: Yeah, he’s well under that. So that's fine. Uh, what about fees?
+Agent: Sure, we have a $300 non-refundable pet fee, and a $25 monthly pet rent per pet. Would you have any other pets?
+Caller: Nope, just him.
+Agent: Great, just to clarify, you mentioned you're considering moving here. Are there any specific amenities you're looking for in an apartment?
+Caller: Uh, I'm pretty open, but maybe...like a gym or a pool?
+Agent: We do have both a gym and a pool available here. Is there anything else you think you might be interested in?
+Caller: No, I think that covers it.
+Agent: Alright, Kevin. Would you like to schedule a tour or receive additional information by email?
+Caller: Maybe...I’m not ready quite yet. Just inquiring for now.
+Agent: Of course, whenever you're ready, feel free to call us back. Anything else I can assist you with today?
+Caller: No, that's all. Thanks for the help.
+Agent: You're welcome, Kevin. Have a great day!
+Caller: You too, bye.

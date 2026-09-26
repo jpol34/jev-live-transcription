@@ -1,0 +1,28 @@
+{
+  "scenario": {
+    "id": 26,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 2.5,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "David Kline",
+    "unit_number": "2B",
+    "work_order_issue": "kitchen sink leaking",
+    "outcome": "Caller informed about scheduled maintenance",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 150
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "scenario": {
+    "id": 50,
+    "category": "prospect",
+    "subtype": "pricing_specials_negotiation",
+    "edge_case": false,
+    "target_minutes": 3.4,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Emma Thompson",
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": [
+      "pool"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "mid-December",
+    "price_quoted": "$1,250",
+    "budget_amount": "$1,200",
+    "outcome": "Tour scheduled",
+    "fields_disclosed": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "phone_number"
+    ],
+    "estimated_call_seconds": 204
+  }
+}

@@ -1,0 +1,20 @@
+# Call 023 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.1  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Alex speaking. How can I assist you today?
+Caller: Uh, hi, Alex. I, um, wanted to ask about a work order I submitted a while ago. It's Lisa, by the way. Lisa Morton.
+Agent: Hi Lisa. Sure, I can help with that. Could you tell me your unit number, please?
+Caller: Oh, um, it's 204B, I think? Or was it 205B... Oh geez, I always mix it up!
+Agent: No worries, Lisa. Let me just check both of those for you. Hold on a moment while I pull up your work order.
+Caller: Thanks, I— oh, is it okay if I, uh, just grab some water? I'm parched!
+Agent: Of course, take your time!
+Caller: Okay, back. Sorry!
+Agent: No problem at all. Alright, so I found your work order under 204B. It seems it was for, um, a leaking faucet, right?
+Caller: Uh, yes! Exactly, the kitchen one. It's been dripping like crazy.
+Agent: Got it. It looks like the maintenance team was scheduled to check on that, uh, yesterday, actually. Did they manage to, uh, get to you?
+Caller: Oh, I didn't even notice anyone came by. My bad! Maybe they tried when I was out. I'm sorry.
+Agent: That's okay, Lisa. Sometimes they run into busy schedules. How about we reschedule a visit? I can ask them to come at a convenient time for you... When would work best?
+Caller: Um, maybe in the morning next week? That's usually when I'm around.
+Agent: Great, I'll note that down and have them contact you beforehand. Anything else you'd like to share or confirm?
+Caller: No, I think that's... uh, it. Thanks, Alex!
+Agent: You're welcome, Lisa! Have a great day!

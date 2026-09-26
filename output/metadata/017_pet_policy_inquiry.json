@@ -1,0 +1,43 @@
+{
+  "scenario": {
+    "id": 17,
+    "category": "prospect",
+    "subtype": "pet_policy_inquiry",
+    "edge_case": false,
+    "target_minutes": 2.5,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "pet_info",
+      "amenities_requested"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Kevin Mills",
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": [
+      "gym",
+      "pool"
+    ],
+    "pet_info": "French Bulldog, under 30 pounds",
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "inquired about pet policy",
+    "fields_disclosed": [
+      "caller_name",
+      "pet_info",
+      "amenities_requested"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "phone_number",
+      "move_in_date"
+    ],
+    "estimated_call_seconds": 155
+  }
+}

@@ -1,0 +1,25 @@
+# Call 045 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.2  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Amy speaking, how may I assist you today?
+Caller: Um, hi. Yeah, I live in the Willow... um, Willow Creek Apartments.
+Agent: Great, thanks for reaching out. And how can I help you today?
+Caller: So, my faucet... uh, it's leaking? In the kitchen. It's been dripping for a few days now.
+Agent: I'm sorry to hear that. Let's get that sorted out for you. Can I have your name to start with?
+Caller: Yeah, it's, um, Carla. Carla Jones.
+Agent: Alright, Carla. Can you please confirm your unit number?
+Caller: Oh, uh, sure, it's 18C.
+Agent: 18C, got it. And just to ensure we're dealing with the correct unit, can I have a contact number in case we need to reach you?
+Caller: Uh, yeah. It's 555-0134. Oh, wait, is it? Actually, it's 555-0214. Sorry about that.
+Agent: No problem at all. 555-0214, is that correct?
+Caller: Yes, that's the one. Sorry, my mind's all over today.
+Agent: No worries, Carla. Now, about the faucet, is it just a constant drip, or has it worsened recently?
+Caller: Uh, yeah, it's constant. But it's not like flooding or anything, just annoying.
+Agent: Understood. I'll make a work order for maintenance to check it out. Do you have any pets that they should be aware of before entering?
+Caller: Oh, yes, I have a small dog. She's friendly, but just in case.
+Agent: Got it, a small dog. And do we have your permission to enter if you're not home, or should we call you first?
+Caller: Oh, um, could you call me first? I just like to know when someone’s coming in.
+Agent: Of course, will do. So, just to recap: unit 18C, your number is 555-0214, and we should call you before coming in due to your dog. Anything else we can assist with?
+Caller: No, I think that covers it. Thanks for taking care of this.
+Agent: Absolutely, Carla. We'll get someone out there as soon as possible. Have a great day!
+Caller: Great, thanks, you too! Bye.

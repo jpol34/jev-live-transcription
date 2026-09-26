@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 46,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 4.6,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Tom Leland",
+    "email": null,
+    "phone_number": "555-3289",
+    "unit_number": "76B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "leaky pipe under kitchen sink, possible mold or additional damage",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "work order escalated to maintenance supervisor with call-first note",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 280
+  }
+}

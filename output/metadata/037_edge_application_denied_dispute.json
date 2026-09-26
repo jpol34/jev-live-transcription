@@ -1,0 +1,31 @@
+{
+  "scenario": {
+    "id": 37,
+    "category": "prospect",
+    "subtype": "edge_application_denied_dispute",
+    "edge_case": true,
+    "target_minutes": 5.5,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jake Sanderson",
+    "email": "sanderson.jake@gmail.com",
+    "phone_number": "718-555-4829",
+    "price_quoted": "1450-1475",
+    "outcome": "Application review escalated",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 335
+  }
+}

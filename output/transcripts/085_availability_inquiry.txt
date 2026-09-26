@@ -1,0 +1,27 @@
+# Call 085 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Laura speaking. How can I help you today?
+Caller: Hi, uh, yeah, this is Mike. I'm looking to see if you have any, uh, apartments available at the moment?
+Agent: Sure thing, Mike. Can I get your last name just in case we need to follow up?
+Caller: Oh, sorry, it's Roddin. R-O-D-D-I-N.
+Agent: Got it, thank you. So, let me pull up our current availability. Can you hang on just a moment?
+Caller: Yeah, no problem.
+Agent: Alright, thanks for waiting, Mike. Are you looking for a particular number of bedrooms?
+Caller: Uh, I think I need a two-bedroom... Uh, actually, sorry, a one-bedroom. Just for myself.
+Agent: No worries. We've got a few one-bedroom units available. Do you have a preferred move-in date in mind?
+Caller: Uh, ideally the start of next month, like January 1st or so?
+Agent: January 1st, got it. And are there any specific amenities you're interested in?
+Caller: Hmm, not really picky, but a gym would be nice. Do you guys have one on-site?
+Agent: Yes, we do have a fitness center available for residents. It's recently updated, actually.
+Caller: Oh, that's great. Uh, what about budget-wise? What should I be expecting here?
+Agent: The one-bedroom units are currently ranging from $1,100 to $1,300, depending on the floor and view. Does that fit within your budget?
+Caller: Hmm, yeah. I was hoping to stay around $1,200, so that sounds doable. Uh, one more thing, do you allow pets?
+Agent: Yes, we're pet-friendly. We have some breed restrictions and a monthly pet fee, though.
+Caller: Okay, thanks for letting me know. Uh, so what's the next step if I decide to go ahead?
+Agent: We can schedule a tour, either virtual or in-person, and then you can fill out an application. Can I get a contact number and email to keep you updated?
+Caller: Ah, sure, my phone's 917-555-0199, and email is mike.rod.email@gmail.com, uh, that's dot com.
+Agent: Perfect, I'll note that down. *typing sounds* Thank you, Mike. I'll send over some more details and available times for a tour. Anything else I can assist with for now?
+Caller: No, I think that's it. Thanks, Laura.
+Agent: Great, have a wonderful day! We'll speak soon.
+Caller: You too, bye!

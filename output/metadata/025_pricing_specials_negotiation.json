@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 25,
+    "category": "prospect",
+    "subtype": "pricing_specials_negotiation",
+    "edge_case": false,
+    "target_minutes": 3.3,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jake Morgan",
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "next month",
+    "price_quoted": "$1,250",
+    "budget_amount": "$1,200",
+    "outcome": "caller plans to discuss with partner",
+    "fields_disclosed": [
+      "caller_name",
+      "budget_amount",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 198
+  }
+}

@@ -1,0 +1,31 @@
+# Call 050 — prospect / pricing_specials_negotiation
+# edge_case=False  target_minutes=3.4  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah. How can I assist you today?
+Caller: Hi, um, I was calling to check on the prices for the one-bedroom units at, uh, Willow Creek Apartment Homes, I think?
+Agent: Yes, of course. I can help with that. May I get your name, please?
+Caller: Oh, it's, um, Emma. Emma Thompson.
+Agent: Thank you, Emma. So you're interested in a one-bedroom?
+Caller: Yeah, that's right. I've been looking around but I got a bit confused with the pricing.
+Agent: No worries, that happens. Let's sort it out for you. Can I ask if you have any specific budget in mind?
+Caller: Oh, um, I was hoping to stay around... maybe twelve hundred dollars a month or so?
+Agent: Got it. Right now, our one-bedroom units are starting at $1,250 per month. Is that a number that would work for you?
+Caller: Hmm...it's a little more than I thought. Do you offer any specials or discounts at the moment?
+Agent: Let's see. We do have a special this month where you get half off your first month's rent. Does that sound helpful?
+Caller: Oh, definitely, that would be great.
+Agent: Perfect! Are you looking to move right away, or did you have a date in mind?
+Caller: Uh, not immediately. Maybe mid-December?
+Agent: Alright, mid-December. Let me just make a note of that. You mentioned a budget of around $1,200, correct?
+Caller: Right, uh, but I guess I could stretch it a bit if the place is really nice.
+Agent: Understood. And our units do include several amenities like a pool and gym access. Would you be interested in those?
+Caller: Oh, pool access sounds good. Not sure about the gym, though.
+Agent: Great! The pool is included so that's one less thing to worry about.
+Caller: Okay, nice, um, can I come over to see one of the units?
+Agent: Absolutely! Would you prefer a weekday or weekend visit?
+Caller: Maybe this Saturday? Late morning would be perfect, I think.
+Agent: Sure thing! I'll note you down for a Saturday morning tour. Do you need directions or anything else?
+Caller: Uh, no, I can find it. I've looked it up online.
+Agent: Alright. Do you have any more questions right now, or shall we finalize your appointment for the tour?
+Caller: No more questions, I think. And yeah, let's go ahead with the tour. Thanks for your help.
+Agent: You're welcome, Emma. Looking forward to meeting you. Have a great day!
+Caller: Thanks, you too.

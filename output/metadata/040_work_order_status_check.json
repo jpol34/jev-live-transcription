@@ -1,0 +1,30 @@
+{
+  "scenario": {
+    "id": 40,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 2.7,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Emily Parker",
+    "unit_number": "303",
+    "work_order_issue": "leaky faucet in kitchen",
+    "permission_to_enter": "yes",
+    "outcome": "permission to enter granted for next attempt",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 162
+  }
+}

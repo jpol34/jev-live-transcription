@@ -1,0 +1,23 @@
+# Call 060 — resident / work_order_status_check
+# edge_case=False  target_minutes=3.0  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. How may I assist you today?
+Caller: Hi, this is Angela Thompson. I'm calling to check the status of a work order I placed a few days ago.
+Agent: Of course, Angela. I can help with that. Could you remind me of your unit number, please?
+Caller: Sure, I'm in unit 3B.
+Agent: Got it, unit 3B. And could you briefly tell me what the issue was regarding?
+Caller: Yeah, it's the kitchen sink. It was leaking quite a bit, so I reported it on... um, I think it was last Thursday.
+Agent: Alright, let me look that up for you. Please hold on for just a moment while I check the work order status. *typing sounds*
+Caller: No problem, take your time.
+Agent: Thank you. *short pause* Okay, I see here that the work order was processed on Friday, and a maintenance team was scheduled to visit your apartment. Did anyone manage to come by already?
+Caller: They did, but I was at work, so I couldn't meet them. I left a note requesting they just fix it if possible.
+Agent: I see. According to our notes, the team wasn’t able to enter because we need explicit permission from residents if they're not home. I'm sorry for any inconvenience.
+Caller: Oh, I didn't know I had to specifically say that. Can you reschedule it?
+Agent: Certainly. Would you like to give us permission to enter when you're not home this time? Or do you prefer us to wait until you're there?
+Caller: Yeah, you can go ahead and enter if I'm not there. That's fine.
+Agent: Great, thanks for letting us know. I’ll set that up. Is there a day that works best for you for the follow-up visit?
+Caller: Uh, Monday or Tuesday works for me. I'll be at work those days, so that’s perfect.
+Agent: Alright, I’ll arrange for the maintenance team to visit either Monday or Tuesday then, and they'll proceed with the necessary repairs. Is there anything else I can help you with today?
+Caller: Nope, that's all I needed. Thanks for your help!
+Agent: Happy to help, Angela. Have a great day!
+Caller: You too, bye!

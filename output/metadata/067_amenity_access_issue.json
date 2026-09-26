@@ -1,0 +1,30 @@
+{
+  "scenario": {
+    "id": 67,
+    "category": "resident",
+    "subtype": "amenity_access_issue",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "James Larsen",
+    "phone_number": "555-0193-725",
+    "unit_number": "2B",
+    "work_order_issue": "Key fob not working for pool access.",
+    "outcome": "Maintenance notified to reset pool access reader.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 125
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "scenario": {
+    "id": 69,
+    "category": "resident",
+    "subtype": "work_order_create_emergency",
+    "edge_case": true,
+    "target_minutes": 3.1,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Natalie Bennett",
+    "phone_number": "619-555-3412",
+    "unit_number": "4A",
+    "work_order_issue": "water flooding in kitchen, potential plumbing issue",
+    "permission_to_enter": "yes",
+    "outcome": "emergency work order created, maintenance dispatched",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 190
+  }
+}

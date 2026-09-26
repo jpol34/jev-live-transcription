@@ -1,0 +1,31 @@
+# Call 042 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=5.7  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah. How can I assist you today?
+Caller: Uh, hi Sarah. I’m...not really sure how to put this, but I’ve got, um, an issue...with my, uh, the water thing. It's just—
+Agent: Sorry, you’re cutting out a bit there. Did you say a water issue?
+Caller: Yeah, it's like...the water in my shower, it's just not...right? I mean, it doesn't even get hot.
+Agent: I see. I'm sorry to hear that. Let’s get this sorted out for you. Could I have your name, please?
+Caller: Oh, sure, it's...uh, Melissa. Melissa Thompson.
+Agent: Thank you, Melissa. And what’s your unit number?
+Caller: Um, it’s unit 308, I think? Or was it 318...? Wait, let me check...yeah, it's 308.
+Agent: Great, 308. And just to confirm, the issue is that the shower water isn’t getting hot, correct?
+Caller: Yeah, that's the main thing...But sometimes, it like, it doesn’t run at all? It's...kinda weird.
+Agent: Oh, that sounds frustrating! Let me pull up your maintenance records. Have you had this issue before?
+Caller: Yeah, I actually called about it...um, last month, maybe? It got fixed, or at least I thought it did, but now it’s happening again.
+Agent: I’m pulling up your details now... Can you confirm your phone number for our records?
+Caller: Oh, um, it’s 555-0172...I mean, wait, is that right? No, no, it’s 555-2710. Sorry for the mix-up.
+Agent: No worries, Melissa. I see here that the earlier work order noted a valve replacement. Did you notice any improvement after that service?
+Caller: Honestly, I think it was okay for, like, a week? But then it just went back to being temperamental.
+Agent: Okay, it seems like the fix wasn’t as permanent as we'd hoped. Let me check when we can get maintenance to take another look. Can I put you on a brief hold?
+Caller: Sure, I’ll hold.
+Agent: (brief hold music) Thanks for waiting, Melissa. We can have someone out tomorrow afternoon. Does that work for you?
+Caller: Uh, I guess, but...can they be more exact on the time? Last time, I waited around all day.
+Agent: I really apologize for that inconvenience. The best we can promise is between 1 PM and 4 PM. I’ll make a note to have them call you when they’re on their way. Does that help?
+Caller: Yeah, that would be better. Thanks...I just hope it gets fixed this time.
+Agent: I'll ensure they do a thorough check. Anything else you need help with while we’re on the line?
+Caller: Uh, I don't think so, unless—wait, maybe I can ask you about the laundry room hours? Sometimes it's locked.
+Agent: Certainly! They should be open from 6 AM to 10 PM. If they're locked outside those hours, please let us know directly and we'll address it.
+Caller: Great, I just wanted to check. Okay, then I’ll wait for the call tomorrow. Thanks, Sarah.
+Agent: You're welcome, Melissa. We’ll get that hot water issue sorted for you! Take care.
+Caller: Alright, bye!

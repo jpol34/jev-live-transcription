@@ -1,0 +1,46 @@
+{
+  "scenario": {
+    "id": 97,
+    "category": "resident",
+    "subtype": "edge_pest_infestation",
+    "edge_case": true,
+    "target_minutes": 4.1,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mike Wilson",
+    "email": null,
+    "phone_number": "847-555-7239",
+    "unit_number": "4B",
+    "amenities_requested": null,
+    "pet_info": "No pets",
+    "permission_to_enter": "call_first",
+    "work_order_issue": "cockroach infestation",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Work order set for pest control with call first request",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "pet_info",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "move_in_date",
+      "price_quoted",
+      "budget_amount"
+    ],
+    "estimated_call_seconds": 246
+  }
+}

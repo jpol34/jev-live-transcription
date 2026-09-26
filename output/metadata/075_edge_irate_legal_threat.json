@@ -1,0 +1,35 @@
+{
+  "scenario": {
+    "id": 75,
+    "category": "resident",
+    "subtype": "edge_irate_legal_threat",
+    "edge_case": true,
+    "target_minutes": 5.0,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Brian",
+    "phone_number": "555-0144",
+    "unit_number": "204",
+    "work_order_issue": "No heating for two weeks; work order incomplete",
+    "permission_to_enter": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Issue escalated to maintenance supervisor for urgent action",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 320
+  }
+}

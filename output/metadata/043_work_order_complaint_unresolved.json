@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 43,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 4.7,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jason",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "305",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "Leaking sink, potential mold smell.",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Scheduled another maintenance visit with a call-first request.",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 282
+  }
+}

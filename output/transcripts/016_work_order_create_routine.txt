@@ -1,0 +1,28 @@
+# Call 016 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.9  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa. How can I help you today?
+Caller: Uh, hi Lisa. This is, um, James... James Turner. I live in the, uh, Willow Creek Apartments, and I've got a bit of an issue.
+Agent: Oh, I'm sorry to hear that, James. Can you tell me which apartment unit you’re in?
+Caller: Yeah, it's, uh...just a moment... It's unit 5B.
+Agent: Got it. What's going on with the unit?
+Caller: Well, it's the, uh, the kitchen faucet. It's... it's leaking, I guess.
+Agent: I see. Somewhat continuous or just with use?
+Caller: Pretty much continuous. It drips a lot, and it’s starting to, uh, affect the cabinet beneath.
+Agent: Okay, I’ll definitely get that on the schedule. Uh, can you hold for a second while I check something?
+Caller: Sure, no problem.
+Agent: Okay, thanks for holding. Just a couple more things. Do you have any pets in the apartment? It helps us know when we're sending someone in.
+Caller: Uh, yeah, we have a cat. But she, she won’t be a problem.
+Agent: Great, just good to know. Now, for scheduling... Is it okay if maintenance enters your apartment if you're not home, or would you prefer they call first?
+Caller: I, uh, I think a call first would be best. I usually need to, you know, sort the cat out before anyone comes in.
+Agent: Absolutely, I understand. And just confirming, I have your phone number as 555-0143?
+Caller: Uh, actually, it's 555-4130. Sorry, about that.
+Agent: No problem, thanks for correcting it. So it's 555-4130?
+Caller: Yep, that's right.
+Agent: All right, James. Let me put this in...one moment, please.
+Caller: Sure, take your time.
+Agent: And we’re back. I’ve got everything down. We'll give you a call before we head over.
+Caller: Great, thanks so much.
+Agent: Of course. Anything else I can help you with today?
+Caller: No, that's it. Uh, thanks again, Lisa.
+Agent: You're welcome, take care and we'll be in touch soon.

@@ -1,0 +1,25 @@
+# Call 039 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=4.8  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, my name is Teresa. How can I assist you today?
+Caller: Hi, um, so I live in the Willow Creek Apartment Homes and there's, uh, been a lot of noise coming from the apartment above me.
+Agent: I’m sorry to hear that. Could I please get your name for our records?
+Caller: Yeah, it's uh... Kyle. Kyle Young.
+Agent: Alright, Kyle. And you mentioned you're experiencing noise issues from the apartment above. Can you describe the noise a bit? Like, is it music, or...?
+Caller: It's mostly loud music, um, and sometimes, like, thumping, like maybe they're moving furniture or, I don't know, but it's a lot especially at night.
+Agent: Got it, I can understand how that's disruptive. Could you confirm your unit number for me, so we can follow up properly?
+Caller: Uh, yeah... hang on, let me see if I have it right here. Yeah, it's 306B.
+Agent: Thank you. And just to clarify, the issue is coming from the unit directly above yours?
+Caller: Right, exactly. Uh, I'm not sure of their unit number, sorry.
+Agent: No worries, we can figure that out from here. Now, have you had a chance to speak with your neighbors about this noise?
+Caller: Um, no, I haven't. I'm not really comfortable doing that... don't really know them.
+Agent: Understood. We can certainly reach out to them on your behalf. Could I also take your phone number, just in case we need to follow up with you directly?
+Caller: Let me think... Do you really need it? I'm not super keen on getting calls, you know?
+Agent: We only use it if absolutely necessary, like if there's more we need to discuss. But it’s not required if you’re uncomfortable sharing it.
+Caller: I mean, okay, it's best if I don’t give it. Can we just handle it this way?
+Agent: That's perfectly fine, Kyle. We can still proceed with the info we have. We'll reach out to your neighbors and remind them of the noise policies.
+Caller: Okay, that sounds good. I just hope it helps, you know?
+Agent: I completely understand. We will do our best to address it quickly. Anything else I can assist you with?
+Caller: No, that's pretty much it. Thanks for handling this.
+Agent: You're welcome, Kyle. We're here to help, so feel free to reach out again if needed. Have a good day!
+Caller: Thanks, you too. Bye.

@@ -1,0 +1,42 @@
+{
+  "scenario": {
+    "id": 16,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.9,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "James Turner",
+    "email": null,
+    "phone_number": "555-4130",
+    "unit_number": "5B",
+    "amenities_requested": null,
+    "pet_info": "Cat",
+    "permission_to_enter": "call_first",
+    "work_order_issue": "Kitchen faucet leaking",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Work order created with call first permission",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "pet_info",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 234
+  }
+}

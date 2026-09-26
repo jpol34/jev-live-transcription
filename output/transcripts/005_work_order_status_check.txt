@@ -1,0 +1,22 @@
+# Call 005 — resident / work_order_status_check
+# edge_case=False  target_minutes=3.0  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sandra, how can I assist you today?
+Caller: Uh, hi, Sandra. This is Mark. I live in, um... Oh, shoot. Unit 5-05, I think. I wanted to check, uh, on a work order I, um, submitted a while back.
+Agent: Of course, Mark. Let me just pull up your information here. You said Unit 505, right?
+Caller: Uh, yeah, I think? It's the one on the fifth floor, uh, overlooking the pool... I keep mixing it up.
+Agent: No worries, that's okay. Let me just verify a few details... Can you remind me what the work order was for?
+Caller: Oh, sure. It was, uh, the leaky faucet in the kitchen. I reported it last week, I think. It's causing a bit of a mess.
+Agent: I see. Let me just check... okay, I found it. And yes, the faucet work order is still open. It was logged on, hmm, looks like the 10th of October.
+Caller: Yeah, that sounds about right. So, um, any idea when someone might come by to fix it?
+Agent: Let me see if there's any scheduled response... it looks like the maintenance team was supposed to handle it yesterday, but I don't see a completion note. Let me check if they left any remarks... Okay, I'm just gonna put you on hold for a moment while I call the team.
+Caller: Uh, sure, okay, I'll wait.
+Agent: (Hold music faintly playing in the background)
+Agent: Thank you for holding, Mark. The maintenance team just updated me—they're running behind on a few orders, but they're set to address your faucet by tomorrow afternoon.
+Caller: Oh, okay. Uh, should I... like, need to be there when they come over?
+Agent: Good question. Do you prefer to be present, or can they enter if you're not home?
+Caller: Uh, I guess it's fine if I'm not there. Just, uh, fix the leak, please.
+Agent: Understood, I'll make a note that they have permission to enter. Is there anything else you need help with today?
+Caller: No, that's, uh, that's all. Thanks for the update, Sandra.
+Agent: You're welcome, Mark. If you have any other concerns, don't hesitate to call. Have a good day!
+Caller: Thanks, you too. Bye!

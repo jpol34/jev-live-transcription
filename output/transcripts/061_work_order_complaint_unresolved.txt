@@ -1,0 +1,28 @@
+# Call 061 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=5.1  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking, how can I help you today?
+Caller: Hi, uh, I'm having a bit of a problem with, uh, the maintenance request I submitted a couple of weeks ago.
+Agent: Oh, I'm sorry to hear that. Could I get your name please so I can pull up your record?
+Caller: Uh, yeah, it's James. James Miller.
+Agent: Alright, James, and could you provide your unit number for verification?
+Caller: Yeah, um, it’s 4B. I think. Or maybe it's the other building?
+Agent: Okay, let me check both buildings for a 4B. You mentioned a request from a couple of weeks ago. Can you remind me what that was for?
+Caller: Yes, it’s, um, the, uh, leaking pipe under the sink. I was told someone would fix it, but no one’s shown up yet.
+Agent: I understand your concern. Let me see, give me just a moment to look that up... hmm, I don't seem to find any recent activity under unit 4B. Could it have been under a different name or unit?
+Caller: Well, could it be under 4A maybe? My friend handles some of these for me sometimes.
+Agent: Let me try 4A. And could I possibly get a phone number on file to speed up this process? It looks like I may have to cross-reference here.
+Caller: Uh, I'd rather not. I forgot which one I gave last time.
+Agent: No problem. I’m checking 4A now... alright, I see the issue now. It looks like it wasn’t fully marked as completed. I'm really sorry about that. I'll have to escalate this to ensure you get some help promptly.
+Caller: Okay, but can you make sure it's gonna be soon? Like, I really can't wait another week.
+Agent: I completely understand. I’m going to mark this as urgent and contact our maintenance team right after we're done here. Could you tell me again what timeframe works best for you?
+Caller: Uh, mornings are usually better. Before noon, if that’s possible.
+Agent: Mornings before noon, got it. Let me make a note of that—
+Caller: And like, uh, I can't live there when it's, you know, with the... all the water.
+Agent: I understand. I'll make sure to stress the urgency given your situation. Is there anything else you'd like us to know?
+Caller: No, that’s... that's really it. Just need it sorted.
+Agent: Absolutely, James. We'll do our best to resolve this quickly. Just to confirm, is it okay if maintenance enters your unit if you're not home?
+Caller: Um, I’d prefer if you call first, if that’s alright.
+Agent: Certainly. We’ll be sure to give you a call ahead of time. I apologize again for any inconvenience. We'll be in touch soon.
+Caller: Alright, thanks. I appreciate it.
+Agent: Thank you for calling, James. Have a good day.

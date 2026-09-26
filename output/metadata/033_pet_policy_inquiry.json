@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 33,
+    "category": "prospect",
+    "subtype": "pet_policy_inquiry",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "pet_info",
+      "amenities_requested"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Lisa",
+    "pet_info": "small dog, 25 pounds",
+    "amenities_requested": [
+      "swimming pool",
+      "fitness center",
+      "dog park"
+    ],
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "inquired about pet policy and amenities",
+    "fields_disclosed": [
+      "caller_name",
+      "pet_info",
+      "amenities_requested"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 132
+  }
+}

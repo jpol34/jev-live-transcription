@@ -1,0 +1,20 @@
+# Call 091 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.7  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking, how can I help you today?
+Caller: Hi Lisa, this is John Carter. I'm calling to check on a work order I submitted last week. My heater seems to be acting up.
+Agent: Of course, John. Let me pull up your information real quick. Can you remind me of your unit number?
+Caller: Sure, it's unit 21B.
+Agent: Great, let me just take a moment to look that up... alright, I've got it here. It looks like your work order was submitted on, uh, October 10th. You mentioned the heater, right?
+Caller: Yes, that's right. It’s not heating properly, just kind of blowing cold air.
+Agent: Got it. So, it shows here that a technician is scheduled to come by tomorrow between 10 a.m. and 2 p.m. Does that time work for you?
+Caller: Yeah, that should be fine. Do they need me to be there, or can they just get in?
+Agent: Let’s see... Normally, they can handle it as long as they have permission to enter. Have you given that before?
+Caller: Um, I'm not sure if I did this time. Could you confirm if they have my permission?
+Agent: Alright, let me check... Okay, yes, it looks like you did give permission for them to enter. So they’ll be able to take care of the issue even if you’re out.
+Caller: Perfect, I just wanted to make sure. Anything else I need to be aware of?
+Agent: Nope, everything looks good from our end. If anything changes or you need to reschedule, just let us know as soon as possible, okay?
+Caller: Great, thanks, Lisa. I’ll make sure to check my phone in case they need to reach me.
+Agent: Sounds good, John. Was there anything else you needed help with today?
+Caller: No, that’s all for now. Thanks for your help!
+Agent: You're welcome! Have a great day. Bye.

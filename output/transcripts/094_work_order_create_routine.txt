@@ -1,0 +1,23 @@
+# Call 094 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.2  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, how can I assist you today?
+Caller: Hi, uh, I need to report a problem in my apartment.
+Agent: Of course, I can help with that. Could I have your name, please?
+Caller: It's, um, Laura. Laura Jensen.
+Agent: Thank you, Laura. And what seems to be the issue in your unit today?
+Caller: There's a leak under my kitchen sink. It's been dripping for a couple of days now, and, um, it's getting worse.
+Agent: Got it, a leak under the kitchen sink. I can definitely help with that. Can you remind me of your unit number, Miss Jensen?
+Caller: Uh, yeah, it's 4B. Sorry, I should have mentioned that.
+Agent: No worries at all! Let me just note that down... and just to confirm, that's 4B, correct?
+Caller: Yes, that's right.
+Agent: Great. Do you have any pets we should know about when sending maintenance up?
+Caller: No, um, no pets here.
+Agent: Alright, and would you like to give permission for maintenance to enter your apartment if you're not home? Or would you prefer a call first?
+Caller: Hmm, I think I'd prefer a call first. Just in case I'm around.
+Agent: Sure, we can do that. Do you mind providing the best phone number for us to reach you?
+Caller: Uh, yeah, it's, um, 555-0198.
+Agent: 555-0198, perfect. Thank you. So, just to recap: You've got a leak under your kitchen sink in unit 4B, no pets, and maintenance should call you first at 555-0198 before entering. Does that all sound correct?
+Caller: Yep, that's it. I appreciate it.
+Agent: Thank you, Laura. We'll have someone out to take a look as soon as possible. If you have any more questions, feel free to call us back at this number. Take care!
+Caller: Thanks, you too. Bye!

@@ -1,0 +1,33 @@
+{
+  "scenario": {
+    "id": 65,
+    "category": "prospect",
+    "subtype": "schedule_tour",
+    "edge_case": false,
+    "target_minutes": 2.7,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Rachel Morris",
+    "email": null,
+    "phone_number": "555-0199",
+    "move_in_date": null,
+    "price_quoted": "$1,200 to $1,800",
+    "outcome": "tour scheduled at 4 PM on Thursday",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "move_in_date"
+    ],
+    "estimated_call_seconds": 162
+  }
+}

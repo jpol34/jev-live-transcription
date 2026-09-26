@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 39,
+    "category": "resident",
+    "subtype": "noise_neighbor_complaint",
+    "edge_case": false,
+    "target_minutes": 4.8,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Kyle Young",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "306B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Agent promised to notify neighbors of noise complaint.",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 252
+  }
+}

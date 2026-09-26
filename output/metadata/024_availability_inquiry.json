@@ -1,0 +1,46 @@
+{
+  "scenario": {
+    "id": 24,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.7,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Emma Green",
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": [
+      "pool",
+      "gym",
+      "in-unit laundry"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "first of next month",
+    "price_quoted": "$1,250 for one-bedroom, $1,750 for two-bedroom",
+    "budget_amount": null,
+    "outcome": "Caller to call back later after deciding.",
+    "fields_disclosed": [
+      "caller_name",
+      "amenities_requested",
+      "move_in_date",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number",
+      "budget_amount"
+    ],
+    "estimated_call_seconds": 222
+  }
+}

@@ -1,0 +1,21 @@
+# Call 033 — prospect / pet_policy_inquiry
+# edge_case=False  target_minutes=2.2  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, how can I assist you today?
+Caller: Uh, hi. I, um, wanted to ask about your pet policy for the Willow Creek Apartment Homes.
+Agent: Sure, I can help with that. First, may I have your name, please?
+Caller: Uh... it's Lisa.
+Agent: Thank you, Lisa. So, regarding our pet policy, we do allow pets, but there are some restrictions. Could you tell me what kind of pet you're interested in bringing?
+Caller: Yeah, so I have a small dog. Um, like, about 25 pounds.
+Agent: Okay, small dogs are generally fine. We do have a limit on weight, usually around 50 pounds. So your dog fits right in. Is there anything else specific you needed to know?
+Caller: Uh, are there any extra fees or... deposits required?
+Agent: Yes, there is a pet deposit. It's a refundable fee as long as there are no damages when you move out. There's also a small monthly pet rent.
+Caller: Hmm, okay. Um, could you, uh, tell me about any amenities you have there?
+Agent: Sure, at Willow Creek Apartment Homes we have quite a few. We've got a swimming pool, a fitness center—even a dog park on-site. Uh, anything specific you're interested in?
+Caller: Uh, no, that... that sounds good. Do you, um, require anything from a vet regarding the pet?
+Agent: Yes, we typically ask for vaccination records and proof of spaying or neutering. Uh, is that something you could provide?
+Caller: Oh, um, yeah, I should have those somewhere. I'll look for them.
+Agent: Great. Is there anything else I can help you with today?
+Caller: No, I think that's it for now. Thanks.
+Agent: Alright, Lisa, if you need any more information don't hesitate to call us back. Have a great day!
+Caller: Thanks, you too. Bye.

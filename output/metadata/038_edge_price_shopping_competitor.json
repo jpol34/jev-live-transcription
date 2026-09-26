@@ -1,0 +1,28 @@
+{
+  "scenario": {
+    "id": 38,
+    "category": "prospect",
+    "subtype": "edge_price_shopping_competitor",
+    "edge_case": true,
+    "target_minutes": 3.2,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Tom",
+    "budget_amount": "$1,400",
+    "price_quoted": "$1,200 for one-bedroom, $1,500 for two-bedroom",
+    "outcome": "caller to consider, call leasing office directly",
+    "fields_disclosed": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 192
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 42,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 5.7,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Melissa Thompson",
+    "email": null,
+    "phone_number": "555-2710",
+    "unit_number": "308",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "Shower water not getting hot",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Scheduled maintenance visit",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 340
+  }
+}

@@ -1,0 +1,28 @@
+# Call 006 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=4.8  disclosure_style=confused
+
+Agent: Good afternoon, thank you for calling Willow Creek Property Management. This is Tara speaking. How may I assist you today?
+Caller: Uh, hi, Tara. My name is Beth and I, uh, live in the Willow Creek Apartment Homes and I'm, um, calling about... There's this noise issue with my neighbor.
+Agent: I'm sorry to hear that, Beth. Could you tell me a little more about what's going on?
+Caller: Yeah, it’s, um, it's been happening late at night, around, uh, 11 PM. There’s just this loud music and... I’m not sure if it’s just, like, a one-time party or... it’s... ongoing. It's quite, um, disruptive.
+Agent: I see. That sounds frustrating. Could you let me know your apartment number, please?
+Caller: Oh, um, yeah, it’s... uh, one sec... It’s B... B207.
+Agent: Okay, B207. And just to confirm, is your phone number ending in 3248?
+Caller: Uh, yeah. Wait, no, no. Sorry, it’s 3298. Got that mixed up.
+Agent: Got it! Thanks for clarifying that. Now, Beth, do you know which apartment the noise is coming from? Like, any idea of the unit number, or if it's directly next door?
+Caller: Uh, I'm not sure actually. It might be... from the floor above? Or maybe next door, yeah... It's hard to tell, you know?
+Agent: Of course, I understand how that can be tricky. We can look into it. And just to clarify, you said the music typically starts around 11 PM?
+Caller: Yeah, uh, sometimes a bit earlier but it definitely goes past midnight. It’s hard to... to sleep, you know?
+Agent: Certainly. We want to make sure you’re comfortable in your home. Have you, um, tried speaking with the neighbor or... was this your first step?
+Caller: No, I haven’t... I didn’t want to, you know, cause any conflict or, uh, make things awkward.
+Agent: Understandable. Would you like us to reach out to the other tenants to address it more generally, or how would you like us to proceed?
+Caller: Um, yeah, if you could just, maybe, remind them about, uh, quiet hours or something? That’d be great.
+Agent: Absolutely, we can definitely do that. I’ll pass this along to our on-site management. Just to ensure we've covered everything, is there anything else you'd like assistance with?
+Caller: Uh, no, I think that’s it. Um, do you know how long it might take?
+Agent: Typically, we get in touch with residents the same day, but sometimes it might take a day to resolve, just depending on, um, how quickly we can reach everyone. We’ll definitely keep you updated.
+Caller: Okay, thanks. I just want some sleep, you know? Haha.
+Agent: I completely understand, Beth. Rest assured, we’ll handle it as promptly as we can.
+Caller: Alright, thank you so much, Tara.
+Agent: You're welcome, and feel free to call us if the issue persists.
+Caller: Will do. Bye!
+Agent: Bye! Have a great day.

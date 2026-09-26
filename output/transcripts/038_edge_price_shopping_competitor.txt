@@ -1,0 +1,22 @@
+# Call 038 — prospect / edge_price_shopping_competitor
+# edge_case=True  target_minutes=3.2  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah speaking. How can I help you today?
+Caller: Hi Sarah, uh, my name is Tom and I'm just, uh, trying to get some information about the pricing at Willow Creek Apartments.
+Agent: Sure thing, Tom! Let me just pull up some details for you. Do you have specific unit types in mind? Like, uh, one-bedroom, two-bedroom?
+Caller: Yeah, I've been looking at, like, uh, one-bedroom units, mostly. But if the price difference isn’t too bad, I might consider, uh, a two-bedroom.
+Agent: Got it. Okay, let me see here... So, our one-bedroom units start at around $1,200 a month. Two-bedroom units start at about $1,500. These prices can vary a bit depending on the amenities and, um, exact location within the complex.
+Caller: Hmm, alright. That's, uh, pretty similar to, um, what I've seen at Creekside Apartments over on Park Avenue. Are there any promotions or discounts currently running at Willow Creek?
+Agent: Ah, let me check that for you. Uh, if you can hold on for just a quick moment?
+Caller: Yeah, sure, no problem.
+Agent: Alright, thanks for holding. So yes, we do have a move-in special right now, which is one month free with a 12-month lease on select units. There's also a waived application fee if you apply within the month.
+Caller: Oh, that’s interesting. Uh, do you know if these apply to the two-bedrooms as well?
+Agent: Let me confirm... Yes, some of the two-bedrooms also qualify for that deal, but it’s best to reach out directly to the leasing office because, um, availability can change quickly.
+Caller: Okay, makes sense. Um, one more thing. Do you guys require, like, any deposits or other upfront costs?
+Agent: Yes, there is a standard security deposit, which is usually one month's rent. Uh, and the first month's rent would be due at signing, unless you're... taking advantage of the promo offers.
+Caller: Got it, got it. Uh, just trying to figure out if this fits into my budget. Thinking around $1,400 max, so almost on the line there.
+Agent: Understood. I definitely recommend visiting or, um, even calling our leasing office directly. They could give you the most accurate up-to-date info, Tom.
+Caller: Yeah, I think I'll do that. Thanks for your help, Sarah. Uh, good to have this info straight from the source.
+Agent: Of course! Happy to help. If you have any more questions or need assistance with anything else, feel free to call back.
+Caller: Will do. Thanks again.
+Agent: You're welcome. Have a great day!

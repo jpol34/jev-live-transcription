@@ -1,0 +1,25 @@
+# Call 079 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=3.8  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jessica speaking, how can I assist you today?
+Caller: Hi, Jessica. Uh, I have a question about my rent payment. I think there's been a mistake with it, something about late fees?
+Agent: Oh, I’m sorry to hear that. Let me help you with that. Can I have your name, please?
+Caller: Yes, it's Timothy Jenkins.
+Agent: Alright, Timothy. Uh, let me just pull up your information. Can you also verify your unit number for me?
+Caller: Uh, sure, it's 307B... Oh wait, oops, sorry, it's 307C.
+Agent: Got it, thank you for that. Um, just a moment while I check your account. Notice any background office chatter? That's just the team bustling around here. All right, here we go... So it looks like there was a late fee added for this month. Did you pay after the grace period, by any chance?
+Caller: Hmm, I don't think so. I usually schedule it exactly on the first. Is there a way to check the payment date?
+Agent: Absolutely. Give me a second… sorry about the clicking, it’s just me looking up things here. Ah, okay, so I see it was posted on the second. Our system might have registered it late since the first was a Sunday. That sometimes happens.
+Caller: Oh, I didn't realize that would be an issue. Is there anything that can be done about the fee?
+Agent: Let me see what I can do. Sometimes we can waive the fee if it’s a first-time occurrence. Have you been charged like this before?
+Caller: No, this is the first time.
+Agent: Alright, great. I’ll need to check with my manager real quick. Can you hold for just a moment?
+Caller: Yeah, that's fine. Thanks.
+Agent: Thank you for holding, Timothy. I spoke with my manager, and we can indeed waive the late fee this time. Going forward, I'd recommend scheduling the payment a day or two earlier to avoid this happening again on a weekend.
+Caller: Oh thank you so much, that's a relief. I’ll make sure to do that next time.
+Agent: No problem at all. Is there anything else I can help you with maybe? Do you need any emails sent as confirmation, or something?
+Caller: Um, actually, if you could send that to my email, that would be great. It's tim.jenkins@example.com.
+Agent: Got it, tim.jenkins@example.com. I’ll send you an email confirmation of the waiver. Anything else we can do for you today?
+Caller: That's it, thanks for all your help, Jessica.
+Agent: You're very welcome, Timothy. Have a great rest of your day!
+Caller: You too, bye.

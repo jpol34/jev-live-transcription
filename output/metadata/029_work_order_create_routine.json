@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 29,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.4,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jake Carmichael",
+    "phone_number": "555-123-9867",
+    "unit_number": "34B",
+    "work_order_issue": "Refrigerator not cooling",
+    "permission_to_enter": "call_first",
+    "pet_info": "cat named Whiskers",
+    "outcome": "work order created",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 204
+  }
+}

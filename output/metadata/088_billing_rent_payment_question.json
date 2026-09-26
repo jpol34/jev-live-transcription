@@ -1,0 +1,32 @@
+{
+  "scenario": {
+    "id": 88,
+    "category": "resident",
+    "subtype": "billing_rent_payment_question",
+    "edge_case": false,
+    "target_minutes": 4.0,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Dan Harrison",
+    "email": "dan.h1988@gmail.com",
+    "unit_number": "203",
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Resolved billing inquiry, no late fee applied, email confirmation resent.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 240
+  }
+}

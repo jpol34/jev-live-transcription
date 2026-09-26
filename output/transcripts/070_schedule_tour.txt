@@ -1,0 +1,27 @@
+# Call 070 — prospect / schedule_tour
+# edge_case=False  target_minutes=2.6  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management, how can I help you today?
+Caller: Hi, yeah, I'm interested in uh, scheduling a tour for an apartment at Willow Creek Apartments, umm, next week, if possible.
+Agent: Of course! Let me check our availability. Can I get your name, please?
+Caller: Oh, right, it's Jenna Th... Thomspon. Sorry, Jenna Thompson.
+Agent: Thank you, Jenna. And could you, uh, spell that last name for me, just to be sure?
+Caller: Sure, it's uh, T-H-O-M-P-S-O-N.
+Agent: Got it. And, Jenna, what's the best email for our records?
+Caller: Right, uh, it's jennathompson89 at gmail dot com.
+Agent: Okay, just to confirm, that's J-E-N-N-A-T-H-O-M-P-S-O-N and then, uh, 89 at gmail.com?
+Caller: Yes, that's it.
+Agent: Great, and how about a contact number, just in case we need to reach you?
+Caller: Oh, um, hold on, it's 415-555-2323. Sorry, noisy here...
+Agent: No worries at all. I've got 415-555-2323. Now, when were you thinking for the tour? You mentioned next week?
+Caller: Uh, yes, maybe Tuesday or Thursday? Uh, afternoons work best for me.
+Agent: Alright, let me put you on a quick hold while I check our calendar. Won't be a moment.
+Caller: Sure, no problem.
+Agent: (brief pause) Thanks for holding. We can schedule a tour on Tuesday at 3 PM. Does that work for you?
+Caller: Yeah, Tuesday at 3 works. And um, do you need anything else from me?
+Agent: Uh, just one more thing—are you looking to move in by a specific date, or are you flexible?
+Caller: Hopefully by, um, by... the beginning of December, you know? But I'm a bit flexible.
+Agent: Got it, beginning of December. Okay, Jenna, you're all set for your tour on Tuesday at 3 PM. If anything changes, feel free to call us back.
+Caller: Great, uh, thanks for your help! I really appreciate it.
+Agent: You're very welcome. See you Tuesday! Have a great day.
+Caller: You too, bye!

@@ -1,0 +1,20 @@
+# Call 014 — prospect / application_status_check
+# edge_case=False  target_minutes=2.2  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking. How can I assist you today?
+Caller: Uh, hi Lisa. I applied for an apartment at, um, Willow Creek, I think it was... I'm just checking to see if there’s any update on my application?
+Agent: Sure thing! Could you tell me your name so I can look up your application status?
+Caller: Oh, uh, it's James... James Anderson.
+Agent: Alright, James. Let me just pull up your information. Can you hold for just a moment?
+Caller: Yeah, sure. No problem.
+Agent: Thank you for holding, James. I just need to confirm the email address associated with your application. Could you provide that for me, please?
+Caller: Uh, it should be j.anderson... no wait, maybe it’s james.a... uh, james.a@gmail.com, yeah, that one.
+Agent: Okay, I’ll check both just to be sure. And can I get your phone number, in case we get disconnected?
+Caller: Right, it’s uh, let me see... Oh! It’s 555-123-9876.
+Agent: Got it. Thanks for that. Alright, let’s see... It looks like your application is still under review. These things can take a bit of time. Did you apply recently?
+Caller: Yeah, I think it was like two weeks ago? Or maybe a bit more? It's all a bit of a blur.
+Agent: I understand, James. It shouldn't be too much longer, but if it helps, you can expect to hear back from us, um, generally within three weeks from your application date.
+Caller: Oh, okay. Uh, is there anything else I need to do, or...?
+Agent: At this moment, your application is all set on our side. If we need anything extra, we’ll reach out to you shortly at the email or phone number you provided. Anything else I can help with today?
+Caller: No, I think that about covers it. Thanks for the help!
+Agent: You’re welcome, James! Have a great day and feel free to call back if you need anything else.

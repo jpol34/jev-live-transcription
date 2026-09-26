@@ -1,0 +1,38 @@
+{
+  "scenario": {
+    "id": 66,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Samantha",
+    "phone_number": "555-0134",
+    "budget_amount": "1200",
+    "amenities_requested": [
+      "gym",
+      "pool"
+    ],
+    "move_in_date": "mid next month",
+    "price_quoted": "1200",
+    "outcome": "Caller received info on availability and amenities. Plans to call back.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 192
+  }
+}

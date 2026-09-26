@@ -1,0 +1,27 @@
+# Call 024 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.7  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Josh speaking. How can I help you today?
+Caller: Hi, uh, yeah, I'm looking for some info on the Willow Creek Apartment Homes. Like, um, availability and stuff.
+Agent: Sure, I can help with that. First, can I have your name, please?
+Caller: Oh, uh, it's Emma. Emma Green.
+Agent: Thank you, Emma. Are you looking for a specific type of unit?
+Caller: Honestly, I'm not too sure. Maybe a one-bedroom? Or possibly a two-bedroom if it's not too expensive.
+Agent: Got it. Let me just pull up our availability. Could you hold on a moment, please?
+Caller: Yeah, sure.
+Agent: Thanks for holding, Emma. We do have some availability. So for a one-bedroom, we’ve got a model that's going to be open in about, uh, two weeks. And for a two-bedroom, there's one available right now.
+Caller: Hmm, okay. Uh, do you have details on pricing?
+Agent: Absolutely. The one-bedroom is priced at $1,250 per month while the two-bedroom is $1,750.
+Caller: Ah, okay. That's a bit higher than I was hoping. Do you guys offer any amenities included with the rent?
+Agent: Yes, actually. Our apartments include access to a pool, a gym, and we've just upgraded our in-unit laundry facilities. Does that help?
+Caller: That sounds good. Uh, can I ask about, like, what might be the best move-in date?
+Agent: Our current openings do allow for some flexibility. The one-bedroom should be ready by the first of next month. Does that timing work for you?
+Caller: I think so, yeah, probably. It's just... I might need some time to think about it. Do I need to decide right away to hold it?
+Agent: No rush. However, these units do tend to go quickly, so I'd recommend reaching out soon. Do you want to give me your phone number or something in case there's a change?
+Caller: Uh, I’d prefer not to give that out right now. I’ll probably just call back if I decide to go with it.
+Agent: That's perfectly fine. Whenever you're ready, you can call us back.
+Caller: Cool, thanks for understanding. And just, can you repeat the prices one more time? I want to write them down.
+Agent: Of course. The one-bedroom is $1,250 and the two-bedroom is $1,750. Anything else I can help with?
+Caller: No, that should do it for now. Thanks for your help, Josh.
+Agent: Anytime, Emma. Feel free to reach out if you have any more questions. Have a great day!
+Caller: You too, bye.

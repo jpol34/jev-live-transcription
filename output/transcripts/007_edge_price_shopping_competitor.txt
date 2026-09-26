@@ -1,0 +1,24 @@
+# Call 007 — prospect / edge_price_shopping_competitor
+# edge_case=True  target_minutes=3.8  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking. How can I help you today?
+Caller: Uh, hi, um, I'm looking for pricing on, um, an apartment, uh, I'm kinda confused about the different options, uh, I saw online. This is Dave... uh, Dave Jenkins.
+Agent: Hi Dave! No worries, I can definitely help with that. Are you looking at Willow Creek Apartment Homes specifically, or was it another community we manage?
+Caller: Uh... Willow Creek, I think? There were a bunch listed, uh, it’s kinda unclear with all those photos and, uh, stuff.
+Agent: No problem, it can get a bit overwhelming! So for Willow Creek, we have several floor plans. I can give you some general pricing—do you have a specific type or size in mind?
+Caller: Er, I saw something like, uh, two bedrooms? Maybe? But, uh, I'm really not sure. Could you, um, just tell me about, like, anything?
+Agent: Of course! Our two-bedroom units start at around $1,800 a month. Is there a particular budget you're trying to stay within?
+Caller: Budget? Uh, right, I’m thinking... maybe no more than, uh, $1,900, I—sorry, I should have this clearer.
+Agent: That's okay, no worries at all. We do have options right at that point, so it could work. Are you planning on moving in by a certain date, or is that open-ended right now?
+Caller: Oh, uh, move-in date? Hmm, that’s a tricky one—I’d say, maybe next month? But honestly, I haven’t worked that out either.
+Agent: Understood. I’d recommend scheduling a tour to see the place and finalize those details. Would you like me to set that up for you?
+Caller: Uh, yeah, probably. Do I—um, how do I do that exactly?
+Agent: I can arrange that right now over the phone. How does that sound? We can find a time that works for you.
+Caller: Um, yeah, sounds good. Uh, what’s—ahem, what’s like, the earliest you can do?
+Agent: Let me check our schedule... Alright, we have some open slots this week in the afternoons. Does that work for you?
+Caller: Afternoons, yeah, should be fine. Can I... um, confirm later, maybe by email or something?
+Agent: Absolutely! Just email or call us when you decide. May I have your email to send you some more details?
+Caller: Oh yeah, it's uh, d.jenkins... uh... at, no wait, sorry, dave.jenkins23 at mail.com. Got it confused for a sec.
+Agent: Perfect, got it. I'll send over all the information, and if you have any questions, just reach out. Is there anything else I can help you with today?
+Caller: Uh, I think that—um, I guess that's it for now. Thanks for, uh, helping clear that up.
+Agent: You’re welcome, Dave! Have a great day, and we'll look forward to hearing from you soon.

@@ -1,0 +1,30 @@
+# Call 073 — prospect / edge_application_denied_dispute
+# edge_case=True  target_minutes=5.4  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jamie speaking, how can I help you today?
+Caller: Hi, uh, my name’s Alex Goodman. I, um, applied for, uh, Willow Creek Apartment Homes recently and I got an, um, a rejection email? I think there might’ve been a mistake or something.
+Agent: Oh, I see, Alex. I’m sorry to hear that. Let me pull up your application. Can I have your email address to locate your file?
+Caller: Sure, it's alexg at, uh, mail dot com.
+Agent: Thank you. Let me just confirm... that's alexg at m-a-i-l dot com, correct?
+Caller: Yes, that's right.
+Agent: Okay, just one moment while I look that up.
+Caller: Sure, no problem. I just... really thought it was all good, you know.
+Agent: I totally understand. There can sometimes be a mix-up. Alright, I have your file here. It looks like the reason for the denial was... hmm, it says 'incomplete income verification'. Do you remember submitting all your paperwork?
+Caller: Um, I thought I did. I sent, uh, my pay stubs and I, um... oh wait, maybe I forgot the second month's one. I think I added the wrong one in there.
+Agent: That could be it. It's important we have all the correct, up-to-date documents. Have you received any other communication besides the rejection email?
+Caller: No, just that one email. I’m a bit confused if there was something else I should’ve done...
+Agent: Understandable. Let’s see how we can resolve this. Would you be able to provide the missing documentation soon or would you need some more time?
+Caller: I can send it over today. Is that the only thing missing? I just... really didn’t expect to be denied, you know?
+Agent: I’m so sorry for the confusion, Alex. Let me double-check if there’s anything else… uh, sorry, just a moment, there seems to be some background noise on my end. Alright, besides the income verification, everything else seems to be in order.
+Caller: Okay, I'll scan and email it today. Can you, um, let me know what the next step is once you get it?
+Agent: Definitely. After we receive the complete documentation, the application will be reviewed again. Typically, this takes about 48 hours, and we’ll notify you by email if there’s any update.
+Caller: Alright. By the way, what's, um... what's the rent again? I think I, I uh, missed that on the initial call.
+Agent: Let me check on that for you... okay, so the monthly rent for the unit you applied for is $1,200. Did you need me to go over the breakdown of costs included?
+Caller: No, that’s fine, just needed the rent amount. Thanks for confirming, Jamie.
+Agent: Of course, just making sure everything is clear. Before we end the call, can I double-check your contact number? We have 555-0178 on file.
+Caller: Oh, it’s actually supposed to be 555-0198. The eight and nine keys, you know, they’re so close, I probably hit the wrong one.
+Agent: No worries at all! Appreciate the correction. So it’s 555-0198, got it. Is there anything else I can help you with?
+Caller: No, I think that covers it. Thanks for the help. I’ll get those documents to you ASAP.
+Agent: Great! Once we receive them, we’ll get back to you soon. Thanks, Alex, and have a great day.
+Caller: Thank you, Jamie. You too. Bye.
+Agent: Goodbye, Alex.

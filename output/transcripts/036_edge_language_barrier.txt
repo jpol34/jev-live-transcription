@@ -1,0 +1,31 @@
+# Call 036 — prospect / edge_language_barrier
+# edge_case=True  target_minutes=5.6  disclosure_style=cooperative
+
+Agent: Good afternoon! Thank you for calling Willow Creek Property Management. This is Lisa, how can I assist you today?
+Caller: Ah, hello. Yes, I want information about, uh, the apartment, Willow, uh, Creek Apartment Homes?
+Agent: Of course! Are you looking for information about availability or amenities, or something else specific?
+Caller: Availability, yes. Uh, I would like to know if there any apartment open soon?
+Agent: Certainly, I can check that for you. Could you first tell me your name, please?
+Caller: Yes, name is Marija, M-A-R-I-J-A, uh, P-E-T-R-O-V-I-C.
+Agent: Thank you, Marija. And are you looking to move in at a particular date?
+Caller: Yes, uh, maybe December... 1st? Or, or earlier, it depends, uh, how quick.
+Agent: Okay, December 1st or possibly earlier. Let me put you on hold for just a moment while I check our availability, alright?
+Caller: Yes, okay. Thank you.
+Agent: (brief hold music) Thank you for holding, Marija. I see that we do have a couple of units expected to open up late November. Does that timeline work for you?
+Caller: Yes, yes, that good. Uh, can you tell me price? How much is it per month?
+Agent: Certainly. The one-bedroom units are starting at $1,200 a month. Are you interested in a one-bedroom, or did you have another type in mind?
+Caller: One-bedroom, yes, only me, so is okay.
+Agent: Great. Do you have any other questions about the property or amenities I can help with?
+Caller: Uh, maybe parking? Is parking included, or...?
+Agent: We do have reserved parking available for an additional $75 per month, or there's unassigned street parking nearby.
+Caller: Ah, okay. Um... and, and how about, uh, pet policy? I have one, uh, small dog, very friendly.
+Agent: Certainly, pets are welcome! There's a pet fee of $300 and a monthly pet rent of $25. Is that alright?
+Caller: Yes, yes, that... that's fine. Uh, can I get tour? To, to look at... apartment?
+Agent: Absolutely! We can schedule a tour for you. Can I get your phone number, Marija, so we can coordinate the schedule?
+Caller: Yes, my phone number is... uh, (pauses, some background noise) 555-1983... uh, wait, 1984! Yes, 555-1984.
+Agent: Got it. 555-1984. Just to confirm, you're interested in a tour for a one-bedroom sometime soon, correct?
+Caller: Yes, yes, as soon as you can available for that. Thank you.
+Agent: Alright, I'll have someone reach out to schedule that with you. Do you have any other questions or concerns for now?
+Caller: No, just, uh, thank you very much for help. I look forward... hearing back for tour time.
+Agent: You're very welcome, Marija. We'll be in touch soon. Thanks for calling Willow Creek. Have a great day!
+Caller: You too, bye-bye!

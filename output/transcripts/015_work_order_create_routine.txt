@@ -1,0 +1,23 @@
+# Call 015 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.5  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah speaking. How can I help you today?
+Caller: Hi, um, this is Megan Thompson from unit 3F. I need to report a maintenance issue.
+Agent: Alright, Megan. Could you briefly describe the issue for me?
+Caller: Yeah, uh, it’s the kitchen sink. It's been, you know, leaking for a few days now. Like, it drips continuously.
+Agent: Oh, I'm sorry to hear that. We can definitely get that sorted for you. Just to confirm, you mentioned you’re in unit 3F, right?
+Caller: Yes, that's right. Sorry, I usually forget to mention that.
+Agent: No worries at all. And is there a specific time you're usually at home, or can we go ahead and put a repair request in with permission to enter if you're not there?
+Caller: Uh, I’m usually at work, so you can go ahead and enter. I’m okay with giving permission.
+Agent: Okay, permission to enter is noted. Do you have any pets we should be aware of before sending someone over?
+Caller: Oh no, no pets in the unit. Should be all clear on that front.
+Agent: Great, makes it easier too. Could you please confirm your phone number just in case we need to reach you during the repair?
+Caller: Yeah, it's, um, 555-0192. Wait, sorry, sorry. It's actually 555-0291.
+Agent: Got it, 555-0291. I'll correct that in our system. Thanks for letting me know. Sometimes we rely on those numbers if there are any changes.
+Caller: No problem. I figured it was better to be thorough, right?
+Agent: Absolutely. So, just to recap, we’ve got a leaking kitchen sink issue, permission to enter your unit 3F, no pets, and I have your phone number as 555-0291. We’ll have a maintenance team member stop by and fix it as soon as possible.
+Caller: Sounds perfect. Do you know how quickly someone might be able to come by?
+Agent: We usually aim within 24 hours, but with today being a weekday, chances are good it’ll be sooner, especially since you’ve given permission to enter.
+Caller: Okay, great. Thank you so much for your help.
+Agent: You're very welcome, Megan. And if you have any other concerns, feel free to call us anytime. Have a great day!
+Caller: Thanks, you too! Bye.

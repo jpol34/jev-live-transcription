@@ -1,0 +1,20 @@
+# Call 095 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=2.8  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. My name is Carol. How can I assist you today?
+Caller: Uh, hi, this is Jamie from, um, I think unit 2B? Sorry, it's been a morning, my head's all over the place.
+Agent: No worries, Jamie. What can we help you with today?
+Caller: There's like, water... it's just coming from the ceiling. I don't know what's going on, but it's everywhere!
+Agent: Oh my, that sounds urgent. Let me just confirm—you're in Unit 2B, right?
+Caller: Yeah, or wait... is it 2A? Hold on—sorry, I'm, uh, I need to check, there’s stuff everywhere.
+Agent: Take your time, Jamie. We want to make sure we get this right.
+Caller: Okay, right, it's 2A for sure. There's just so much water!
+Agent: Thank you for confirming. And what's the best phone number to reach you, just in case?
+Caller: Uh, yeah, it's 555-0199. No, wait that's my old number—it's 555-8765. Gosh, I'm sorry, this flood is just—
+Agent: It's completely understandable. Do you want us to send someone right away to check it? And do we have your permission to enter if no one's home?
+Caller: Yes, yes, please do. Just get someone here, I can't tell where it's coming from, I tried—
+Agent: Got it. We’ll dispatch maintenance immediately. So you’re okay with them entering the apartment even if you’re out?
+Caller: Yes, absolutely. I might have to step out.
+Agent: Understood, Jamie. We’ll get right on it. Anything else you want us to note?
+Caller: No, just fix this, please. It's really worrying me.
+Agent: We’re on it. Thank you for calling, and hang in there. Help is on the way!

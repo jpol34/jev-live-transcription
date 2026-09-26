@@ -1,0 +1,33 @@
+# Call 092 — resident / edge_dispute_never_completed
+# edge_case=True  target_minutes=5.6  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Angela speaking. How can I assist you today?
+Caller: Uh, hi. This is, um, David... Peters. I'm, uh, calling about my apartment. There's been sort of an ongoing issue.
+Agent: Oh, I'm sorry to hear that, Mr. Peters. Could you please tell me your unit number so I can pull up your account and see how I can help?
+Caller: Yeah, well, uh, hm, it's 237... no, wait, uh, 2737.
+Agent: Thank you, Mr. Peters. Can you please confirm, is that 237 or 2737?
+Caller: Oh, right, it's definitely 2737. Sorry about that.
+Agent: No problem at all. Let me pull that up real quick. It might take a second. Are you calling about a maintenance issue or something else?
+Caller: Well, it's kind of both? You see, the issue is with these shrubs outside my window; they weren’t trimmed last time and they're blocking a lot of light, and I think it’s leading to, like, dampness or something.
+Agent: I see. So the shrubs outside unit 2737 need more attention? And you believe it's related to a damp issue inside?
+Caller: Yeah, possibly. I know, it sounds weird, but since they grew, I've noticed a musty smell in the living room too.
+Agent: That does sound concerning. I'll make a note of it. Have you submitted a work order for the damp issue to our maintenance team before?
+Caller: No, not yet. I've been meaning to, but I guess I thought calling would be faster. Um, do I need to do both?
+Agent: Typically, we do encourage a written work order for records, but I can certainly initiate it over the phone for you. Would you like me to do that now?
+Caller: Uh, maybe, I'm not sure. Can you tell me what happens then? I mean, do they call, or just show up?
+Agent: Once it's logged, maintenance should reach out to schedule a time. They don’t just show up without notice, unless there’s an emergency access permission.
+Caller: Okay, 'cause I really prefer if they call me first before coming over. I, uh, work odd hours.
+Agent: Absolutely, we can note that down. Just to confirm, you'd like our maintenance team to trim the shrubs and investigate the dampness in your living room, and you'd like a call before they visit?
+Caller: Yeah, that's right. Er, and would you, um, need my number again, or do you have it already from, you know, my account details?
+Agent: I can double-check the number we have on file for you. Is it... 555-0143?
+Caller: Uh, close. It's actually, uh, 555-0413. I should've updated that before.
+Agent: Great, I'll update that for you as well. Just to be sure, do you prefer messages or direct calls?
+Caller: Calls are fine, thanks.
+Agent: Got it. Let me just summarize to make sure I’ve got everything: You need the shrubs outside unit 2737 trimmed, and you're concerned about possible interior dampness, particularly in the living room. You'd like a call before anyone visits. Does that cover everything?
+Caller: Yep, that sounds about right. Oh, actually... can they check the windows too? Like the seals, if that makes any sense?
+Agent: Checking the window seals is definitely relevant if there's dampness involved. I'll add that to the request too.
+Caller: Thanks, I really appreciate it. It's just been a, you know, a worry for a while.
+Agent: No problem at all, Mr. Peters. Let’s take care of it. Once I've submitted the request, you should hear back from our team soon.
+Caller: Alright, that sounds good. And, um, Angela, right? Thanks for your help.
+Agent: You're welcome! Feel free to call back if you need any further assistance. Have a great day!
+Caller: You too, bye.

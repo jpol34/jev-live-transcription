@@ -1,0 +1,22 @@
+# Call 059 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=3.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jenna speaking. How can I assist you today?
+Caller: Hi, Jenna. This is Mike... uh, sorry, Michael Evans. I'm calling about my rent payment for this month.
+Agent: Of course, Michael. Could you please confirm your unit number for me?
+Caller: Yeah, sure. It's uh, 4B... no wait, sorry, it's actually 4D.
+Agent: Got it, 4D. Let me pull up your account. Can I place you on a brief hold while I do that?
+Caller: Uh, yeah, that's fine.
+Agent: [Hold music] Thanks for holding. So, Michael, how can I help with your rent payment?
+Caller: Yeah, I noticed there was a, uh, late fee applied, but I think I paid on time. I just want to check on that.
+Agent: Alright, let me check on the payment dates. Just a moment... Okay, it looks like the payment was received on the 5th, which is a bit past the due date. Do you happen to have a confirmation email or receipt?
+Caller: Um, I think I do. Let me find it... Hang on... [background noises] Yeah, it's here. So, it was... it went through on the 3rd. That's what I see here.
+Agent: Okay, I see. Could you forward that email to us? The best email to use would be info@willowcreekmgmt.com.
+Caller: Alright, I'll send it over. My email's uh, m.evans1980 at, uh, gmail.com. Did you get that?
+Agent: Perfect, m.evans1980@gmail.com. I'll look out for that. Once we receive it, we'll verify the payment date and adjust any fees accordingly.
+Caller: Great, thanks. Oh, and just to confirm, I don’t need to do anything else, right? Just email the receipt?
+Agent: That's correct. Just send that over, and we'll handle the rest.
+Caller: Awesome, thanks Jenna. Appreciate the help.
+Agent: You're welcome, Michael. If there's anything else, feel free to give us a call.
+Caller: Will do. Bye now!
+Agent: Have a great day!

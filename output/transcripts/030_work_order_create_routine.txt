@@ -1,0 +1,26 @@
+# Call 030 — resident / work_order_create_routine
+# edge_case=False  target_minutes=4.0  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Janet. How can I assist you today?
+Caller: Uh, hi... Yeah, this is Lisa. I'm having some, um, issues in my apartment.
+Agent: Oh, I'm sorry to hear that, Lisa. Can you tell me more about the issue you're experiencing?
+Caller: Sure, um, well, it's with the sink in my kitchen. It's... kinda dripping, and I can't seem to fix it. It's, uh, been going on for a bit now.
+Agent: I see, a dripping sink. That could be a leak or a faucet issue. Let me get that logged for you. Could I have your last name for our records?
+Caller: It's Taylor. Lisa Taylor.
+Agent: Thank you, Lisa. And, just to make sure I have the right unit, what is your apartment number?
+Caller: Oh, right, it's uh, 5B.
+Agent: Got it, 5B. Now, do you have any pets that we should be aware of before sending someone over?
+Caller: No, no pets here. Just me.
+Agent: Alright, makes maintenance a bit simpler! Now, when our maintenance team comes, is it okay if they enter if you aren't home, or would you prefer if they call first?
+Caller: Um, could you have them call me first? I'm at work most days, so... it's just easier.
+Agent: Absolutely, we'll make a note to call you first. And can I get the best number to reach you at?
+Caller: Yeah, it's 555-0183. That's my cell, so... you can always get me there.
+Agent: Perfect, thank you. I'll add that note here. Just to confirm, you're having a leaking or dripping sink in the kitchen, and we’ll reach out before entering. Is there anything else you’d like us to look into while we’re there?
+Caller: No, I think that's all for now. It's just been annoying, the drip. So if that could be fixed, I'd really appreciate it.
+Agent: Definitely, we’ll make sure to get that fixed for you. Our technicians will give you a call ahead of their visit. Expect to hear from them within the next day or two.
+Caller: Okay, great, thanks. Uh, just one more thing, do you know if they’ll come in the morning or afternoon, or is it, like, whenever?
+Agent: Typically, they try to start as early as possible, but I'll put a note for them to call you first so you can discuss timing directly with them.
+Caller: Alright, sounds good. Thanks again, Janet.
+Agent: You're welcome, Lisa. I’ve got your work order submitted. Is there anything else you need help with today?
+Caller: No, that's it. Thanks.
+Agent: Alright, then. You have a great day!

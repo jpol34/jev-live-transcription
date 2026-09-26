@@ -1,0 +1,29 @@
+# Call 086 — resident / edge_pest_infestation
+# edge_case=True  target_minutes=4.3  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management, this is Amy. How can I assist you today?
+Caller: Uh, hi Amy. This is, uh, Jake. I live in the Willow Creek Apartment Homes, and I have, um, sort of an unexpected issue.
+Agent: Hi Jake, I'm sorry to hear that. Could you tell me a bit more about the issue you're experiencing?
+Caller: Yeah, so, uh, it's a bit strange. I… I'm seeing a lot of bugs, and I mean a lot, in my apartment. Like, these little beetles, or maybe they're ants? Not sure.
+Agent: I'm really sorry to hear you're dealing with that. You're not quite sure if they're beetles or ants, right? Could you describe them a bit more?
+Caller: Uh, yeah, they're small, dark, kind of shiny… moving in lines? It's kinda weird.
+Agent: Okay, I understand, and which unit are you in?
+Caller: Oh, uh, sorry I forgot to mention that. It's 305.
+Agent: Thanks for providing that, Jake. I'll go ahead and make a note of that. Have you noticed them anywhere specific in your apartment?
+Caller: Yeah, um, mostly near the kitchen and, uh, around my window. They seem to be coming from, uh, somewhere near the sill maybe?
+Agent: Got it. I'll log this as a work order for pest control. Do you have any pets we should be cautious about when coming in?
+Caller: Oh, no pets for me. Well, aside from these bugs, I guess.
+Agent: Alright, no pets. Um, do we have your permission to enter your unit if you're not home, or would you prefer we call ahead?
+Caller: Uh, can you, um, can you call first? Just so I… I know what to expect?
+Agent: Of course, we can certainly do that. I'll make a note to have the team call you before they arrive.
+Caller: Thanks. Uh, sorry is this going to cost me anything? I mean, I’ve never had this before so I’m a bit, uh, concerned.
+Agent: No worries, Jake. There's no cost to you for pest control visits. This is part of the services provided for your unit to ensure everything’s up to standards.
+Caller: Oh, okay, that’s a relief. I wasn’t sure if… yeah, that’s good.
+Agent: Happy to help clear that up. Just to make sure I've got everything down: we’ll have a pest control team examine your unit, 305, and we'll call you beforehand. They’re small, shiny insects concentrated around the kitchen and window, correct?
+Caller: Yep, that’s… that sounds about right. I mean, I don’t know exactly what they are, never really saw them before.
+Agent: Understood. We’ll make sure to handle it. Is there anything else today that we can assist with?
+Caller: Uh, no, not at the moment. Just hoping this gets resolved soon. It’s kinda unnerving, you know?
+Agent: I completely understand. We'll prioritize this and get it sorted out as soon as possible. If anything else comes up, don’t hesitate to let us know.
+Caller: Thank you, Amy. I appreciate it. Just… just really wasn’t expecting to deal with bugs today.
+Agent: No problem, Jake. Have a good day, and we’ll be in touch soon!
+Caller: Thanks, you too. Bye now.

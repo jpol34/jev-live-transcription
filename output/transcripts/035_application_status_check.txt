@@ -1,0 +1,29 @@
+# Call 035 — prospect / application_status_check
+# edge_case=False  target_minutes=3.7  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Alicia. How can I help you today?
+Caller: Hi, uh, yeah, I, um, recently applied for a unit at, uh, Willow Creek… uh, Creek Apartments, and I wanted to check on, like, the status of my application?
+Agent: Of course! I'd be happy to help with that. Can I get your name, please, to look that up?
+Caller: Oh, sure, uh, it's, um, Steven… uh, Johnson. Yeah, Steven Johnson.
+Agent: Great, thank you, Steven. Let me pull up your application. Can you also verify the email you used when applying?
+Caller: Uh, let's see, I think it was… uh... S Johnson… 87 at, uh, Gmail.com?
+Agent: Alright, just a moment while I search that…
+Caller: Yeah, no rush. I've been, uh, you know, waiting on this. Want to make sure I didn't, like, mess any of the steps up.
+Agent: Understandable! I’m just pulling that up now. And, uh, you applied for a one-bedroom, correct?
+Caller: Uh, no, actually it was a two-bedroom I was looking for.
+Agent: Ah, right, I see now. Thank you for clarifying. I see your application here. Can I just quickly confirm the phone number associated with it?
+Caller: Uh, oh yeah, it's 555... um, 493... uh, 6824.
+Agent: Perfect, thank you! Alright, it looks like your application is still being processed. We, uh, we had a bit of a backlog, you see.
+Caller: Oh, backlog? Uh, okay. So, like, what should I do next, or...?
+Agent: Right now, there's nothing additional required on your end. We’re just completing some background checks and verification.
+Caller: Hmm, okay, uh, how long do you think that might, um, take with the backlog and all?
+Agent: Usually it's about a week, but with the current volume, it might be just a few extra days. Have you, uh, provided all the usual docs, like pay stubs?
+Caller: Uh, yeah, I think I sent those all, uh, through email. I hope they got it.
+Agent: Yes, let me check... Yes, we did receive those. Everything seems to be in order, Steven.
+Caller: Alright, good. I just, uh, wasn't sure if I dotted all my i's.
+Agent: You're all set on that front. If anything else is needed from you, we’ll reach out via email or phone.
+Caller: Great, thanks. Should I, like, follow up or just, you know, wait?
+Agent: I'd suggest waiting for a bit, but feel free to call back if you haven't heard anything next week.
+Caller: Okay, will do. Thanks a lot, Alicia, really appreciate your help today.
+Agent: No problem at all, Steven. Have a great day!
+Caller: You too, bye now.

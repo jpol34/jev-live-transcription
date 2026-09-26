@@ -1,0 +1,23 @@
+# Call 077 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.9  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Hi, yeah, I'm calling about a, um, work order I submitted a couple of days ago.
+Agent: Sure, I can help with that. Could I have your name, please?
+Caller: Oh, right, it's Jennifer... uh, sorry, Jennifer Lawson.
+Agent: Thanks, Jennifer. And what's your unit number?
+Caller: It's 307. Uh, wait, no, sorry, 308. I just moved in, and I'm still getting used to it.
+Agent: Got it, Unit 308. Let me pull up your information. Can you hold on for a moment, please?
+Caller: Yeah, take your time.
+Agent: Alright, thanks for waiting. I see we have a request here. Can you remind me of the issue you reported?
+Caller: Sure, it was about the leaky faucet in the kitchen. It's, uh, just constantly dripping.
+Agent: Oh, right, the kitchen faucet. Let me check the status on that. Please hold for another moment.
+Caller: Okay, no problem.
+Agent: Alright, just checked, and it seems like our maintenance technician was scheduled for tomorrow morning. Do you need them to call before they arrive?
+Caller: Uh, no need to call. I'll be here, so they can just come right in.
+Agent: Perfect, noted. They'll be there tomorrow morning, first thing. Is there anything else that needs attention while they're there?
+Caller: No, that's it for now. Uh, actually, well, I was supposed to get a new air filter too. Can they handle that as well?
+Agent: Absolutely, I’ll add the air filter replacement to your request. Anything else you'd like to mention?
+Caller: Uh, no, that should be all. Thanks for checking on that for me.
+Agent: My pleasure, Jennifer. If anything comes up, just give us a call back. Have a great day!
+Caller: Thanks, you too. Bye.

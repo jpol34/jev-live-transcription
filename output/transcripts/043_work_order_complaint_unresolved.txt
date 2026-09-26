@@ -1,0 +1,31 @@
+# Call 043 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=4.7  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Rebecca. How can I assist you today?
+Caller: Uh, hi. I've been having a problem with my sink and, uh, I've called before but it's still not fixed.
+Agent: I'm sorry to hear that. Let's see if we can sort that out. Can I get your name, please?
+Caller: It's...uh, it's Jason. But I'm not sure if the name's even right on your record. I had a roommate change.
+Agent: Alright, Jason. And just to pull up the right details, could you tell me your unit number?
+Caller: Yeah, it's, uh, 305, I think? Yeah, 305.
+Agent: Great, thank you. And can you describe what's been happening with the sink?
+Caller: Sure, so it's uh, it’s leaking, like constantly. Under the sink it’s all wet and I think it’s actually starting to smell, like moldy or something.
+Agent: That doesn't sound good at all. Let me check our records. [typing noise] Alright, I see a work order was placed last week. Did someone come out to take a look?
+Caller: Yeah, someone did come over, said they'd fix it, but I don't think they did anything. I didn’t... uh, I wasn’t home when they supposedly came back.
+Agent: Got it. Do you recall if you gave permission for them to enter while you weren’t home?
+Caller: I mean, I did, kind of. But I’d prefer if they call me first next time.
+Agent: Understood, I'll make a note of that preference. I'm going to reconnect with maintenance right now.
+Agent: Can I put you on a brief hold while I do that?
+Caller: Yeah, sure, but please don't take forever.
+Agent: [hold music playing] Alright, Jason, thanks for holding. I spoke with maintenance. They're aware of the issue, but it seems there was some confusion about timing.
+Caller: Confusion? With what exactly?
+Agent: It seems there was a mix-up with your availability, which might explain why it’s unresolved. Let's fix this. Can you let me know when you’re usually available?
+Caller: I'm generally home late afternoons, post 4 p.m. But weekends are better.
+Agent: Alright, how about we aim for this Friday around 5 p.m? I'll ensure maintenance contacts you first.
+Caller: Yeah, that should be fine. Please make sure they really do this time.
+Agent: I certainly will. Can I confirm your phone number to ensure they have the right contact info?
+Caller: Uh, I'd actually prefer to just leave things through email or the app. I don’t...uh, I don't wanna share the number over the line again.
+Agent: That's no problem at all. I’ll update our notes accordingly. Is there anything else I can help you with?
+Caller: No, just make sure this gets resolved. I've got guests over the weekend and it’s really...annoying.
+Agent: Absolutely, Jason. We'll get right on it and make sure it's sorted out. Thanks for calling in.
+Caller: Thanks, let’s hope this time it works.
+Agent: Take care, bye now.

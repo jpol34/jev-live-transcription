@@ -1,0 +1,27 @@
+# Call 071 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=3.7  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah. How can I help you today?
+Caller: Hi, um, I have a question about my rent payment for this month.
+Agent: Of course, I'd be happy to help with that. Could I get your name to make sure I'm looking at the right account?
+Caller: Uh, yes, it's... uh, James. James Greene.
+Agent: Thank you, James. Can you also provide your unit number, just to confirm I'm pulling up the right record on my system?
+Caller: Sure, um, it’s Building 5, ah, 5C, I think.
+Agent: Alright, let me check on that for a moment... Okay, I see you here at 5C. What question do you have about your rent payment?
+Caller: I think I was charged more than what the lease says, but I'm not sure... Um, has there been a change in the rent for October?
+Agent: Let me take a look at your billing details. Can you hold for just a moment while I pull that up?
+Caller: Yeah, sure.
+Agent: Thank you for holding, James. I see that last month's rent included a late fee. It seems your payment for September was processed a bit late—does that ring a bell?
+Caller: Oh, um, I thought I paid on time. Can you, uh, check when it was posted?
+Agent: Let me see here... It looks like the payment was posted on the 6th of September. Rent is due by the 5th; was there a processing delay on your end, perhaps?
+Caller: Hmm, yeah, I remember my bank had some issues, uh, there was a delay. But I wasn’t sure it'd affect this.
+Agent: I understand, these things happen. If there was a confirmed banking issue, sometimes they'll reimburse fees like this. It might be worth checking with them.
+Caller: Alright, I guess I can try that. Do I need to do anything else on my end with you guys?
+Agent: Not necessarily, unless they require documentation from us. If needed, we can provide confirmation of the charge date.
+Caller: Okay, thanks for clarifying. Um, and you’re sure the rent itself isn't different now?
+Agent: Yes, the base rent hasn't changed. Your lease remains the same until renewal.
+Caller: Got it, thanks. Uh, if I have more questions, should I call back or can I just…
+Agent: You're welcome to call back anytime. Or you can email us—it's help@willowcreekpm.com. Either way, we’re here to assist you.
+Caller: Alright, thanks. I’ll see what the bank says first.
+Agent: Sounds good. Hope everything works out smoothly with them. Have a great day, James!
+Caller: Thanks, you too. Bye.

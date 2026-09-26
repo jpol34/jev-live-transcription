@@ -1,0 +1,21 @@
+# Call 067 — resident / amenity_access_issue
+# edge_case=False  target_minutes=2.2  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah speaking. How can I assist you today?
+Caller: Hi, um, I'm having trouble with, uh, accessing the pool area. My key fob doesn’t seem to be working.
+Agent: Oh, I’m sorry to hear that! Let me see how I can help with that. Can I start off with your name, please?
+Caller: Yeah, it's uh, James. James Lar-sen. L-A-R-S-E-N.
+Agent: Thank you, James. And could you provide me with your unit number so I can pull up your details?
+Caller: Ah, uh, I'm in 2B. Sorry, I should've mentioned that earlier.
+Agent: No worries! Let’s check that for you. So, your key fob isn’t working at the pool access point?
+Caller: Yeah, that's right. It's been, uh, a couple of days now.
+Agent: Okay, I’m going to put you on a brief hold while I check your account. Will that be alright?
+Caller: Uh, sure, that's fine.
+Agent: Thank you. I'll be right back.
+Agent: Hi, James? Thanks for holding. I see that there are no recent updates or blocks on your account. Have you tried using the key fob at other access points?
+Caller: Yeah, it works fine at the front entrance, but, uh, the pool... not so much.
+Agent: Okay, that helps narrow things down. Sometimes the pool access reader needs a reset. I’ll pass this on to maintenance right away. Could you confirm your phone number, just in case they need to contact you?
+Caller: Uh, yeah, it's 555-0193-725.
+Agent: Great, I’ve got that. Maintenance should get to it within the next day or so. Is there anything else I can do for you?
+Caller: No, that's all. Thanks for your help.
+Agent: You're welcome, James. Have a great day!

@@ -1,0 +1,24 @@
+# Call 069 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=3.1  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sandra speaking. How can I assist you today?
+Caller: Hi, um, yeah, it's—it's Natalie. I live in uh, um, 4A—Unit 4A, and there's like water everywhere in my kitchen. It's bad.
+Agent: Oh no, I'm sorry to hear that, Natalie. Let's get this sorted out for you. Can I get your full name and a callback number just in case we get disconnected?
+Caller: Um, sure, sure, it's Natalie Bennett. My phone number is—hold on—619-555-3412. It's a real mess here.
+Agent: Got it, Natalie. Thanks for confirming that. Uh, and you mentioned Unit 4A, right?
+Caller: Yeah, Unit 4A. It's like, the sink maybe exploded or something? I don't know.
+Agent: I understand. We'll mark this as an emergency, um, since it sounds like potential flooding. Do you need us to send someone right away?
+Caller: Yes, please! And—should I, like, turn off the water or something? I mean, is that—
+Agent: If you know where the shut-off valve is, go ahead and try that. But let's also get maintenance over there immediately. Do we have permission to enter if you're not there?
+Caller: Oh, uh, yeah, sure—just do what you need to do. This is crazy.
+Agent: Got it. Permission to enter is granted. Uh, you said it's just in the kitchen so far, is that right?
+Caller: Yeah, but it's starting to spread—like to the dining, ugh, I can't believe this.
+Agent: Alright, I'm getting someone over to you as quickly as possible. Can I confirm the address? Just to make sure we’re sending them to the right place.
+Caller: Oh, yeah, it's uh, 123 Willow Lane, right?
+Agent: That's correct, got it. And Natalie, you mentioned water everywhere—has it affected any electrical outlets or appliances? Just for safety’s sake.
+Caller: I—I haven't checked. It’s just... everywhere, and I don’t know.
+Agent: Okay, thanks for letting me know. We’ll have maintenance assess it and make sure everything is safe. They should be there shortly.
+Caller: Thank you, I really appreciate it. I’ll—I'll be here waiting.
+Agent: You're welcome, Natalie. If anything else comes up or you need further assistance, don't hesitate to give us a call back, alright?
+Caller: Yeah, okay. Thanks again. Bye.
+Agent: Bye now, take care.

@@ -1,0 +1,21 @@
+# Call 044 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.8  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. My name is Jasmine, how can I help you today?
+Caller: Uh, hi Jasmine, this is Mark.
+Agent: Hi Mark! How can I assist you today?
+Caller: Yeah, I wanted to check the status on a work order I placed a few days ago. It's for my, um, garbage disposal. It's been acting up lately.
+Agent: Sure thing, Mark. Can you please provide me with your unit number so I can pull up your work order?
+Caller: Oh, yes! Um, it's 23B. Wait, no, sorry, 26B. 26B.
+Agent: Got it, 26B. Thank you for that. Let me put you on a brief hold while I look up your order, okay?
+Caller: Yeah, sure, no problem.
+Agent: (hold music plays briefly) Alright, Mark, thanks for holding. I see here that your work order was received. It looks like it’s scheduled for tomorrow between 10 AM and 2 PM.
+Caller: Ah, I see. I thought it might have been today. No worries, though. Do I need to be at home for that?
+Agent: Well, you can be there, but you can also grant us permission to enter if you're comfortable. What would you prefer?
+Caller: Uh, I might be at work, so it'd probably be best if you just entered. Is that fine?
+Agent: Yes, that’s completely fine. I'll note that you give permission to enter.
+Caller: Great. Thanks, Jasmine.
+Agent: No problem at all. Is there anything else you need help with?
+Caller: No, that’s it. Appreciate it!
+Agent: Alright, Mark. Have a nice day!
+Caller: You too, bye!

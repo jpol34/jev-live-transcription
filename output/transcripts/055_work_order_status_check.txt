@@ -1,0 +1,17 @@
+# Call 055 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.2  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Hi, yeah—uh, I'm just checking on a work order, uh, status? Placed it a few days ago.
+Agent: Sure thing! Can I have your name, please?
+Caller: Oh, right. It's, uh, Mark Jensen.
+Agent: Thanks, Mark. And could you tell me your unit number?
+Caller: Yeah, uh, it's unit 5B. The one with the, uh, noisy fridge.
+Agent: Got it. You mentioned a fridge issue?
+Caller: Yeah, it's making a loud hum, kinda like, uh, a drone or something?
+Agent: Alright, let me pull up the system, just a second—
+Agent: Looks like your work order is in progress. The technician should be by, uh, either later today or early tomorrow. Should I have them call before coming in?
+Caller: Uh, yeah, could they? My schedule's a bit tight, y'know?
+Agent: Absolutely, I'll make a note for them to call first. Is there anything else I can help you with today?
+Caller: No, that's it. Just wanted to make sure it wasn't forgotten. Thanks, Sarah!
+Agent: You're welcome, Mark. Have a good day!

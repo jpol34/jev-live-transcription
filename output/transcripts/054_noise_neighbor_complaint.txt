@@ -1,0 +1,24 @@
+# Call 054 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=4.6  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sara, how can I assist you today?
+Caller: Hi, uh, this is Mark. I live in, um, Willow Creek Apartments. I'm having, uh, a bit of a problem with noise from my neighbors. It's been... really unbearable lately.
+Agent: Oh, I'm sorry to hear that, Mark. Could you let me know your unit number so I can look into it?
+Caller: Yeah, sure, it's uh, 205B. It's just been so loud constantly. I can't even... have a decent night's sleep. It's driving me crazy.
+Agent: That sounds really frustrating. Just to confirm, that was 205B, correct?
+Caller: Yes, that's right.
+Agent: And you mentioned it's been constant? Is there a particular time or type of noise you've noticed?
+Caller: Oh, uh, it's mostly in the evenings. There's loud music and, sometimes parties, I guess? It's really affecting my work schedule.
+Agent: I understand. And you're saying this is happening mainly at night? We certainly want to make sure our residents are comfortable. Let me note that down.
+Caller: Right, it starts around, like, 9 PM and goes on sometimes till, uh, midnight or later. I don't know... it's... really stressful.
+Agent: Thank you for letting us know. We'll definitely address this. Just to confirm, this has been ongoing for a while now?
+Caller: Yes, it's been about two weeks. I wasn't sure at first if it would stop, but it hasn't.
+Agent: Got it. And, just to better assist you, can I get your last name and a phone number where we could reach you about any updates?
+Caller: Oh, sure, it's, uh, Dawson. And the phone number is 555-0198.
+Agent: Perfect, so, Dawson at 555-0198. Great. I'll file a complaint with our on-site team to monitor the noise. We'll keep you updated on any actions taken.
+Caller: Thank you so much. I was really worried nothing could be done.
+Agent: You're welcome. We strive to maintain a peaceful community, and we'll do our best to resolve this quickly.
+Caller: Okay, thanks again, Sara. I really appreciate it.
+Agent: No problem, Mark. Please feel free to call back if you continue to experience issues.
+Caller: Alright, will do. Have a great day.
+Agent: You too, thank you for calling Willow Creek Property Management.

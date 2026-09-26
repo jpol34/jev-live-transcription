@@ -1,0 +1,21 @@
+# Call 004 — prospect / application_status_check
+# edge_case=False  target_minutes=2.2  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Uh, hi, yeah. I submitted an application for the Willow Creek Apartment Homes about a week ago. Just checking in on the status.
+Agent: Of course, I'd be happy to help with that. Can I have your name, please?
+Caller: It's Kyle, uh, Kyle... Anderson.
+Agent: Alright, thank you, Kyle. Let me just pull up your application. Could you hold on for just a moment?
+Caller: Sure, no problem.
+Agent: [typing sounds] Okay, I'm seeing a few applications under similar names. Could you verify your email address, please?
+Caller: Oh right, it's uh, kyle.anderson... uh, haha, at email.com.
+Agent: Got it, thank you. [pause] And just to confirm, was that Anderson with an 'o' or 'e'?
+Caller: Oh, with an 'o', it’s spelled A-N-D-E-R-S-O-N.
+Agent: Great, let me get that up. [typing] Alright, I see your application here. It looks like it's still under review by our leasing team. These things usually take about a week or two.
+Caller: Okay, that makes sense. Uh, is there anything else you need from me to speed it up?
+Agent: For now, everything seems in order on your end. If they need additional documents or have any questions, they'll reach out to you directly. Is this phone number the best way to reach you?
+Caller: Yeah, this number is fine, you can call me here anytime.
+Agent: Perfect, we'll keep that noted. Anything else I can help you with today, Kyle?
+Caller: Nope, that’s it. Just wanted to check in. Thanks!
+Agent: You're welcome! Feel free to call back if you have any other questions. Have a great day!
+Caller: You too! Bye.

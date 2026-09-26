@@ -1,0 +1,26 @@
+# Call 090 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.6  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Uh, hi Sarah, um, I'm looking to find out about availability for a... uh, a two-bedroom apartment? At, um, Willow Creek Apartment Homes.
+Agent: Sure! I can help with that. May I have your name, please?
+Caller: Oh, yeah, it's Dan. Dan Overs—no wait, it's actually Ovens. Sorry about that.
+Agent: No worries, Dan. And just to confirm, you're interested in a two-bedroom unit, is that right?
+Caller: Yes, that's right.
+Agent: Perfect. Let me check our availability real quick. Can you hold on for a moment?
+Caller: Sure, take your time.
+Agent: Alright, thank you for holding. It looks like we do have a couple of two-bedroom units coming up. Just to get a better sense, do you have a preferred move-in date?
+Caller: Um, ideally by the end of next month. Yeah, something like November 30th, if possible.
+Agent: Got it. That should work just fine. And can I ask, do you have a particular budget range you're aiming for?
+Caller: Ah, yes, around... like, twelve hundred to fourteen hundred. Somewhere in there.
+Agent: Okay, that's good to know. Our two-bedroom units are currently within that range, so that should be a fit. Now, are there any specific amenities you're interested in?
+Caller: Oh, uh, I’d definitely like in-unit laundry. And, um, is there, maybe, a pool?
+Agent: Yes, we do have a community pool. And I can confirm some of our two-bedroom units do come with in-unit laundry.
+Caller: Great. That's, uh, that's good to hear.
+Agent: Wonderful. Would you like to schedule a tour to see these options in person?
+Caller: Oh, um, I might have to check my schedule first. Can I call you back to arrange that?
+Agent: Of course, you can absolutely reach us at the same number when you're ready. Also, can I get your phone number just in case we need to follow up?
+Caller: Right, it's uh, 555-0198. Oh no, sorry, I mean 555-0199.
+Agent: Got it, 555-0199. Thanks for clarifying that.
+Caller: Thanks, and, um, thanks for all the info, Sarah.
+Agent: You're very welcome, Dan. Don't hesitate to call back if you have any more questions!

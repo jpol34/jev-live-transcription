@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 19,
+    "category": "resident",
+    "subtype": "edge_non_english_speaker",
+    "edge_case": true,
+    "target_minutes": 5.0,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Emiliano",
+    "email": null,
+    "phone_number": "555-9801",
+    "unit_number": "126",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "Water heater not providing hot water",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Work order created for water heater issue with call-ahead permission noted.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 300
+  }
+}

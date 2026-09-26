@@ -1,0 +1,27 @@
+# Call 096 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=4.5  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. My name is Lisa. How can I assist you today?
+Caller: Hi Lisa, this is Brian Taylor. I received a notice about my lease renewal and I'm considering giving a move-out notice instead.
+Agent: Okay, Brian, I can help with that. Can you confirm your unit number for me, please?
+Caller: Yeah, it's uh... 3B—not 3D like last time; that was my mistake. It's 3B.
+Agent: Got it, 3B. Thanks for clarifying. So, you're thinking about moving out. Has a date been set for your move, or are you still deciding?
+Caller: I'm aiming for end of November, maybe November 30th. But I haven't locked that in yet.
+Agent: Okay, end of November. I'll make a note. Have you received any renewal pricing that you're comparing against? Sometimes that decision helps.
+Caller: I, uh, I think they quoted me $1,500. But is, is that accurate? Could you double-check?
+Agent: Let me pull up your file. Can I put you on a brief hold while I check?
+Caller: Sure, no problem.
+Agent: Thanks for holding, Brian. It looks like the renewal rate is indeed $1,500 per month.
+Caller: Alright, that's what I thought. It's just a bit higher than I hoped. Could you also remind me of the process if I decide to move out?
+Agent: Absolutely. We require a written notice at least 30 days before your move-out date. You can drop by our office or email us the notice. Would you like that email address?
+Caller: Yes, please, just in case. Also, I think I've been using the wrong email. It’s not brian_taylor123, it's brianjt@example.com.
+Agent: Got it, brianjt@example.com. And our email for notices is notices@willowcreekpm.com.
+Caller: Okay, got it, thank you.
+Agent: No problem. Also, consider a final walk-through to make sure everything's in order for your deposit. A good standing helps with that.
+Caller: Right, a good point. I'll keep that in mind.
+Agent: Was there anything else you needed or any other questions you might have?
+Caller: No, I think that covers it for now. If I choose to renew, when should I let you know by?
+Agent: To renew, we'd ideally want confirmation at least 30 days before your lease ends. Let me double-check... your lease ends on... right, November 30th.
+Caller: Okay, that makes sense. I'll decide soon and get back to you. Thanks for your help, Lisa.
+Agent: You're very welcome, Brian. Feel free to call if anything else comes up. Have a great day!
+Caller: Thanks, you too. Bye.

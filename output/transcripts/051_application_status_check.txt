@@ -1,0 +1,23 @@
+# Call 051 — prospect / application_status_check
+# edge_case=False  target_minutes=3.2  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Uh, hi, um, I'm, I'm calling to check on the status of my, uh, application? It's for the Willow Creek, um, Apartment Homes?
+Agent: Sure, I can help with that. May I get your full name, please?
+Caller: Right, right, it's, uh, Jason... uh, Jason Henderson.
+Agent: Jason Henderson, got it. Let me just pull that up for you. Can I put you on hold for a quick moment while I check the status?
+Caller: Oh, uh, yeah, that’s, that's fine.
+Agent: Thank you. Please hold…
+Caller: Okay.
+Agent: Alright, thanks for holding, Jason. So, let's see... okay, it looks like your application is still under review. Can I just confirm the phone number linked to your application?
+Caller: Uh, yeah, I think it's, um, 555... uh, 0167? Yeah, that sounds right.
+Agent: Okay, 555-0167. Great. And is there an email on record that might help us more quickly get updates to you?
+Caller: Oh, uh, probably—it’s, um, j-dot-henderson... uh, at, let’s see here, uh, no, actually it’s jhenderson23 at—wait, no, uh—can I just send that to you later?
+Agent: Sure, no problem. You can email it to us at info@willowcreek.com whenever you're ready. It can help speed things up if we need to send you any documents.
+Caller: Gotcha, gotcha. Okay, I’ll do that.
+Agent: Great. Just to let you know, it usually takes about two weeks for the full review process, but we will notify you as soon as there's a decision.
+Caller: Two weeks? Oh, wow, okay. I thought maybe it'd be faster. Uh, can I call back if I, you know, need to check again?
+Agent: Of course, you're welcome to check in any time. Just give us your name and your application's already saved with your details, so we can easily pull it up.
+Caller: Alright, thanks. Uh, I appreciate the help.
+Agent: No problem, Jason. Have a great day, and do get in touch if you have more questions.
+Caller: Yeah, I will. Thanks again, bye!

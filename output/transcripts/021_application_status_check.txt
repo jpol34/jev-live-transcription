@@ -1,0 +1,18 @@
+# Call 021 — prospect / application_status_check
+# edge_case=False  target_minutes=2.2  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Laura. How can I help you today?
+Caller: Hi, yeah, I'm checking on my, um, application status for an apartment I applied for? I think it was, uh, for Willow Creek Apartment Homes.
+Agent: Sure, I can help with that. Could you please provide your name?
+Caller: Oh, uh, it's Kevin. Kevin Harper.
+Agent: Great, Kevin. And just to make sure we have the right application, do you have your email address handy?
+Caller: Uh, yes, I think so. It's harper.kevin... uh... at maildotcom? No, wait, it's harper.kj at mail dot com. Yeah, that's it.
+Agent: Okay, harper.kj at mail dot com. Let me pull up that info for you. Can you hold on for just a moment?
+Caller: Sure, no problem.
+Agent: Thanks for holding, Kevin. I’ve found your application here. It looks like we're just waiting on one more document. Did you submit your proof of income yet?
+Caller: Hmm, I thought I did. Maybe I forgot to send it? It was kind of a rush submitting everything.
+Agent: No worries. You can email it to us and we'll update your file. Can I confirm your phone number, in case we need to follow up?
+Caller: Yeah, that's 555-0143. Uh, area code is 303.
+Agent: 303-555-0143, got it. Once we receive the document, we'll process your application as soon as possible. Anything else I can help with?
+Caller: That’s all for now. I’ll make sure to send that in today. Thanks a lot!
+Agent: You're welcome, Kevin. Have a great day!
