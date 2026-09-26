@@ -1,0 +1,144 @@
+"""Local, CPU-only candidate-extraction stage for the live-transcription benchmark.
+
+Runs two GLiNER models against the transcript-so-far on every tick: a streaming
+PII checkpoint (`knowledgator/gliner-stream-pii-v1.0`) that reuses its decoder
+KV cache incrementally per call for `caller_name`/`email`/`phone_number`, and a
+standard zero-shot checkpoint (`urchade/gliner_medium-v2.1`) that fully
+re-encodes the transcript-so-far for the remaining 8 domain fields.
+`extract_candidates` is the single entry point the jev resolver stage
+consumes.
+"""
+
+from __future__ import annotations
+
+import asyncio
+
+from gliner import GLiNER
+
+PII_MODEL_NAME = "knowledgator/gliner-stream-pii-v1.0"
+ZERO_SHOT_MODEL_NAME = "urchade/gliner_medium-v2.1"
+
+# Native labels the streaming PII checkpoint was trained on, mapped to this
+# project's field names.
+PII_FIELD_LABELS: dict[str, str] = {
+    "caller_name": "person",
+    "email": "email address",
+    "phone_number": "phone number",
+}
+
+# Zero-shot labels for the remaining domain fields, handed to the standard
+# GLiNER checkpoint on every tick alongside the full transcript-so-far.
+ZERO_SHOT_FIELD_LABELS: dict[str, str] = {
+    "unit_number": "apartment unit number",
+    "amenities_requested": "requested apartment amenity",
+    "pet_info": "pet type, breed, or description",
+    "permission_to_enter": "statement about permission to enter the unit",
+    "work_order_issue": "maintenance or work order issue description",
+    "move_in_date": "move-in date or lease date",
+    "price_quoted": "quoted rent price or dollar amount",
+    "budget_amount": "budget or price range the caller can afford",
+}
+
+_PII_LABEL_TO_FIELD = {label: field for field, label in PII_FIELD_LABELS.items()}
+_ZERO_SHOT_LABEL_TO_FIELD = {label: field for field, label in ZERO_SHOT_FIELD_LABELS.items()}
+
+# Module-level singletons, lazily loaded on first use and reused for the rest
+# of the process's lifetime. Lazy (rather than eager at import time) so that
+# importing this module in tests doesn't require a real model download.
+_pii_model: GLiNER | None = None
+_zero_shot_model: GLiNER | None = None
+
+# Count of transcript characters already fed into the PII model's streaming
+# session per call_id. Only the new suffix is sent each tick; the checkpoint's
+# cached-incremental mode reuses decoder KV state, labels, words, and span
+# history for everything already seen. Never shared across call_ids.
+_pii_sent_length: dict[str, int] = {}
+
+
+def _get_pii_model() -> GLiNER:
+    global _pii_model
+    if _pii_model is None:
+        _pii_model = GLiNER.from_pretrained(PII_MODEL_NAME)
+    return _pii_model
+
+
+def _get_zero_shot_model() -> GLiNER:
+    global _zero_shot_model
+    if _zero_shot_model is None:
+        _zero_shot_model = GLiNER.from_pretrained(ZERO_SHOT_MODEL_NAME)
+    return _zero_shot_model
+
+
+def _entities_to_candidates(
+    entities: list[dict], label_to_field: dict[str, str]
+) -> dict[str, list[dict]]:
+    """Group raw GLiNER entity dicts into `{field: [candidate, ...]}` buckets."""
+    candidates: dict[str, list[dict]] = {field: [] for field in label_to_field.values()}
+    for entity in entities:
+        field = label_to_field.get(entity.get("label"))
+        if field is None:
+            continue
+        candidates[field].append(
+            {
+                "text": entity.get("text"),
+                "score": entity.get("score"),
+                "start": entity.get("start"),
+                "end": entity.get("end"),
+            }
+        )
+    return candidates
+
+
+def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict]]:
+    """Advance `call_id`'s streaming PII session to `transcript_snapshot` and return its candidates."""
+    model = _get_pii_model()
+    sent = _pii_sent_length.get(call_id, 0)
+    delta = transcript_snapshot[sent:]
+    if not delta:
+        # No new text this tick. The streaming API requires a non-empty chunk
+        # per call, so there's nothing to feed the session; report no
+        # candidates rather than re-querying stale state.
+        return {field: [] for field in PII_FIELD_LABELS}
+    entities = model.inference(
+        [delta],
+        list(PII_FIELD_LABELS.values()),
+        session_id=[call_id],
+        threshold=0.5,
+    )[0]
+    _pii_sent_length[call_id] = len(transcript_snapshot)
+    return _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
+
+
+def _run_zero_shot_tick(transcript_snapshot: str) -> dict[str, list[dict]]:
+    """Re-encode `transcript_snapshot` in full against the zero-shot domain labels."""
+    model = _get_zero_shot_model()
+    entities = model.predict_entities(
+        transcript_snapshot,
+        list(ZERO_SHOT_FIELD_LABELS.values()),
+        multi_label=True,
+    )
+    return _entities_to_candidates(entities, _ZERO_SHOT_LABEL_TO_FIELD)
+
+
+async def extract_candidates(transcript_snapshot: str, call_id: str) -> dict[str, list[dict]]:
+    """Return per-field candidate spans for one call's transcript-so-far.
+
+    Runs the streaming PII checkpoint (`caller_name`/`email`/`phone_number`,
+    cached incrementally per `call_id`) and the zero-shot domain checkpoint
+    (the other 8 fields, fully re-encoded every call) concurrently via
+    `asyncio.to_thread`, so wall-clock latency is the max of the two rather
+    than their sum. The result covers all 11 fields; each maps to a list of
+    candidate spans shaped `{"text", "score", "start", "end"}`, empty when no
+    candidate was found this tick.
+    """
+    pii_task = asyncio.to_thread(_run_pii_tick, transcript_snapshot, call_id)
+    zero_shot_task = asyncio.to_thread(_run_zero_shot_tick, transcript_snapshot)
+    pii_candidates, zero_shot_candidates = await asyncio.gather(pii_task, zero_shot_task)
+    return {**pii_candidates, **zero_shot_candidates}
+
+
+def reset_call(call_id: str) -> None:
+    """Discard cached streaming state for `call_id`, e.g. once its call has ended."""
+    _pii_sent_length.pop(call_id, None)
+    if _pii_model is not None:
+        _pii_model.clear_session(call_id)
