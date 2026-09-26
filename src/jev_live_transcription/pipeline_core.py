@@ -522,11 +522,12 @@ async def run_call(
     (replay paced to wall-clock time).
 
     `on_tick`, if given, is called synchronously after every tick (whether or not the transcript
-    grew that tick) with `(tick_number, total_ticks, committed_snapshot)`, where
-    `committed_snapshot` is a shallow copy of the internal `(pipeline, field_name) -> (value,
-    confidence)` carry-forward state at that point -- e.g. for a live-progress display. Exceptions
-    raised by `on_tick` propagate, so a caller that wires this up to UI rendering is responsible
-    for its own error handling.
+    grew that tick) with `(tick_number, total_ticks, transcript_snapshot, committed_snapshot)`,
+    where `transcript_snapshot` is the transcript text so far and `committed_snapshot` is a
+    shallow copy of the internal `(pipeline, field_name) -> (value, confidence)` carry-forward
+    state at that point -- e.g. for a live-progress display. Exceptions raised by `on_tick`
+    propagate, so a caller that wires this up to UI rendering is responsible for its own error
+    handling.
     """
     calls = calls if calls is not None else corpus.load_all()
     if call_id not in calls:
@@ -623,7 +624,7 @@ async def run_call(
                     await asyncio.gather(*steps)
 
                 if on_tick is not None:
-                    on_tick(tick_number, call_pacer.total_ticks, dict(committed))
+                    on_tick(tick_number, call_pacer.total_ticks, snapshot, dict(committed))
         finally:
             # Each cleanup step is isolated so one raising (e.g. a GLiNER session that was never
             # created because every tick had grew=False) doesn't skip the rest -- in particular,

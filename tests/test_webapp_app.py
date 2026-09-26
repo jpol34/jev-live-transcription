@@ -66,10 +66,18 @@ async def test_active_call_guard_blocks_same_call_id_until_released():
     assert await guard.try_acquire(1) is True  # freed
 
 
+class FakeResolver:
+    """Stands in for JevFieldResolver -- constructing a real one requires a real
+    TYPESAFE_API_KEY, which these mocked tests never set."""
+
+    aclose = AsyncMock()
+
+
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setattr(app_module.secrets, "load_typesafe_key", lambda: None)
     monkeypatch.setattr(app_module.batch_runner, "warm_up_gliner", AsyncMock())
+    monkeypatch.setattr(app_module, "JevFieldResolver", FakeResolver)
     with TestClient(app_module.app) as test_client:
         app_module.app.state.calls = _calls_fixture()
         yield test_client
@@ -85,8 +93,8 @@ def test_list_calls_endpoint(client):
 
 def test_websocket_replay_streams_ticks_and_done(client, monkeypatch):
     async def fake_run_call(call_id, db_path, *, pacer_mode, calls, on_tick):
-        on_tick(1, 3, {("gliner_jev", "caller_name"): ("Tim Barker", 0.9)})
-        on_tick(2, 3, {("gliner_jev", "caller_name"): ("Tim Barker", 0.9)})
+        on_tick(1, 3, "Agent: hi", {("gliner_jev", "caller_name"): ("Tim Barker", 0.9)})
+        on_tick(2, 3, "Agent: hi there", {("gliner_jev", "caller_name"): ("Tim Barker", 0.9)})
 
     monkeypatch.setattr(app_module.pipeline_core, "run_call", fake_run_call)
 
@@ -96,6 +104,8 @@ def test_websocket_replay_streams_ticks_and_done(client, monkeypatch):
         done = websocket.receive_json()
 
     assert first["tick_number"] == 1
+    assert first["transcript"] == "Agent: hi"
+    assert first["caller_type"] == {"status": "pending", "confidence": 0.0}
     assert first["committed"]["gliner_jev"]["caller_name"]["value"] == "Tim Barker"
     assert second["tick_number"] == 2
     assert done == {"type": "done"}
@@ -121,7 +131,7 @@ def test_websocket_replay_sends_busy_when_over_session_cap(client, monkeypatch):
 
 def test_websocket_replay_sends_busy_when_call_id_already_active(client, monkeypatch):
     async def slow_run_call(call_id, db_path, *, pacer_mode, calls, on_tick):
-        on_tick(1, 5, {})
+        on_tick(1, 5, "Agent: hi", {})
         await asyncio.sleep(0.3)
 
     monkeypatch.setattr(app_module.pipeline_core, "run_call", slow_run_call)
@@ -140,7 +150,7 @@ def test_websocket_disconnect_cancels_the_underlying_replay(client, monkeypatch)
     async def fake_run_call(call_id, db_path, *, pacer_mode, calls, on_tick):
         nonlocal finished_normally
         for tick in range(1, 20):
-            on_tick(tick, 20, {})
+            on_tick(tick, 20, f"Agent: tick {tick}", {})
             ticks_emitted.append(tick)
             await asyncio.sleep(0.05)
         finished_normally = True

@@ -30,6 +30,8 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 
 from .. import batch_runner, corpus, pipeline_core, secrets
+from ..jev_pipeline import JevFieldResolver
+from .caller_type import CallerTypeClassifier
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -136,17 +138,32 @@ def _serialize_committed(committed: dict[tuple[str, str], tuple[str, float]]) ->
 
 async def _run_replay(websocket: WebSocket, call_id: int, calls: dict, queue: asyncio.Queue) -> None:
     """Runs `run_call` to completion (or until cancelled by `_run_replay_session` on a send
-    failure), always leaving a `_DONE` sentinel on `queue` so `_consume` below can't block
-    forever waiting for one more item that will never arrive."""
+    failure), always leaving a `_DONE` sentinel on `queue` so `consume` in `_run_replay_session`
+    can't block forever waiting for one more item that will never arrive."""
 
-    def on_tick(tick_number: int, total_ticks: int, committed: dict) -> None:
+    # A resolver of its own, rather than sharing run_call's internal one (which would require
+    # threading it through run_call's signature) -- what actually matters here is reusing
+    # jev_pipeline's retry/timeout machinery, not sharing the connection pool.
+    resolver = JevFieldResolver()
+    classifier = CallerTypeClassifier(resolver, call_id)
+    classify_task: asyncio.Task | None = None
+
+    def on_tick(tick_number: int, total_ticks: int, snapshot: str, committed: dict) -> None:
         # Called synchronously from inside run_call's async tick loop -- queue.put_nowait is the
         # sync-safe way to hand a tick off to the consumer task, which does the actual
-        # (necessarily async) websocket.send_json.
+        # (necessarily async) websocket.send_json. Classification is likewise fired off as a
+        # background task rather than awaited here (on_tick can't await); `classify_task` guards
+        # against overlapping attempts if a prior classification call is still in flight when a
+        # later tick fires.
+        nonlocal classify_task
+        if classify_task is None or classify_task.done():
+            classify_task = asyncio.create_task(classifier.classify(tick_number, snapshot))
         queue.put_nowait(
             {
                 "tick_number": tick_number,
                 "total_ticks": total_ticks,
+                "transcript": snapshot,
+                "caller_type": {"status": classifier.status, "confidence": classifier.confidence},
                 "committed": _serialize_committed(committed),
             }
         )
@@ -163,9 +180,16 @@ async def _run_replay(websocket: WebSocket, call_id: int, calls: dict, queue: as
                 call_id, tmp_db_path, pacer_mode="realtime", calls=calls, on_tick=on_tick
             )
         finally:
+            # Cancelled rather than awaited: by the time we reach here (whether run_call finished
+            # normally or this whole task was itself cancelled on viewer disconnect), no more
+            # payloads will be sent, so there's nothing left for a still-in-flight classification
+            # call to usefully report -- awaiting it would just delay teardown for no benefit.
+            if classify_task is not None and not classify_task.done():
+                classify_task.cancel()
             queue.put_nowait(_DONE)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+        await resolver.aclose()
 
 
 async def _run_replay_session(websocket: WebSocket, call_id: int) -> None:
