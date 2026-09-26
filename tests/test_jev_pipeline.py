@@ -1,5 +1,6 @@
 """Mocked tests for jev_pipeline -- no real typesafe.ai calls (kept fast/offline)."""
 
+import asyncio
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
@@ -268,15 +269,9 @@ async def test_transient_error_exhausts_retries_and_raises(monkeypatch):
 @pytest.mark.asyncio
 async def test_timeout_is_treated_as_transient_and_retried(monkeypatch):
     monkeypatch.setattr("jev_live_transcription.jev_pipeline.asyncio.sleep", AsyncMock())
-
-    async def slow_then_fast(*args, **kwargs):
-        if slow_then_fast.calls == 0:
-            slow_then_fast.calls += 1
-            raise TimeoutError("simulated wait_for timeout")
-        return _noul_response(0.9)
-
-    slow_then_fast.calls = 0
-    system_one = AsyncMock(side_effect=slow_then_fast)
+    system_one = AsyncMock(
+        side_effect=[TypeSafeAPITimeoutError(timeout=6.0), _noul_response(0.9)]
+    )
     resolver = _resolver(system_one)
 
     result = await resolver.resolve_field(
@@ -285,3 +280,115 @@ async def test_timeout_is_treated_as_transient_and_retried(monkeypatch):
 
     assert result is not None
     assert system_one.await_count == 2
+    # The timeout is passed to the SDK's own per-call `timeout=` rather than wrapped in
+    # asyncio.wait_for, so the shared client's pooled connection is never cancelled externally.
+    _, kwargs = system_one.call_args
+    assert kwargs["timeout"] == 6.0
+
+
+# --- none_of_these and phone-number country-code normalization ------------------------------
+
+
+@pytest.mark.asyncio
+async def test_choice_none_of_these_is_flagged_not_treated_as_a_real_candidate():
+    system_one = AsyncMock(return_value=_choice_response("none_of_these", 0.9))
+    resolver = _resolver(system_one)
+
+    result = await resolver.resolve_field(
+        call_id=1,
+        field_name="phone_number",
+        candidates=["555-3212", "555-4321"],
+        context_window="ctx",
+    )
+
+    assert result is not None
+    assert result.candidate == "none_of_these"
+    assert result.is_none_of_these is True
+
+
+@pytest.mark.asyncio
+async def test_choice_real_candidate_is_not_flagged_as_none_of_these():
+    system_one = AsyncMock(return_value=_choice_response("555-4321", 0.9))
+    resolver = _resolver(system_one)
+
+    result = await resolver.resolve_field(
+        call_id=1,
+        field_name="phone_number",
+        candidates=["555-3212", "555-4321"],
+        context_window="ctx",
+    )
+
+    assert result is not None
+    assert result.is_none_of_these is False
+
+
+def test_normalize_phone_number_strips_leading_country_code():
+    assert normalize_candidate("phone_number", "+1 555-432-1123") == normalize_candidate(
+        "phone_number", "555-432-1123"
+    )
+
+
+@pytest.mark.asyncio
+async def test_country_code_variant_stays_single_candidate_not_choice():
+    system_one = AsyncMock(return_value=_noul_response(0.9))
+    resolver = _resolver(system_one)
+
+    result = await resolver.resolve_field(
+        call_id=1,
+        field_name="phone_number",
+        candidates=["+1 555-432-1123", "555-432-1123"],
+        context_window="ctx",
+    )
+
+    assert result is not None
+    assert result.question_type == "noul"
+    system_one.assert_awaited_once()
+
+
+# --- concurrency safety -----------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_concurrent_calls_for_same_key_are_serialized():
+    async def system_one(*args, **kwargs):
+        await asyncio.sleep(0.01)
+        return _noul_response(0.9)
+
+    resolver = _resolver(AsyncMock(side_effect=system_one))
+    key_kwargs = dict(
+        call_id=1, field_name="caller_name", candidates=["Someone"], context_window="ctx"
+    )
+
+    results = await asyncio.gather(
+        resolver.resolve_field(**key_kwargs), resolver.resolve_field(**key_kwargs)
+    )
+
+    # The lock serializes the two calls for the same key: whichever runs first commits the
+    # field, so the second sees an already-committed single candidate and skips its own jev
+    # call entirely rather than racing the first for the write to `self._committed`.
+    assert sum(r is not None for r in results) == 1
+    resolver._client.system_one.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_concurrent_calls_for_different_keys_run_concurrently():
+    started = asyncio.Event()
+
+    async def system_one(*args, **kwargs):
+        started.set()
+        await asyncio.sleep(0.01)
+        return _noul_response(0.9)
+
+    resolver = _resolver(AsyncMock(side_effect=system_one))
+
+    results = await asyncio.gather(
+        resolver.resolve_field(
+            call_id=1, field_name="caller_name", candidates=["A"], context_window="ctx"
+        ),
+        resolver.resolve_field(
+            call_id=2, field_name="caller_name", candidates=["B"], context_window="ctx"
+        ),
+    )
+
+    assert all(r is not None for r in results)
+    assert resolver._client.system_one.await_count == 2

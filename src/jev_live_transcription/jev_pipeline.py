@@ -30,8 +30,11 @@ from typing import Literal
 from typesafe_sdk import (
     AsyncTypeSafeClient,
     Choice,
+    JSONContent,
     Noul,
+    Questions,
     RetryPolicy,
+    SystemOneResponse,
     TypeSafeAPIConnectionError,
     TypeSafeAPIError,
 )
@@ -64,11 +67,16 @@ def field_description(field_name: str) -> str:
 def normalize_candidate(field_name: str, value: str) -> str:
     """Normalize a raw candidate value for dedup, per the field's type.
 
-    `phone_number` compares digits only; `email` and `caller_name` compare case- and
-    whitespace-insensitively; every other field compares trimmed text.
+    `phone_number` compares digits only, with a leading US country code ("1" prefix on an
+    11-digit number) dropped so "+1 555-432-1123" and "555-432-1123" dedup to the same value;
+    `email` and `caller_name` compare case- and whitespace-insensitively; every other field
+    compares trimmed text.
     """
     if field_name == "phone_number":
-        return _DIGITS_RE.sub("", value)
+        digits = _DIGITS_RE.sub("", value)
+        if len(digits) == 11 and digits[0] == "1":
+            digits = digits[1:]
+        return digits
     if field_name in ("email", "caller_name"):
         return value.strip().lower()
     return value.strip()
@@ -80,7 +88,7 @@ def _is_transient(exc: BaseException) -> bool:
     Auth/config/malformed-request failures (400/401/403/404/422, or a validation error on an
     otherwise-successful response) are not retried.
     """
-    if isinstance(exc, TimeoutError):  # covers asyncio.wait_for and TypeSafeAPITimeoutError
+    if isinstance(exc, TimeoutError):  # TypeSafeAPITimeoutError subclasses TimeoutError
         return True
     if isinstance(exc, TypeSafeAPIConnectionError):
         return True
@@ -111,6 +119,10 @@ class JevResolution:
     `is_committed` only reflects this call's confidence against `config.JEV_COMMIT_THRESHOLD`;
     tracking which value is "currently committed" across ticks (and holding it steady when a
     later call comes back under threshold) is the calling orchestrator's job.
+
+    `candidate` holds jev's raw selection, which for a `choice` question can be the synthetic
+    `"none_of_these"` label rather than an actual candidate value -- callers must check
+    `is_none_of_these` before treating `candidate` as a real field value.
     """
 
     call_id: CallId
@@ -119,6 +131,7 @@ class JevResolution:
     candidate: str
     confidence: float
     is_committed: bool
+    is_none_of_these: bool
     distinct_candidates: tuple[str, ...]
     input_tokens: int | None
     output_tokens: int | None
@@ -139,6 +152,11 @@ class JevFieldResolver:
         self._client = client or AsyncTypeSafeClient(retry=RetryPolicy(max_retries=0))
         self._candidates: dict[tuple[CallId, str], dict[str, str]] = {}
         self._committed: dict[tuple[CallId, str], bool] = {}
+        # Serializes resolve_field calls per (call_id, field_name): each call reads then awaits a
+        # jev round-trip before writing self._committed, so concurrent calls for the same key
+        # would otherwise race on which result's commit outcome wins. Different keys stay fully
+        # concurrent.
+        self._locks: dict[tuple[CallId, str], asyncio.Lock] = {}
 
     async def resolve_field(
         self,
@@ -153,28 +171,32 @@ class JevFieldResolver:
         single already-committed candidate with nothing new to resolve).
         """
         key = (call_id, field_name)
-        seen = self._candidates.setdefault(key, {})
-        for raw in candidates:
-            value = raw.strip()
-            if not value:
-                continue
-            normalized = normalize_candidate(field_name, value)
-            if normalized and normalized not in seen:
-                seen[normalized] = value
+        lock = self._locks.setdefault(key, asyncio.Lock())
+        async with lock:
+            seen = self._candidates.setdefault(key, {})
+            for raw in candidates:
+                value = raw.strip()
+                if not value:
+                    continue
+                normalized = normalize_candidate(field_name, value)
+                if normalized and normalized not in seen:
+                    seen[normalized] = value
 
-        distinct = list(seen.values())
-        if not distinct:
-            return None
-
-        if len(distinct) == 1:
-            if self._committed.get(key, False):
+            distinct = list(seen.values())
+            if not distinct:
                 return None
-            result = await self._resolve_noul(call_id, field_name, distinct[0], context_window)
-        else:
-            result = await self._resolve_choice(call_id, field_name, distinct, context_window)
 
-        self._committed[key] = result.is_committed
-        return result
+            if len(distinct) == 1:
+                if self._committed.get(key, False):
+                    return None
+                result = await self._resolve_noul(
+                    call_id, field_name, distinct[0], context_window
+                )
+            else:
+                result = await self._resolve_choice(call_id, field_name, distinct, context_window)
+
+            self._committed[key] = result.is_committed
+            return result
 
     async def _resolve_noul(
         self, call_id: CallId, field_name: str, candidate: str, context_window: str
@@ -201,6 +223,7 @@ class JevFieldResolver:
             candidate=candidate,
             confidence=confidence,
             is_committed=confidence >= config.JEV_COMMIT_THRESHOLD,
+            is_none_of_these=False,
             distinct_candidates=(candidate,),
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
@@ -235,20 +258,32 @@ class JevFieldResolver:
             candidate=answer.choice,
             confidence=answer.confidence,
             is_committed=answer.confidence >= config.JEV_COMMIT_THRESHOLD,
+            is_none_of_these=answer.choice == _NONE_OF_THESE,
             distinct_candidates=tuple(distinct),
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
         )
 
-    async def _call_with_retry(self, *, call_id: CallId, field_name: str, state, questions):
+    async def _call_with_retry(
+        self,
+        *,
+        call_id: CallId,
+        field_name: str,
+        state: JSONContent,
+        questions: Questions,
+    ) -> SystemOneResponse:
+        # The per-call timeout is passed to the SDK itself rather than wrapped in
+        # `asyncio.wait_for`: cancelling a coroutine from outside mid-request can leave the
+        # shared client's pooled connection in a stale state for the next caller to reuse,
+        # whereas the SDK's own timeout raises `TypeSafeAPITimeoutError` through its own
+        # cancellation path.
         last_exc: BaseException | None = None
         for attempt in range(_MAX_RETRIES + 1):
             try:
-                return await asyncio.wait_for(
-                    self._client.system_one(state=state, questions=questions),
-                    timeout=_TIMEOUT_SECONDS,
+                return await self._client.system_one(
+                    state=state, questions=questions, timeout=_TIMEOUT_SECONDS
                 )
-            except (TimeoutError, TypeSafeAPIError, TypeSafeAPIConnectionError) as exc:
+            except (TypeSafeAPIError, TypeSafeAPIConnectionError) as exc:
                 last_exc = exc
                 if attempt == _MAX_RETRIES or not _is_transient(exc):
                     raise JevResolutionError(call_id, field_name, exc) from exc
