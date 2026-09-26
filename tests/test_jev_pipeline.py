@@ -30,9 +30,12 @@ def _choice_response(choice: str, confidence: float, input_tokens: int = 15, out
     )
 
 
-def _resolver(system_one: AsyncMock) -> JevFieldResolver:
+def _resolver(system_one: AsyncMock, *, settle_ticks: int = 1) -> JevFieldResolver:
+    # `settle_ticks=1` (trigger on the very first observation) is the default here so tests that
+    # aren't specifically about the settle gate can exercise a Choice call in a single
+    # `resolve_field` call, as before; settle-gating behavior itself is covered separately below.
     fake_client = SimpleNamespace(system_one=system_one, aclose=AsyncMock())
-    return JevFieldResolver(client=fake_client)
+    return JevFieldResolver(client=fake_client, settle_ticks=settle_ticks)
 
 
 # --- normalization -----------------------------------------------------------------------------
@@ -196,14 +199,68 @@ async def test_self_correction_after_committed_noul_escalates_to_choice():
 
 
 @pytest.mark.asyncio
-async def test_more_than_one_distinct_always_calls_choice_even_when_committed():
+async def test_repeated_identical_choice_candidates_trigger_exactly_one_real_call():
+    # GLiNER re-detects the same candidates most ticks -- repeated identical observations of an
+    # already-resolved distinct-candidate set must not re-call jev.
     system_one = AsyncMock(return_value=_choice_response("555-4321", 0.9))
     resolver = _resolver(system_one)
     key_kwargs = dict(call_id=1, field_name="phone_number", context_window="ctx")
 
-    await resolver.resolve_field(candidates=["555-3212", "555-4321"], **key_kwargs)
-    await resolver.resolve_field(candidates=["555-3212", "555-4321"], **key_kwargs)
+    first = await resolver.resolve_field(candidates=["555-3212", "555-4321"], **key_kwargs)
+    assert first is not None
 
+    for _ in range(5):
+        again = await resolver.resolve_field(candidates=["555-3212", "555-4321"], **key_kwargs)
+        assert again is None
+
+    system_one.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_choice_settle_gate_requires_persistence_before_first_real_call():
+    # With settle_ticks=2 (the config default), a candidate set must be observed unchanged on 2
+    # consecutive ticks before it triggers a real jev call -- a single glitchy tick is not enough.
+    system_one = AsyncMock(return_value=_choice_response("555-4321", 0.9))
+    resolver = _resolver(system_one, settle_ticks=2)
+    key_kwargs = dict(call_id=1, field_name="phone_number", context_window="ctx")
+
+    first = await resolver.resolve_field(candidates=["555-3212", "555-4321"], **key_kwargs)
+    assert first is None
+    system_one.assert_not_awaited()
+
+    second = await resolver.resolve_field(candidates=["555-3212", "555-4321"], **key_kwargs)
+    assert second is not None
+    system_one.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_self_correction_resolves_once_new_candidate_settles_bounded_latency():
+    # The real self-correction scenario: a phone number is committed via Noul, then the caller
+    # restates a different one. The Choice re-resolution should fire promptly once the new
+    # candidate set settles -- at most `settle_ticks` ticks after it first appears, not never.
+    system_one = AsyncMock(
+        side_effect=[_noul_response(0.9), _choice_response("555-4321", 0.8)]
+    )
+    resolver = _resolver(system_one, settle_ticks=config.JEV_RECONFIRM_SETTLE_TICKS)
+    key_kwargs = dict(call_id=1, field_name="phone_number", context_window="ctx")
+
+    committed = await resolver.resolve_field(candidates=["555-3212"], **key_kwargs)
+    assert committed is not None and committed.is_committed is True
+
+    # The corrected value first appears alongside the original -- not settled yet, so no Choice
+    # call fires on any of the first `settle_ticks - 1` ticks it's observed.
+    for _ in range(config.JEV_RECONFIRM_SETTLE_TICKS - 1):
+        pending = await resolver.resolve_field(
+            candidates=["555-3212", "555-4321"], **key_kwargs
+        )
+        assert pending is None
+    system_one.assert_awaited_once()
+
+    settled = await resolver.resolve_field(candidates=["555-3212", "555-4321"], **key_kwargs)
+
+    assert settled is not None
+    assert settled.question_type == "choice"
+    assert settled.candidate == "555-4321"
     assert system_one.await_count == 2
 
 
