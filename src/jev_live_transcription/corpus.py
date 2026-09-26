@@ -33,6 +33,11 @@ def _parse_transcript(text: str) -> list[dict]:
     return turns
 
 
+def render_turns(turns: list[dict]) -> str:
+    """Render parsed transcript turns back into `"Speaker: text"` lines."""
+    return "\n".join(f"{turn['speaker']}: {turn['text']}" for turn in turns)
+
+
 def load_all(
     transcripts_dir: Path = TRANSCRIPTS_DIR, metadata_dir: Path = METADATA_DIR
 ) -> dict[int, dict]:

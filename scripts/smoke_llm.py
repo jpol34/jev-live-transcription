@@ -20,10 +20,6 @@ from jev_live_transcription import corpus, llm_baseline, secrets  # noqa: E402
 TICK_TURN_STRIDE = 2  # simulate one LLM-cadence tick every N transcript turns
 
 
-def _render_turns(turns: list[dict]) -> str:
-    return "\n".join(f"{turn['speaker']}: {turn['text']}" for turn in turns)
-
-
 def _select_demo_call(calls: dict[int, dict]) -> int:
     def field_richness(call: dict) -> int:
         return sum(1 for value in call["ground_truth"].values() if value not in (None, [], ""))
@@ -48,7 +44,7 @@ async def main() -> None:
     cached_tokens_seen_nonzero = False
     try:
         for tick, end in enumerate(tick_ends, start=1):
-            snapshot = _render_turns(turns[: min(end, len(turns))])
+            snapshot = corpus.render_turns(turns[: min(end, len(turns))])
             try:
                 result = await llm_baseline.extract(session_id, snapshot)
             except llm_baseline.PermanentLLMError as exc:

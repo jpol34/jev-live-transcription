@@ -153,6 +153,39 @@ def test_permanent_error_raises_permanent_llm_error_and_is_not_silently_swallowe
         assert "404" in str(exc)
 
 
+def test_non_retryable_status_outside_the_named_error_classes_is_still_permanent(monkeypatch):
+    # 402 (payment required, e.g. exhausted account credits) has no dedicated
+    # openai.*Error subclass and isn't one of the SDK's retried codes
+    # (408/409/429/5xx) either — it must still be classified as permanent.
+    request = httpx2.Request("POST", "https://api.openai.com/v1/responses")
+    permanent_error = openai.APIStatusError(
+        "insufficient quota", response=httpx2.Response(402, request=request), body=None
+    )
+    create_mock = AsyncMock(side_effect=[permanent_error])
+    _install_fake_client(monkeypatch, create_mock)
+
+    try:
+        asyncio.run(llm_baseline.extract("call-1", "Agent: hello"))
+        assert False, "expected PermanentLLMError"
+    except llm_baseline.PermanentLLMError as exc:
+        assert "402" in str(exc)
+
+
+def test_second_call_with_no_new_transcript_reuses_prior_result_without_an_api_call(monkeypatch):
+    create_mock = AsyncMock(
+        return_value=_fake_response(
+            response_id="resp-1", fields=_all_fields(), input_tokens=100, cached_tokens=0, output_tokens=10
+        )
+    )
+    _install_fake_client(monkeypatch, create_mock)
+
+    first = asyncio.run(llm_baseline.extract("call-1", "Agent: hello"))
+    second = asyncio.run(llm_baseline.extract("call-1", "Agent: hello"))
+
+    assert create_mock.await_count == 1
+    assert second == first
+
+
 def test_incomplete_status_raises_runtime_error(monkeypatch):
     create_mock = AsyncMock(
         return_value=_fake_response(
@@ -171,6 +204,61 @@ def test_incomplete_status_raises_runtime_error(monkeypatch):
         assert False, "expected a RuntimeError for a non-completed response"
     except RuntimeError as exc:
         assert "incomplete" in str(exc)
+
+
+def test_unparseable_response_still_advances_chain_and_does_not_resend_delta(monkeypatch):
+    # A response that completes (billed, chained server-side) but whose body
+    # doesn't parse into the expected fields must still advance the chain --
+    # otherwise the same delta gets sent (and billed) again next call.
+    bad_response = types.SimpleNamespace(
+        id="resp-1",
+        status="completed",
+        error=None,
+        output_text="not valid json",
+        usage=types.SimpleNamespace(
+            input_tokens=100,
+            input_tokens_details=types.SimpleNamespace(cached_tokens=0),
+            output_tokens=10,
+        ),
+    )
+    create_mock = AsyncMock(
+        side_effect=[
+            bad_response,
+            _fake_response(
+                response_id="resp-2", fields=_all_fields(), input_tokens=50, cached_tokens=0, output_tokens=10
+            ),
+        ]
+    )
+    _install_fake_client(monkeypatch, create_mock)
+
+    try:
+        asyncio.run(llm_baseline.extract("call-1", "Agent: hello"))
+        assert False, "expected a JSON parse error"
+    except json.JSONDecodeError:
+        pass
+
+    asyncio.run(llm_baseline.extract("call-1", "Agent: hello\nCaller: hi"))
+
+    second_kwargs = create_mock.call_args.kwargs
+    assert second_kwargs["previous_response_id"] == "resp-1"
+    assert second_kwargs["input"] == "\nCaller: hi"
+
+
+def test_shrunk_transcript_snapshot_raises_instead_of_silently_desyncing(monkeypatch):
+    create_mock = AsyncMock(
+        return_value=_fake_response(
+            response_id="resp-1", fields=_all_fields(), input_tokens=100, cached_tokens=0, output_tokens=10
+        )
+    )
+    _install_fake_client(monkeypatch, create_mock)
+
+    asyncio.run(llm_baseline.extract("call-1", "Agent: hello there"))
+
+    try:
+        asyncio.run(llm_baseline.extract("call-1", "Agent: hi"))
+        assert False, "expected a ValueError for a shrunk transcript_snapshot"
+    except ValueError as exc:
+        assert "call-1" in str(exc)
 
 
 def test_reset_call_clears_chain_state(monkeypatch):
@@ -232,8 +320,7 @@ def test_estimate_cost_uses_cached_discount_not_flat_input_rate():
     assert actual == expected
 
     # Sanity check the formula actually discounts cached tokens rather than
-    # billing all input tokens at the flat rate (the mistake this ticket's
-    # correction exists to prevent).
+    # billing all input tokens at the flat rate.
     flat_rate_cost = input_tokens * price_in + output_tokens * price_out
     assert actual < flat_rate_cost
 

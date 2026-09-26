@@ -30,11 +30,16 @@ MODEL_NAME = "gpt-5.1"
 MAX_RETRIES = 3
 REQUEST_TIMEOUT_SECONDS = 15.0
 
-# Status codes the SDK's own retry loop does not retry (see
-# openai._base_client.BaseClient._should_retry, which only retries
-# 408/409/429/5xx) — anything else has already reached us as a final,
-# non-retried failure, so it's treated as permanent rather than transient.
-_PERMANENT_STATUS_CODES = frozenset({400, 401, 403, 404, 422})
+
+def _is_retryable_status(status_code: int) -> bool:
+    """Mirrors openai._base_client.BaseClient._should_retry's status-code rules.
+
+    A status code the SDK itself won't retry has already reached us as a
+    final, non-retried failure, so it's treated as permanent rather than
+    transient.
+    """
+    return status_code in (408, 409, 429) or status_code >= 500
+
 
 # The 11 target fields, shared with the GLiNER+jev pipeline for a fair,
 # apples-to-apples comparison (see gliner_pipeline.PII_FIELD_LABELS /
@@ -112,7 +117,7 @@ class PermanentLLMError(RuntimeError):
 
     Covers auth/permission/bad-request/not-found style failures (e.g. the
     account not having access to `MODEL_NAME`) — the SDK's own retry loop
-    already leaves these alone (see `_PERMANENT_STATUS_CODES`), so this just
+    already leaves these alone (see `_is_retryable_status`), so this just
     makes the failure loud instead of letting a generic exception through.
     """
 
@@ -131,6 +136,10 @@ class _ChainState:
 
     last_good_response_id: str | None = None
     last_good_offset: int = 0
+    # The result `extract` returned for `last_good_response_id`, re-served
+    # as-is (at zero additional cost) when a later tick has no new transcript
+    # text to send — see the empty-delta branch in `extract`.
+    last_result: dict | None = None
     # asyncio.Lock, not threading.Lock: this is held across an `await`
     # (the API call itself), and blocking the whole event-loop thread on a
     # contended threading.Lock there would stall every other call's tick,
@@ -186,19 +195,42 @@ def _estimate_cost_usd(input_tokens: int, cached_tokens: int, output_tokens: int
 async def extract(call_id: str, transcript_snapshot: str) -> dict:
     """Run one chained GPT-5.1 extraction call for `call_id`.
 
-    Sends only the transcript text new since the last *successful* call for
-    this `call_id` (chained via `previous_response_id`), and returns the 11
-    fields, their self-reported confidences, `is_committed` per field, and
-    usage/cost accounting. Raises `PermanentLLMError` on an unretryable API
-    failure (bad request, auth, missing model, ...); any other exception
-    means the SDK's own retries were exhausted, and this call's transcript
-    delta will be re-sent (on top of anything new) the next time `extract`
-    succeeds for this `call_id`.
+    Sends only the transcript text new since the last call that got a
+    completed response for this `call_id` (chained via
+    `previous_response_id`), and returns the 11 fields, their self-reported
+    confidences, `is_committed` per field, and usage/cost accounting. Raises
+    `PermanentLLMError` on an unretryable API failure (bad request, auth,
+    missing model, ...); any other exception raised before a response comes
+    back means the SDK's own retries were exhausted, and this call's
+    transcript delta will be re-sent (on top of anything new) the next time
+    `extract` succeeds for this `call_id`. A response that completes but
+    can't be parsed into the 11 fields still advances the chain — the delta
+    was billed and is now part of the server-side context either way — and
+    the parse error propagates instead.
+
+    When `transcript_snapshot` has grown by nothing since the last successful
+    call, no API call is made — the previous result is re-served at zero
+    additional cost/latency, mirroring `gliner_pipeline`'s equivalent
+    no-new-text skip.
     """
     state = _get_state(call_id)
     async with state.lock:
+        if state.last_good_offset > len(transcript_snapshot):
+            raise ValueError(
+                f"transcript_snapshot for call_id={call_id!r} is shorter than "
+                f"what was already sent for it ({len(transcript_snapshot)} "
+                f"chars vs. {state.last_good_offset} already delivered) — call "
+                f"reset_call({call_id!r}) before reusing this call_id for a "
+                f"different transcript."
+            )
+
         delta = transcript_snapshot[state.last_good_offset :]
-        input_text = delta if delta else "(no new transcript content since last update)"
+        if not delta and state.last_result is not None:
+            return state.last_result
+
+        # Only reached with an empty `delta` on the very first call for a
+        # `call_id` whose opening transcript snapshot is itself empty.
+        input_text = delta if delta else "(no transcript content yet)"
 
         kwargs = {
             "model": MODEL_NAME,
@@ -214,7 +246,7 @@ async def extract(call_id: str, transcript_snapshot: str) -> dict:
         try:
             response = await client.responses.create(**kwargs)
         except openai.APIStatusError as exc:
-            if exc.status_code in _PERMANENT_STATUS_CODES:
+            if not _is_retryable_status(exc.status_code):
                 raise PermanentLLMError(
                     f"gpt-5.1 call failed permanently ({type(exc).__name__}, "
                     f"status {exc.status_code}): {exc}"
@@ -227,6 +259,13 @@ async def extract(call_id: str, transcript_snapshot: str) -> dict:
                 f"gpt-5.1 response did not complete cleanly: "
                 f"status={response.status} error={response.error}"
             )
+
+        # The call is billed and chained server-side as of here, regardless of
+        # whether we can parse its body below — advance now so a parse
+        # failure doesn't cause this same delta to be re-sent (and re-billed)
+        # on the next call. `last_result` stays behind until parsing succeeds.
+        state.last_good_response_id = response.id
+        state.last_good_offset = len(transcript_snapshot)
 
         parsed = json.loads(response.output_text)
         fields = {name: parsed[name]["value"] for name in FIELDS}
@@ -241,11 +280,7 @@ async def extract(call_id: str, transcript_snapshot: str) -> dict:
         output_tokens = usage.output_tokens
         estimated_cost_usd = _estimate_cost_usd(input_tokens, cached_tokens, output_tokens)
 
-        # Only advance chaining state on success — see `_ChainState` docstring.
-        state.last_good_response_id = response.id
-        state.last_good_offset = len(transcript_snapshot)
-
-        return {
+        result = {
             "fields": fields,
             "confidences": confidences,
             "is_committed": is_committed,
@@ -256,3 +291,6 @@ async def extract(call_id: str, transcript_snapshot: str) -> dict:
             "estimated_cost_usd": estimated_cost_usd,
             "latency_ms": latency_ms,
         }
+        state.last_result = result
+
+        return result
