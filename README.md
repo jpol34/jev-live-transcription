@@ -25,6 +25,10 @@ edge case flag, target length, caller disclosure style).
   - `cli.py`, `tui.py` — the `jlt` command-line entry point; `jlt tui
     <call_id>` replays one call live in a terminal UI showing both
     pipelines' current committed field values side by side.
+  - `webapp/` — a FastAPI stakeholder-demo web page: replays a corpus call
+    live over a WebSocket, rendered as a leasing-office agent's screen pop
+    (`app.py`, `caller_type.py`, `static/`). See "Stakeholder demo web page"
+    below.
 - `scripts/scenarios.py` — deterministic scenario builder for the 100 calls.
 - `scripts/generate.py` — async OpenAI-based transcript + ground-truth
   generator that writes into `output/transcripts/` and `output/metadata/`.
@@ -72,6 +76,30 @@ Replays call `036`'s transcript paced to wall-clock time and shows both pipeline
 committed value and confidence for all 11 fields, updating roughly once per simulated second.
 Requires `OPENAI_API_KEY` and `TYPESAFE_API_KEY` (loaded from Strongbox, same as above). Writes
 its capture DB to `output/tui_captures/call_<id>.db` by default (`--db-path` overrides this).
+
+## Stakeholder demo web page
+
+A separate, hosted web page that replays a corpus call tick-by-tick over a WebSocket, rendered as
+a leasing-office agent's live screen pop -- a stakeholder demo, not a production tool. Fully
+public, no auth gate; a `MAX_CONCURRENT_SESSIONS` cap and an `ActiveCallGuard` (one live session
+per call_id at a time) bound concurrent load/cost instead.
+
+Run it locally:
+
+```
+uv run uvicorn jev_live_transcription.webapp.app:app --reload
+```
+
+Requires `TYPESAFE_API_KEY` (loaded from Strongbox, same as above) -- no `OPENAI_API_KEY`, since
+the GPT-5.1 baseline is never shown here. Open `http://127.0.0.1:8000/` to pick a call.
+
+### Deployment
+
+Deployed as its own Railway service (`railway.json` pins the Nixpacks builder explicitly, since
+the repo's `Dockerfile` -- used for Part 1's GPU pod image, unrelated to this service -- would
+otherwise be Railway's default auto-detected build path). After linking the service
+(`railway link`), set its `TYPESAFE_API_KEY` by running `scripts/set-railway-webapp-secrets.ps1`
+yourself -- it sources the value from Strongbox and never routes it through anything else.
 
 ## Tests
 
