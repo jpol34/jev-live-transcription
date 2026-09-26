@@ -1,5 +1,9 @@
 """Shared constants for the benchmark harness."""
 
+# Device both GLiNER checkpoints load onto: "auto" (resolved to "cuda" if available, else "cpu" --
+# see gliner_pipeline._resolve_device), or an explicit "cpu"/"cuda" override.
+GLINER_DEVICE = "auto"
+
 # Simulated call clock.
 TICK_SECONDS = 1
 WPM_RANGE = (130, 160)

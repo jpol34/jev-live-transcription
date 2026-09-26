@@ -8,8 +8,8 @@ Two independent semaphores bound how many calls, and how many of those calls' GL
 may run at once: `call_concurrency` and `gliner_concurrency`. Both default to `1` -- fully
 sequential, one call fully processed before the next starts -- because this benchmark's actual
 purpose is measuring how fast the pipeline extracts fields from *one* live call, and any
-concurrency above 1 makes calls contend for the same GLiNER model, which is a real (CPU-bound,
-this machine has no GPU) shared resource. That contention shows up as queueing delay inside
+concurrency above 1 makes calls contend for the same GLiNER model, which is a single shared
+resource regardless of which device it runs on. That contention shows up as queueing delay inside
 `pipeline_runs.latency_ms` indistinguishably from real inference time, even though a real live
 call would never experience it -- so it silently inflates the exact number this benchmark exists
 to measure. Raising either default is a throughput/correctness trade a caller can make deliberately
@@ -47,9 +47,10 @@ async def _warm_up_gliner() -> None:
     """Force both GLiNER checkpoints to load now, on a throwaway snapshot.
 
     GLiNER's first inference call in a process pays a one-time model-load cost (observed at
-    roughly 26-28s on this CPU-only machine) on top of its actual per-tick latency -- calling it
-    once here, before any real call's ticks are timed, keeps that load cost out of the latency
-    numbers `pipeline_core` records for every subsequent (real) tick.
+    roughly 26-28s on a CPU-only machine; device-dependent -- see `config.GLINER_DEVICE`) on top
+    of its actual per-tick latency -- calling it once here, before any real call's ticks are
+    timed, keeps that load cost out of the latency numbers `pipeline_core` records for every
+    subsequent (real) tick.
 
     jev and the LLM baseline are not warmed up here: both are plain HTTP calls over an
     already-constructed client, whose only cold-start cost is a TCP/TLS handshake -- on the order
