@@ -162,7 +162,10 @@ def _write_remote_env(ssh_direct: dict, ssh_key: str | None, env: dict[str, str]
     than as a shell argument so a secret value is never visible in the pod's own process listing.
     """
     lines = "\n".join(f"export {key}={shlex.quote(value)}" for key, value in env.items())
-    result = _run_ssh(ssh_direct, ssh_key, f"cat > {_REMOTE_ENV_PATH} && chmod 600 {_REMOTE_ENV_PATH}", input=lines)
+    # `umask 077` before creating the file, rather than a separate `chmod 600` afterward, so there
+    # is never a window where the file exists at the shell's default (often world-readable)
+    # permissions.
+    result = _run_ssh(ssh_direct, ssh_key, f"umask 077 && cat > {_REMOTE_ENV_PATH}", input=lines)
     if result.returncode != 0:
         raise RuntimeError(f"failed to write remote env file: {result.stderr}")
 
@@ -186,7 +189,7 @@ def _launch_batch_detached(
         batch_cmd += " --enable-llm-baseline"
 
     remote_command = (
-        f"nohup sh -c '. {_REMOTE_ENV_PATH}; {batch_cmd}; echo $? > {_REMOTE_EXIT_MARKER}' "
+        f"nohup sh -c '. {_REMOTE_ENV_PATH} && {batch_cmd}; echo $? > {_REMOTE_EXIT_MARKER}' "
         f"> {_REMOTE_LOG_PATH} 2>&1 & disown; echo LAUNCHED"
     )
     result = _run_ssh(ssh_direct, ssh_key, remote_command)
@@ -275,7 +278,9 @@ def run_gpu(
         _wait_for_ssh_connectable(ssh_direct, ssh_key)
         _cuda_preflight(ssh_direct, ssh_key)
 
-        _write_remote_env(ssh_direct, ssh_key, extra_env)
+        # PUBLIC_KEY is only relevant to the pod's own sshd startup, not to `jlt batch` -- excluded
+        # here so the remote secrets file holds only what the batch process actually consumes.
+        _write_remote_env(ssh_direct, ssh_key, {k: v for k, v in extra_env.items() if k != "PUBLIC_KEY"})
         _launch_batch_detached(
             ssh_direct,
             ssh_key,
