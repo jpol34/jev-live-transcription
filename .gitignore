@@ -10,3 +10,4 @@ venv/
 *.sqlite3-wal
 data/
 .env
+.jlt_gpu_state.json
