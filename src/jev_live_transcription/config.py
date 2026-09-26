@@ -67,5 +67,8 @@ PROMPT_CACHE_DISCOUNT = 0.5
 # development), so this is a single best-effort choice, not pinned to a data center -- letting
 # RunPod's scheduler place the pod keeps it working as stock shifts between regions. If this type
 # has no stock when you run it, check current availability (hangar.runpod_client / the runpod
-# MCP's get-capacity) and update this constant.
-RUNPOD_GPU_TYPE_ID = "NVIDIA RTX 6000 Ada Generation"
+# MCP's get-capacity) and update this constant. RTX 6000 Ada Generation (the original pick) had no
+# stock across two separate real attempts; A100 SXM was reliably available and its 80GB VRAM is
+# far more than this ~184M-param model needs, but that headroom is the tradeoff for actually
+# getting a pod at all right now.
+RUNPOD_GPU_TYPE_ID = "NVIDIA A100-SXM4-80GB"
