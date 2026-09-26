@@ -29,8 +29,8 @@ class FakeZeroShotModel:
         self.calls = []
         self._responses = list(responses)
 
-    def predict_entities(self, text, labels, multi_label=False):
-        self.calls.append({"text": text, "labels": list(labels), "multi_label": multi_label})
+    def predict_entities(self, text, labels, multi_label=False, threshold=None):
+        self.calls.append({"text": text, "labels": labels, "multi_label": multi_label, "threshold": threshold})
         return self._responses.pop(0)
 
 
@@ -59,7 +59,7 @@ def test_extract_candidates_merges_pii_and_zero_shot_candidates(monkeypatch):
         monkeypatch,
         pii_responses=[[{"start": 0, "end": 4, "text": "Jane", "label": "person", "score": 0.9}]],
         zero_shot_responses=[
-            [{"start": 18, "end": 26, "text": "unit 204", "label": "apartment unit number", "score": 0.8}]
+            [{"start": 18, "end": 26, "text": "unit 204", "label": "unit_number", "score": 0.8}]
         ],
     )
 
@@ -217,7 +217,7 @@ def test_zero_shot_candidate_offsets_are_translated_to_full_snapshot_coordinates
                     "start": start_in_window,
                     "end": end_in_window,
                     "text": candidate_text,
-                    "label": "apartment unit number",
+                    "label": "unit_number",
                     "score": 0.8,
                 }
             ]
@@ -238,13 +238,63 @@ def test_zero_shot_offsets_unchanged_when_snapshot_shorter_than_window(monkeypat
         monkeypatch,
         pii_responses=[[]],
         zero_shot_responses=[
-            [{"start": 18, "end": 26, "text": "unit 204", "label": "apartment unit number", "score": 0.8}]
+            [{"start": 18, "end": 26, "text": "unit 204", "label": "unit_number", "score": 0.8}]
         ],
     )
 
     result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-short"))
 
     assert result["unit_number"] == [{"text": "unit 204", "score": 0.8, "start": 18, "end": 26}]
+
+
+def test_zero_shot_model_receives_configured_threshold_and_label_descriptions(monkeypatch):
+    _pii_model, zero_shot_model = _install_fakes(
+        monkeypatch, pii_responses=[[]], zero_shot_responses=[[]]
+    )
+
+    asyncio.run(gliner_pipeline.extract_candidates("some transcript text", "call-threshold"))
+
+    call = zero_shot_model.calls[0]
+    assert call["threshold"] == config.GLINER_ZERO_SHOT_THRESHOLD
+    assert call["labels"] == gliner_pipeline.ZERO_SHOT_FIELD_LABELS
+
+
+def test_zero_shot_inference_lock_is_held_during_the_model_call(monkeypatch):
+    lock_states = []
+
+    class LockCheckingZeroShotModel(FakeZeroShotModel):
+        def predict_entities(self, text, labels, multi_label=False, threshold=None):
+            lock_states.append(gliner_pipeline._zero_shot_inference_lock.locked())
+            return super().predict_entities(text, labels, multi_label=multi_label, threshold=threshold)
+
+    monkeypatch.setattr(gliner_pipeline, "_pii_sent_length", {})
+    pii_model = FakePIIModel([[]])
+    zero_shot_model = LockCheckingZeroShotModel([[]])
+    monkeypatch.setattr(gliner_pipeline, "_pii_model", pii_model)
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", zero_shot_model)
+
+    asyncio.run(gliner_pipeline.extract_candidates("some text", "call-lock"))
+
+    assert lock_states == [True]
+
+
+def test_pii_inference_lock_is_held_during_the_model_call(monkeypatch):
+    lock_states = []
+
+    class LockCheckingPIIModel(FakePIIModel):
+        def inference(self, texts, labels, *, session_id, threshold=0.5):
+            lock_states.append(gliner_pipeline._pii_inference_lock.locked())
+            return super().inference(texts, labels, session_id=session_id, threshold=threshold)
+
+    monkeypatch.setattr(gliner_pipeline, "_pii_sent_length", {})
+    pii_model = LockCheckingPIIModel([[]])
+    zero_shot_model = FakeZeroShotModel([[]])
+    monkeypatch.setattr(gliner_pipeline, "_pii_model", pii_model)
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", zero_shot_model)
+
+    asyncio.run(gliner_pipeline.extract_candidates("some text", "call-pii-lock"))
+
+    assert lock_states == [True]
 
 
 def test_reset_call_clears_tracked_length_and_model_session(monkeypatch):

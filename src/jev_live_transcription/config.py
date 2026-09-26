@@ -33,6 +33,15 @@ JEV_RECONFIRM_SETTLE_TICKS = 2
 # caching.
 GLINER_ZERO_SHOT_WINDOW_CHARS = 200
 
+# Minimum confidence the standard zero-shot GLiNER model requires to report a candidate span, on
+# GLiNER's 0-1 scale (library default is 0.5). Set below that default because nothing downstream
+# double-checks a candidate's confidence before jev resolution sees it: a field GLiNER never
+# surfaces at all is unrecoverable, while a low-confidence false positive is just one more
+# candidate for jev to weigh and reject. 0.30 is the same value Microsoft's own Presidio project
+# uses in its official GLiNER-based PII recognizer, which has the same no-verification-step shape
+# as this pipeline.
+GLINER_ZERO_SHOT_THRESHOLD = 0.30
+
 # This machine's installed RAM, used to size call-level concurrency: reserve
 # 4GB headroom for the OS/other sessions and budget ~4GB per concurrent call.
 RAM_GB = 16
