@@ -1,7 +1,7 @@
 import asyncio
 import time
 
-from jev_live_transcription import gliner_pipeline
+from jev_live_transcription import config, gliner_pipeline
 
 
 class FakePIIModel:
@@ -110,8 +110,9 @@ def test_pii_model_receives_only_the_new_transcript_suffix(monkeypatch):
 
     assert pii_model.calls[0]["texts"] == ["Hello there."]
     assert pii_model.calls[1]["texts"] == [" More text."]
-    # The zero-shot model always re-encodes the full snapshot, unlike the
-    # streaming PII model's delta-only input.
+    # The zero-shot model re-encodes a trailing window of the snapshot, unlike the streaming PII
+    # model's delta-only input -- both snapshots here are shorter than the configured window, so
+    # the window has no effect and it still receives the full text.
     assert zero_shot_model.calls[0]["text"] == "Hello there."
     assert zero_shot_model.calls[1]["text"] == "Hello there. More text."
 
@@ -152,6 +153,98 @@ def test_entities_with_unrecognized_labels_are_dropped(monkeypatch):
     result = asyncio.run(gliner_pipeline.extract_candidates("xyz text", "call-4"))
 
     assert all(spans == [] for spans in result.values())
+
+
+def test_zero_shot_model_receives_only_the_trailing_window(monkeypatch):
+    # A snapshot much longer than the configured window -- if the model still received the whole
+    # thing, its input size (and therefore latency) would keep growing with call length, which is
+    # exactly the unbounded-latency behavior this window bounds.
+    long_snapshot = "x" * (config.GLINER_ZERO_SHOT_WINDOW_CHARS * 5)
+    _pii_model, zero_shot_model = _install_fakes(
+        monkeypatch, pii_responses=[[]], zero_shot_responses=[[]]
+    )
+
+    asyncio.run(gliner_pipeline.extract_candidates(long_snapshot, "call-window"))
+
+    sent_text = zero_shot_model.calls[0]["text"]
+    assert len(sent_text) == config.GLINER_ZERO_SHOT_WINDOW_CHARS
+    assert sent_text == long_snapshot[-config.GLINER_ZERO_SHOT_WINDOW_CHARS :]
+
+
+def test_zero_shot_input_length_stays_capped_as_transcript_grows(monkeypatch):
+    # What actually keeps latency flat regardless of call length is that the model's input size
+    # stays capped no matter how long the transcript gets -- a wall-clock timing assertion here
+    # would be too noisy (and too close to unrelated scheduling overhead) to reliably catch a
+    # regression, so this checks the input size directly across a sequence of growing snapshots.
+    call_id = "call-growing"
+    _pii_model, zero_shot_model = _install_fakes(
+        monkeypatch, pii_responses=[[]] * 5, zero_shot_responses=[[]] * 5
+    )
+    turn = "The caller mentioned unit 204 needs repairs soon. "
+    last_snapshot = ""
+    for n in (1, 2, 5, 20, 100):
+        last_snapshot = turn * n
+        asyncio.run(gliner_pipeline.extract_candidates(last_snapshot, call_id))
+    gliner_pipeline.reset_call(call_id)
+
+    sent_lengths = [len(call["text"]) for call in zero_shot_model.calls]
+    assert all(length <= config.GLINER_ZERO_SHOT_WINDOW_CHARS for length in sent_lengths)
+    # The final, largest snapshot's window is close to the configured cap (word-boundary snapping
+    # can shrink it slightly, never grow it) and far smaller than the full snapshot it was cut
+    # from -- proof the window actually bit, not just an incidentally-small input.
+    assert sent_lengths[-1] > config.GLINER_ZERO_SHOT_WINDOW_CHARS - len(turn)
+    assert sent_lengths[-1] < len(last_snapshot)
+
+
+def test_zero_shot_candidate_offsets_are_translated_to_full_snapshot_coordinates(monkeypatch):
+    prefix = "word " * 100  # plenty of word-boundary-aligned filler, well past the window
+    candidate_text = "unit 204"
+    snapshot = prefix + candidate_text
+    # Ground truth for where the model's window actually starts (word-boundary snapping means this
+    # isn't simply `len(snapshot) - GLINER_ZERO_SHOT_WINDOW_CHARS`).
+    window_text, window_start = gliner_pipeline._zero_shot_window(snapshot)
+    assert snapshot[window_start:] == window_text
+    # The offsets GLiNER would report are relative to the windowed slice actually fed to the
+    # model, not the full snapshot.
+    start_in_window = window_text.index(candidate_text)
+    end_in_window = start_in_window + len(candidate_text)
+    _pii_model, _zero_shot_model = _install_fakes(
+        monkeypatch,
+        pii_responses=[[]],
+        zero_shot_responses=[
+            [
+                {
+                    "start": start_in_window,
+                    "end": end_in_window,
+                    "text": candidate_text,
+                    "label": "apartment unit number",
+                    "score": 0.8,
+                }
+            ]
+        ],
+    )
+
+    result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-offset"))
+
+    span = result["unit_number"][0]
+    assert span["start"] == window_start + start_in_window
+    assert span["end"] == window_start + end_in_window
+    assert snapshot[span["start"] : span["end"]] == candidate_text
+
+
+def test_zero_shot_offsets_unchanged_when_snapshot_shorter_than_window(monkeypatch):
+    snapshot = "Jane called about unit 204"
+    _pii_model, _zero_shot_model = _install_fakes(
+        monkeypatch,
+        pii_responses=[[]],
+        zero_shot_responses=[
+            [{"start": 18, "end": 26, "text": "unit 204", "label": "apartment unit number", "score": 0.8}]
+        ],
+    )
+
+    result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-short"))
+
+    assert result["unit_number"] == [{"text": "unit 204", "score": 0.8, "start": 18, "end": 26}]
 
 
 def test_reset_call_clears_tracked_length_and_model_session(monkeypatch):
