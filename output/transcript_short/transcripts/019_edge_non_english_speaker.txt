@@ -1,0 +1,20 @@
+# Call 019 — resident / edge_non_english_speaker
+# edge_case=True  target_minutes=5.0  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management, how can I assist you today?
+Caller: Uh, hello, uh, help please. My bathroom, um, uh, it's uh, leaking. Water everywhere.
+Agent: I'm sorry to hear that! Could you please tell me your name?
+Caller: My name is, uh, Eduardo, uh, Gonzales.
+Agent: Thank you, Eduardo. Can I ask for your unit number so we can locate the issue?
+Caller: Ah, yes. Um, it’s... I think two-oh-three? No, no, sorry, two-three-oh.
+Agent: Let me confirm, that's unit 230, correct?
+Caller: Si, yes. Two-three-zero.
+Agent: Okay, and can you describe the issue a bit more? What's leaking exactly?
+Caller: Uh, it's the pipe, I think, under sink. Water coming very fast.
+Agent: Got it. I will create a work order right away. Would you like us to send someone to fix it right now or schedule for later?
+Caller: Uh... yes, please come now. Much water, very urgent.
+Agent: Alright, I'll mark this as urgent. Eduardo, do we have your permission to enter your apartment if no one is home?
+Caller: Um... ah, please call me first. I, uh, need to be there, ah, to, um, show.
+Agent: Understood, we will call first. Is there anything else you'd like to address while I have you on the line?
+Caller: Uh, no, just this leak. Very worry. Thank you.
+Agent: No worries, Eduardo. Help is on the way soon. If you need further assistance, don't hesitate to call us.

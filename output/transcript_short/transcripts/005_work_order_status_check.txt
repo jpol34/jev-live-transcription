@@ -1,0 +1,16 @@
+# Call 005 — resident / work_order_status_check
+# edge_case=False  target_minutes=3.0  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Ava. How can I help you today?
+Caller: Uh, hi, Ava? Um, this is, uh, Mark… Mark Davidson. I’m calling to check on a work order I put in.
+Agent: Sure thing, Mark. Can you, uh, give me the unit number again? Just to pull up your file here.
+Caller: Oh, uh, yeah, it's... oh man, I always forget. Hang on… it's 15B. Right, yes, 15B.
+Agent: Alright, 15B. Let me check the system here, just a moment please… *keyboard typing sounds* So, was this the one about the leaky faucet?
+Caller: Uh, no wait, it's actually about… the window. It wasn't closing properly. I think I mentioned that.
+Agent: Got it, the window. Okay, I see that here now. It looks like, let me see... the technician has marked this as pending. Do you know if they’ve visited yet?
+Caller: No, uh, no, I haven't seen anyone yet. Do you, uh, have any idea when they'll be around?
+Agent: Hmm, it says they're likely targeting tomorrow, um, sometime in the afternoon. We can give you a call when they’re on their way, if that helps.
+Caller: Yeah, yeah, that’d be good. Just so I can make sure I’m around.
+Agent: Alright, we’ll do our best to keep you updated. Anything else I can assist you with, Mark?
+Caller: No, that's, uh, that's all I think. Thanks, Ava.
+Agent: You're welcome. Have a great day!

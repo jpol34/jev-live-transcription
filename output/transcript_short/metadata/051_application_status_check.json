@@ -1,0 +1,28 @@
+{
+  "scenario": {
+    "id": 51,
+    "category": "prospect",
+    "subtype": "application_status_check",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Michelle Rodriguez",
+    "email": "m.r.odriguez@gmail.com",
+    "phone_number": "555-0198",
+    "outcome": "application status checked, pending review",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 192
+  }
+}

@@ -1,0 +1,22 @@
+# Call 032 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=5.8  disclosure_style=corrects_mistake
+
+Agent: Willow Creek Property Management, this is Jessica speaking. How can I assist you today?
+Caller: Hi, Jessica. Uh, this is, um, Sean Callahan. I'm calling because the, uh, work order I filed last week hasn't been addressed yet. It was supposed to be fixed by now.
+Agent: I'm sorry to hear that, Sean. Could you give me your unit number, please, so I can pull up your account information?
+Caller: Sure, it's 308. Although, I think you might have it under 3-O-eight... or, um, three-zero-eight. But I think it's showing as three-zero-eight, usually.
+Agent: Alright, let me check here... Okay, yes, I found it. Can you confirm the issue for me?
+Caller: Yeah, it was, uh, the kitchen sink. It's been leaking pretty badly.
+Agent: Kitchen sink leak, got it. And, uh, it looks like our system says it's—wait, no, sorry—yeah, it's noted as in progress, but hasn't been marked completed. Let me see what's going on.
+Caller: It's been, uh, really inconvenient, with the water and all.
+Agent: I understand completely. Can I put you on hold for just a moment while I contact maintenance to see what's causing the delay?
+Caller: Yeah, that's fine. Thanks.
+Agent: [On hold music]
+Agent: Thanks for holding, Sean. I spoke with maintenance, and it seems there's been a mix-up with scheduling. We're prioritizing it now, and they should be coming by later today.
+Caller: Later today, you said. Okay, but—do they need, uh, permission to enter, or should I plan to be around for it?
+Agent: I'll make a note to call first if that's easier for you? Just to confirm before they enter.
+Caller: Yeah, that sounds good. Could you have them call my cell number, just in case I'm not home? It's 555-0143?
+Agent: Alright, I'll put that in. And I'll have them contact you when they're on their way.
+Caller: Okay, thank you. I really hope it gets fixed soon.
+Agent: We're on it. If there's anything else, don't hesitate to give us a call. Have a good day, Sean.
+Caller: Thanks, you too. Bye.

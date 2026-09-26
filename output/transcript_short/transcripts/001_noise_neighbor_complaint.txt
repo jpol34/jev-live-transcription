@@ -1,0 +1,19 @@
+# Call 001 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=3.5  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jamie speaking. How can I help you today?
+Caller: Uh, hi... I'm sorry, I'm not sure if I called the right number, but, um, I live in one of your apartments and there's just, uh, this noise issue with my neighbor.
+Agent: Oh, I'm sorry to hear that! Could I have your full name to check your details?
+Caller: Yeah, it's, uh, Lindsey...Lindsey Perkins.
+Agent: Thank you, Lindsey. Could you also tell me your unit number? That'll help me look up your information faster.
+Caller: Uh, let me think, I think it's B...uh, B-207. Yeah, that's it.
+Agent: Alright, B-207. And just for verification, could you confirm a contact number we can reach you at?
+Caller: Uh, sure, it's 555...wait, it's 555-3212...uh, 555-4321. Sorry, I'm just a bit flustered.
+Agent: No worries! So, Lindsey, can you tell me a bit more about the noise issue?
+Caller: Yes, it's, um, it's like a really loud music and sometimes people shouting. It's been happening, uh, almost every night.
+Agent: That sounds frustrating. Have you had a chance to speak with the neighbor directly?
+Caller: No, I haven't. I, I don't really feel comfortable doing that, you know?
+Agent: Understandable. We'll look into it. I'll escalate this to our community manager, Janelle, and someone will follow up with you soon. Anything else I can do for you today?
+Caller: Uh, no, that's it. Thanks for helping out.
+Agent: You're welcome, Lindsey. We’ll be in touch soon, and thanks for bringing this to our attention.
+Caller: Thanks, bye.

@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 42,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 5.7,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Samantha Reed",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "2D",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": "washing machine not working",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "work order escalated",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 345
+  }
+}

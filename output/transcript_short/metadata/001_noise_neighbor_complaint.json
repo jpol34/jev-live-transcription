@@ -1,0 +1,29 @@
+{
+  "scenario": {
+    "id": 1,
+    "category": "resident",
+    "subtype": "noise_neighbor_complaint",
+    "edge_case": false,
+    "target_minutes": 3.5,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Lindsey Perkins",
+    "phone_number": "555-4321",
+    "unit_number": "B-207",
+    "work_order_issue": "Noise complaint about loud music and shouting from neighbor.",
+    "outcome": "Complaint noted and escalated to community manager.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 210
+  }
+}

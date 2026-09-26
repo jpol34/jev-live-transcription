@@ -1,0 +1,45 @@
+{
+  "scenario": {
+    "id": 85,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Robert",
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": [
+      "pet-friendly",
+      "pool"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "mid-November",
+    "price_quoted": "around $1,800",
+    "budget_amount": "$1,800",
+    "outcome": "prospect will call back to schedule a tour",
+    "fields_disclosed": [
+      "caller_name",
+      "budget_amount",
+      "move_in_date",
+      "amenities_requested"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "phone_number"
+    ],
+    "estimated_call_seconds": 180
+  }
+}

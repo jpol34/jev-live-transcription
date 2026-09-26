@@ -1,0 +1,36 @@
+{
+  "scenario": {
+    "id": 44,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 2.8,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Doug Marvin",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "215",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": "Dishwasher not cleaning properly",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Status of work order provided, scheduled for tomorrow",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 160
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 91,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 2.7,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Johnson",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "204B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "leaking kitchen faucet",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Scheduled repair confirmation with call preference noted.",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 160
+  }
+}

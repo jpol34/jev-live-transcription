@@ -1,0 +1,38 @@
+{
+  "scenario": {
+    "id": 9,
+    "category": "prospect",
+    "subtype": "schedule_tour",
+    "edge_case": false,
+    "target_minutes": 2.4,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "David",
+    "email": "d.miller23@gmail.com",
+    "phone_number": "555-823-4410",
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "next month or two",
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "tour scheduled",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 144
+  }
+}

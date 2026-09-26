@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 23,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 2.1,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Robert",
+    "email": null,
+    "phone_number": "555-0198",
+    "unit_number": "14C",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": "leaky faucet",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "maintenance follow-up scheduled",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 125
+  }
+}

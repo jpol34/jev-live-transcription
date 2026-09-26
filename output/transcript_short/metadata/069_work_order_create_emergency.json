@@ -1,0 +1,35 @@
+{
+  "scenario": {
+    "id": 69,
+    "category": "resident",
+    "subtype": "work_order_create_emergency",
+    "edge_case": true,
+    "target_minutes": 3.1,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Sarah",
+    "phone_number": null,
+    "unit_number": "304B",
+    "work_order_issue": "Flooded kitchen due to water leak",
+    "permission_to_enter": "yes",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 150,
+    "outcome": "Emergency work order created; maintenance dispatched immediately"
+  }
+}

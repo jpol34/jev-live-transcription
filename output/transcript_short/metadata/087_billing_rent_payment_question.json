@@ -1,0 +1,38 @@
+{
+  "scenario": {
+    "id": 87,
+    "category": "resident",
+    "subtype": "billing_rent_payment_question",
+    "edge_case": false,
+    "target_minutes": 3.9,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Ben Sanchez",
+    "email": "ben.sanchez@silvermail.com",
+    "phone_number": null,
+    "unit_number": "302",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Caller understood extra charge on bill",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 235
+  }
+}

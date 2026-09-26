@@ -1,0 +1,23 @@
+# Call 057 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=5.7  disclosure_style=cooperative
+
+Agent: Hi there, thank you for calling Willow Creek Property Management. This is Lisa. How can I assist you today?
+Caller: Uh, hi Lisa. My name is Brian. I'm trying to, uh, apply for an apartment at the Willow Creek Apartment Homes. Could you help me with that?
+Agent: Of course, Brian! I can definitely help with that. Have you already toured one of our units, or are you applying for a specific one?
+Caller: Yeah, I actually visited last weekend and, um, I think I’m interested in a two-bedroom. They mentioned to catch up over a call about filling the application.
+Agent: Great! Let's get started then. I need to gather a few details from you. Can you spell your last name for me?
+Caller: Sure thing, it’s H-a-r-r-i-s.
+Agent: Got it, Brian Harris. And what's a good email address for you?
+Caller: Oh right, my email is brian.harris78@gmail.com.
+Agent: Perfect, and could I have a phone number where we can reach you?
+Caller: Yeah, um, it's 805-555-3821.
+Agent: Thank you. Now regarding move-in dates, do you have a preferred timing?
+Caller: Uh, I'm looking to move in around November 15th, if that's available.
+Agent: Let me just check that... Yes, it looks like we do have availability around mid-November. Uh, do you have any pets we should know about?
+Caller: Nope, no pets at the moment.
+Agent: Alright, and just so you know, the rent for the two-bedroom is $1,850. Does that work with your budget?
+Caller: Yes, that's within what I was looking to spend.
+Agent: Great! Since you’ve visited already, you just need to submit the application with your details. I'll send over the link to your email right after this call.
+Caller: Awesome, I'll keep an eye out for that email. Thanks for your help, Lisa.
+Agent: No problem at all, Brian! If you need any further assistance, feel free to reach out. Have a great rest of your day!
+Caller: You too, bye now!

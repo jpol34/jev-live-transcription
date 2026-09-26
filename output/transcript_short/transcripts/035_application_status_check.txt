@@ -1,0 +1,25 @@
+# Call 035 — prospect / application_status_check
+# edge_case=False  target_minutes=3.7  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Emily speaking, how can I assist you today?
+Caller: Uh, hey—so, I applied to, uh, Willow Creek Apartment Homes? I wanted to check... um, the status of my application.
+Agent: Of course, I can help with that. Could I have your name, please?
+Caller: Oh, right. Uh, it's Steven, Steven Thompson.
+Agent: Thank you, Steven. Just a moment while I pull up your information.
+Agent: Okay, so I need to verify—do you happen to have the email address you used when you applied?
+Caller: Um, I used steven.t34 at... gmail dot com, I think? Or maybe it was my work one.
+Agent: Alright, we'll try that one first. Can you hang on just a moment?
+Caller: Uh, yeah, sure. No worries.
+Agent: Thanks for holding, Steven. I do have your application here. It looks like it's still under review by our leasing team.
+Caller: Okay, um, do you know how long that usually takes?
+Agent: Typically, it can take about one to two weeks, but I can check if there are any specific notes for your application.
+Caller: Uh, yeah, please.
+Agent: Checking... it seems like everything was in order, they're just processing several applications right now. Did you need to make any changes or updates to your application?
+Caller: No, I don't think so. Uh, you'd contact me if anything's missing, right?
+Agent: Yes, absolutely. We would contact you via the phone number you provided or your email. Just to confirm, is that the best way to reach you?
+Caller: Yeah, phone's good. Uh, it's 555-0192, if that's—if you need it.
+Agent: Great, that's the number we have. Is there anything else you need help with today?
+Caller: Uh, no, I think that's it. Just anxious, you know?
+Agent: I understand, completely. If there's any change, you'll be the first to know. Thanks for calling in, Steven.
+Caller: Alright, thanks a lot. Have a good day.
+Agent: You too, take care!

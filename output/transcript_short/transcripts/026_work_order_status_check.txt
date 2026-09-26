@@ -1,0 +1,24 @@
+# Call 026 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.5  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa. How can I assist you today?
+Caller: Uh, hi, yeah. I'm calling to check on a maintenance request I submitted.
+Agent: Sure, I can help with that. Could I have your name, please?
+Caller: Oh, right. It's, uh, Maria, Maria Jennings.
+Agent: Thank you, Maria. And could you confirm your unit number for me?
+Caller: Hmm, it's 304... I mean, 403. Sorry, it's 403.
+Agent: No worries. Let me just pull that up... Okay, and what was the issue you reported?
+Caller: It was, um, the leaky faucet in the kitchen. Yeah.
+Agent: Got it. Let me take a look. Could you hold for just a moment while I check the status for you?
+Caller: Yeah, sure.
+Agent: Thank you *hold music sounds faintly in background*
+Agent: Hi Maria, thank you for holding. It looks like the maintenance team has scheduled a visit for tomorrow morning to fix that faucet.
+Caller: Oh, okay. Do you know around what time they'll be here?
+Agent: It should be around 9 AM. Does that work for you?
+Caller: Uh, yeah, I guess that'll work. Do they need me to be home for it?
+Agent: No, they don't need you to be there, unless you want to be. They have permission to enter, right?
+Caller: Hmm, yeah, that should be fine. They'll lock up, right?
+Agent: Absolutely. They'll make sure everything is secure before they leave.
+Caller: Alright. Thank you for the info.
+Agent: You're welcome, Maria. Have a great day!
+Caller: You too, bye.

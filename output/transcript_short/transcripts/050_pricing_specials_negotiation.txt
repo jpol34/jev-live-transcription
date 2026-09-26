@@ -1,0 +1,17 @@
+# Call 050 — prospect / pricing_specials_negotiation
+# edge_case=False  target_minutes=3.4  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah. How can I help you today?
+Caller: Uh, hi. I'm, um, I'm looking into maybe moving into, uh, one of the apartments there. I saw... something about pricing specials?
+Agent: Yeah, we do have some specials running right now. Can I start by getting your name?
+Caller: Oh, sure, it's, uh, Paul. Paul Stevens.
+Agent: Hi, Paul. Nice to meet you over the phone. Do you have an idea of what your budget might be, or do you need info on specific units?
+Caller: Uh, well, I'm really not sure. I guess I could, um, maybe go up to fifteen hundred or so? But, uh, less is better, obviously.
+Agent: Got it. We're offering a move-in special for our one-bedroom apartments right now, starting at $1,350. When are you thinking of moving in?
+Caller: Hmm, I'm not entirely sure. Maybe, uh, next month? Actually, wait, probably December... it's just... depends.
+Agent: Okay, so December possibly. We can definitely work around that once you're more certain. Would you be interested in taking a tour sometime soon to get a better idea?
+Caller: Uh, maybe. Yeah, probably a good idea. I need to check my schedule first, though.
+Agent: Sounds great! Let me give you our direct number so you can call back when you're ready to schedule. It's 555-0199.
+Caller: Perfect, thanks. I'll, uh, call back once I figure everything out.
+Agent: No rush. We're here to help whenever you need. Thanks for calling, Paul. Talk soon!
+Caller: Thanks, Sarah. Bye!

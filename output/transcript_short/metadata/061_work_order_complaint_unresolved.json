@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 61,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 5.1,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "John",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "303",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "HVAC blowing warm air despite completed work order",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "issue escalated to maintenance supervisor",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 309
+  }
+}

@@ -1,0 +1,22 @@
+# Call 042 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=5.7  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Tina, how can I assist you today?
+Caller: Hi, um, I'm not sure if I'm in the right department or if you can help, but I've... I've got a problem in my apartment.
+Agent: Okay, no worries. Let me see if I can help. Could you tell me your name and maybe what's going on?
+Caller: Yeah, I'm uh, it's Samantha, Samantha Reed. It's about, um, my washing machine isn't working. I reported it last week and still nothing?
+Agent: Oh, I'm sorry to hear that. Can you remind me which unit you're in?
+Caller: Uh, I think it's 2B? No, wait, sorry, 2D. Yeah, 2D. It's been a bit frustrating.
+Agent: Got it, thank you. Let me pull up that work order. Hmm, I see a request was logged. Let me check on the status real quick, can you hold for a moment?
+Caller: Yeah, sure, I can wait.
+Agent: (background typing) Okay, thanks for holding. It seems like the technician noted that they needed a part, but it's not... uh, it's not clear why there hasn't been a follow-up. I'm really sorry about this.
+Caller: I just don't understand why no one told me! I've been waiting and, I mean, I've got stuff piling up.
+Agent: I completely understand. It's so inconvenient. What I can do is escalate this and see if we can prioritize your order. Would you like a follow-up call when I get more info?
+Caller: Yes, please. I just—should I wait for another week or?
+Agent: I'm pushing to have this resolved by this week. Please hold one more moment while I note everything you're saying.
+Caller: Okay, I'm... I'll be here.
+Agent: Alright, thanks for your patience. I've submitted an escalation for the work order on your washing machine. Hopefully, we'll get this sorted out promptly.
+Caller: I just need someone to let me know what's happening, you know?
+Agent: Definitely, communication should be better. I apologize for the lapse. You should expect either a call or an update on the portal soon.
+Caller: Okay... thanks (sighs). I guess I'll wait for your call then.
+Agent: Absolutely, I'll make sure you're informed. Thank you for calling, Samantha. Have a good day.

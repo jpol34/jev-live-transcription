@@ -1,0 +1,18 @@
+# Call 059 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=3.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Kara speaking. How can I help you today?
+Caller: Uh, hi Kara. This is James Monroe. I'm just, uh, calling about a little issue I've got with my rent statement.
+Agent: Sure, James. I'd be happy to help with that. Could you let me know your unit number to start with?
+Caller: Yeah, it's um, 12D. But, oh wait, actually it's 12B. Sorry, my mistake there.
+Agent: No problem, James. Let me just pull up your file here... okay, got it. Can you tell me what seems to be the issue with your statement?
+Caller: Well, I noticed there's an extra $50 charge this month and I'm not really sure what that's about. My usual rent's $1,250, but this one's showing $1,300.
+Agent: Hmm, let me look into that for you. Alright, James, I see... there was a maintenance fee applied for the sink repair you requested. Does that ring a bell?
+Caller: Oh... right, the sink thing. Totally forgot about that. They did come by last month. All makes sense now, my bad!
+Agent: No worries! Anything else I can assist you with regarding your account?
+Caller: No, I think that's everything for now. Uh, actually, could you just confirm my email on file? I might've changed it recently and not remember.
+Agent: Sure, let me check. We have... james.monroe83@... oh, it says 'gnail.com,' did you mean 'gmail.com'?
+Caller: Ah, yeah that's supposed to be gmail! Figures I'd mess that up.
+Agent: Got it. I'll update that right away. Anything else I can help you with?
+Caller: Nah, I think I'm good. Thanks a lot for your help, Kara.
+Agent: You're welcome, James. Have a great day!

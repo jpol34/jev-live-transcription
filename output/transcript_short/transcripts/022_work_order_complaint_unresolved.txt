@@ -1,0 +1,16 @@
+# Call 022 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=4.2  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Megan speaking, how can I assist you today?
+Caller: Hi Megan, this is Sandra... um, Sandra Klein. I'm calling because I submitted a work order about, hmm, two weeks ago, and I'm really, uh, frustrated it hasn't been, you know, resolved yet.
+Agent: Oh, I'm sorry to hear that, Sandra. Could you please tell me which apartment unit you’re in so I can take a look at the status for you?
+Caller: Sure, I'm in unit 4B. It was, uh, a plumbing issue. We have, like, a constant dripping sound from the kitchen sink that's driving me crazy.
+Agent: Alright, unit 4B. Let me pull up your record here. Can I also have your phone number just to verify?
+Caller: Uh, yeah, it's 555-0193. Uh, 555-0193, I mean. Sorry, I'm a bit flustered.
+Agent: No worries, Sandra, I completely understand. Give me a moment to check... alright, it looks like your request was logged, but there's been a delay due to, hmm, some staffing issues. I apologize for the inconvenience.
+Caller: I've, uh, called twice already, and it's getting really tiresome. I, um, work from home, you know, and it's difficult to focus when the kitchen’s a, uh, orchestra.
+Agent: I understand this is very disruptive. I'll escalate your issue right away so our maintenance team can prioritize it. Could you be available tomorrow, or—?
+Caller: Oh, yeah, uh, tomorrow works. I just really need this fixed as soon as possible.
+Agent: Got it. I'll make sure someone reaches out by this evening to confirm a time. Is there anything else I can help you with today, Sandra?
+Caller: No, just, uh, hoping it really gets done this time. Thanks, Megan.
+Agent: You're welcome. We'll get it sorted for you. Take care.

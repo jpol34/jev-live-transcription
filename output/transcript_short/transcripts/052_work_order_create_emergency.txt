@@ -1,0 +1,24 @@
+# Call 052 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=3.6  disclosure_style=guarded
+
+Agent: Willow Creek Property Management, this is Anna speaking, how can I help you today?
+Caller: Uh, hi, I, um, I think it's an emergency. Something's, um, leaking in my apartment.
+Agent: Oh no, I'm sorry to hear that. Can you tell me a bit more about where it's leaking from?
+Caller: I think... it's the ceiling? Water's coming down in, uh, the living room.
+Agent: Alright, I'll need to get someone out there. Could you confirm your unit number for me?
+Caller: Uh, it's... oh, 241, I think.
+Agent: 241, got it. And your name, please?
+Caller: Uh, yeah, it's, um, Mark. Mark Allen.
+Agent: Thank you, Mark. And just to make sure, could you confirm your phone number in case our maintenance team needs to reach you?
+Caller: I— I'm not sure I have it on me. Uh, can I— can I email it later?
+Agent: That's okay, no worries. Do we have permission to enter the apartment if you're not there?
+Caller: Well, I— I'd prefer you call first. It's 'cause I can't be reached right now.
+Agent: Okay, we'll make sure to call first. Just to clarify, is there anyone else in the unit right now, anyone who can look in or provide more info?
+Caller: Uh, no, no, I'm alone and... hold on, let me check something—
+Agent: [Background typing sounds] Sure, take your time.
+Caller: [muffled] Uh, okay, uh, yeah, sorry, it's definitely the living room ceiling. It's really dripping now.
+Agent: Alright, we need to address that as quickly as possible. I'll prioritize this with our emergency response team.
+Caller: Alright, just, um, let me know what's happening, okay?
+Agent: Of course, we'll keep you updated. Is there anything else you need right now?
+Caller: No, uh, just, just the leak. I'll email my number once, um, I have it.
+Agent: Absolutely. Thank you for calling, Mark. We'll handle this right away.

@@ -1,0 +1,20 @@
+# Call 064 — prospect / pricing_specials_negotiation
+# edge_case=False  target_minutes=4.4  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking. How can I help you today?
+Caller: Uh, hi Lisa, um, I'm, I'm Cal— uh, Calvin. I'm looking into, uh, apartments over at, um, Willow Creek Apartments Homes. I— I'm kind of curious about pricing and any specials you might have right now.
+Agent: Sure, Calvin! I can definitely help with that. Are you interested in a particular move-in date so I can, uh, give you the most accurate information?
+Caller: Uh, I'm not quite sure, maybe the next, like, month or so? But, uh, is it better if I, um, decide on a specific date? I'm uh, I'm flexible.
+Agent: That's totally okay. We can work with an approximate timeline. Lemme check our current rates and any promotions we might have. Could you hold for just a moment?
+Caller: Yeah, sure, no problem.
+Agent: Thanks. Just a sec—
+Agent: [hold music briefly] Okay, thanks for your patience, Calvin. So, right now, we have some one-bedroom units starting at $1,250 per month, and there's a move-in special where you get $200 off your first month if you sign the lease before the, uh, end of the month. Do you have a budget in mind?
+Caller: Um, uh, well, I was kinda hoping around, like, $1,000? Is there, uh, wiggle room on that, or is it pretty firm?
+Agent: I understand, and we're always trying to be competitive. The rates are pretty firm right now because of, uh, availability. But I recommend checking back in case anything changes or if we have different units opening up in your budget range.
+Caller: Okay, I see. Um, do you have, uh, like any predictions if that, uh, might change? I mean, uhh, I know it's hard to say, but just—
+Agent: Understandable, uh, it really depends on the market. Sometimes we do see changes, uh, you know, month-to-month. I can put a note in, uh, to contact you if we have any price adjustments or new specials that come up.
+Caller: Yeah, that sounds good. Um, would it be okay to have your, uh, email or something, so I don’t have to keep calling back?
+Agent: Absolutely. You can reach out any time at info@willowcreekpm.com, and just mention we spoke, and I'll keep you updated on anything new.
+Caller: Great, thanks, Lisa. I appreciate the help.
+Agent: You're very welcome, Calvin. Have a great day.
+Caller: You too, thanks, bye!

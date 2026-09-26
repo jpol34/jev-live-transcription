@@ -1,0 +1,23 @@
+# Call 071 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=3.7  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa speaking. How can I help you today?
+Caller: Hi, yeah, um, I have a question about my rent payment. I just got, uh, charged more than I expected for October.
+Agent: Alright, let me help you with that. Can you please provide me with your unit number?
+Caller: Uh, yeah, I think...it's 3B? Or maybe 3D.
+Agent: Okay, could you confirm your last name with me so I can look that up?
+Caller: It's Parker, Jake Parker.
+Agent: Thank you, Jake. Let me just pull up your file. Please hold for a moment.
+Caller: Sure, no problem.
+Agent: Alright, I'm seeing your account here. Looks like you're in unit 3D. Now, let me check into the charges for October.
+Caller: Yeah, I was just confused because I thought it was supposed to be the same as September, but it's, like, $50 more.
+Agent: I see. And did you receive an email or notice about any changes to your rent?
+Caller: I...uh, not that I remember. Maybe it went to my old email or something.
+Agent: Okay, just a moment. Let me verify the email we have on file. Is it still jparker89@gmail.com?
+Caller: Oh no, that's my old one. I use the new one, uh, it’s j_parker@yahoo.com.
+Agent: Got it, I've noted that down. So it looks like there was an increase due to a community-wide utility raise. It should've been in the notice last month. Would you like me to forward you a copy of that?
+Caller: Yeah, that’d be great. That explains it, I guess.
+Agent: Alright, I'll send that over to your updated email. Is there anything else I can help you with today?
+Caller: No, I think that should cover it. Thanks for explaining.
+Agent: You're welcome, and don't hesitate to reach out if any other questions come up. You have a great day!
+Caller: Thanks, you too.

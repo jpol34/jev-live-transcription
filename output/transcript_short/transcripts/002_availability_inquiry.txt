@@ -1,0 +1,19 @@
+# Call 002 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.0  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management, how can I help you today?
+Caller: Hi, um, I was wondering if you have any two-bedroom apartments available at the, uh, Willow Creek Apartments?
+Agent: Sure, I can help with that. Could I get your name to start off?
+Caller: Oh, uh, yeah, it's Linda. Linda Thompson.
+Agent: Thank you, Linda. Let me just check on that for you. *typing sounds* Okay, we do have a couple of two-bedroom units available. Are there any specific amenities you're looking for?
+Caller: Um, let me think... definitely need parking. And, is there a gym? I could use that.
+Agent: Yes, we do have a gym on site and ample parking for residents. When are you looking to move in?
+Caller: I'm hoping for sometime next month, early November maybe? It's all a bit last minute.
+Agent: Got it. And, if you don't mind, what's your budget range? Just to make sure we find the right fit for you.
+Caller: Hmm, I'd like to keep it under $1,500, but, you know, depends on what we get.
+Agent: Great, we do have a few options within that price range. Can I also have a good phone number to reach you, in case we need to follow up?
+Caller: Oh yeah, sure, write it down... it's 555-234-6789.
+Agent: Thank you, Linda. Is there any other question I can answer for you right now?
+Caller: No, that's all for now. Thanks!
+Agent: Alright, thanks for calling Willow Creek Property Management. Have a great day!
+Caller: You too, bye!

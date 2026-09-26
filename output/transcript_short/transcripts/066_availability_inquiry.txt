@@ -1,0 +1,25 @@
+# Call 066 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.2  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management, how can I assist you today?
+Caller: Uh, hi, yeah, I was... I think I was checking on, um, availability? Like, for apartments at... Willow Creek Apartments.
+Agent: Sure thing. Are you looking for a specific move-in date?
+Caller: Uh, well, maybe... like next month? November. Yeah, I think November.
+Agent: Alright, November. And do you have any particular budget in mind?
+Caller: Oh, um, I don't know. Around $1,200? Or maybe $1,300? Something like that.
+Agent: Okay, we can see what might be available in that range. Are there any specific amenities you're interested in?
+Caller: Uh, what do you guys have? I think like a gym or a big, uh... big closets?
+Agent: We do have a fitness center and walk-in closets in some units. Anything else?
+Caller: Yeah, maybe... maybe a pool?
+Agent: Yes, there's a pool on the property as well. Can I have your name, please?
+Caller: Oh, right, it's... it's Jake. Uh, last name is... Thomson, with a 'P-H', you know.
+Agent: Thank you, Jake. And is there a number we can reach you at, just in case?
+Caller: Uh sure, let me... one second... okay, it's 555-0193.
+Agent: Alright, 555-0193. Let me check on the available units for you. Can you hold for just a moment?
+Caller: Yeah, yeah, that's fine.
+Agent: Thanks for holding, Jake. It looks like we do have some options in November within your budget. Would you like to come in for a tour?
+Caller: Uh yeah, sure, I think that would be good. Do you have weekend hours?
+Agent: Yes, we do. How about I send you an email with some tour slots?
+Caller: Uh, yeah, but I need to... can you call me back about that? I gotta check my, uh, schedule first.
+Agent: No problem, I'll follow up with you. Thanks for calling Willow Creek, Jake! Have a good day.
+Caller: Thanks, you too. Bye!

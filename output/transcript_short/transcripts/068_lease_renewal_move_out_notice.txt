@@ -1,0 +1,21 @@
+# Call 068 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=4.4  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Mike speaking. How can I help you today?
+Caller: Uh, hi Mike, I'm, uh, Katherine. I'm, um, calling about, uh, the lease for my apartment. I'm, I'm thinking about moving out.
+Agent: Okay, I see. Well, first off, thank you for reaching out about that. Can I ask which apartment you're currently in?
+Caller: Oh, right. It's... um, it's unit number 218.
+Agent: Got it, unit 218. And, Katherine, do you mind if I get a last name just to look up your records here?
+Caller: It's, uh, Taylor. Katherine Taylor.
+Agent: Thanks, Katherine. Alright, let me pull up your account. Mmm, okay, got it. So, you're looking to move out, you said? Have you, uh, decided on an exact move-out date?
+Caller: Uh, not exactly. I think maybe around, uh, mid-next month? But I’m not completely sure yet.
+Agent: Understandable. Uh, just so you know, typically we'd need a 30-day notice to ensure there are no penalties. Do you know when your current lease is set to expire?
+Caller: Oh, um, I think it's, uh, next month too. Maybe around, uh, the 15th, I think?
+Agent: Okay, that sounds about right. I have the records here. So, mid-next month aligns with your lease ending. If you confirm the exact date soon, it'd help us both avoid any hiccups.
+Caller: Yeah, uh, I’ll, I’ll try to confirm it. Can, can you send me, like, an email or something with what's needed for the move-out process?
+Agent: Absolutely, Katherine. Could I confirm your email address for that?
+Caller: Uh, sure, it's ktaylor18 at, um, I'm sorry at, uh, gmail dot com. Sorry, just a bit flustered today.
+Agent: No worries at all, got that. I'll send over detailed instructions right after our call. Is there anything else I can assist you with today?
+Caller: No, I think that's it for now. I'll, I'll let you know once I have that date.
+Agent: Sounds good, Katherine. Thank you for calling, and feel free to reach out anytime. Have a good day!
+Caller: Thanks, you too, bye now.

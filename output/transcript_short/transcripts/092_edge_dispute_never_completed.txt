@@ -1,0 +1,24 @@
+# Call 092 — resident / edge_dispute_never_completed
+# edge_case=True  target_minutes=5.6  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, how can I assist you today?
+Caller: Hi, um, I'm calling because... uh, I had, uh... an issue that was supposed to be resolved in my apartment, but I don't think, um, it ever got sorted out.
+Agent: I'm sorry to hear about that. Could you let me know what the issue is?
+Caller: Yeah, it's... uh, something with the, um, garbage disposal... uh, it's still acting up.
+Agent: Alright. Let me just check your records. Can I have your unit number, please?
+Caller: It's... uh, hold on. I think it’s 403B? Yeah.
+Agent: Thank you. And just to confirm, this is the garbage disposal unit, correct?
+Caller: Yes, that’s right. Uh, it was... someone was supposed to come like... last week, I think... but no one did.
+Agent: I'm really sorry about that. Let me see if I can find anything here... Could I also have your name, please?
+Caller: It’s Robert.
+Agent: Thank you, Robert. And a contact number, just in case we need to get back to you?
+Caller: Um, yeah sure... it's, uh, 555-0199.
+Agent: Great, let me check the work order assigned to your unit. Give me a moment...
+Agent: Okay, it seems there was a ticket opened, but it might not have been closed properly. I’ll escalate this for you.
+Caller: Oh, um... okay. So... like what happens now?
+Agent: I'll make sure maintenance gets this as a priority. Would you prefer them to come by when you're at home, or can they enter if you're out?
+Caller: Uh, I guess... just call first before they come, please.
+Agent: Sure, we'll have them give you a call beforehand. Anything else you need help with?
+Caller: No, that's about... yeah, that's it. Thanks.
+Agent: You're welcome, Robert. We'll get this sorted for you as soon as possible. Have a nice day!
+Caller: Thanks, bye.

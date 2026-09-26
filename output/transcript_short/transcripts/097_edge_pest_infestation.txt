@@ -1,0 +1,24 @@
+# Call 097 — resident / edge_pest_infestation
+# edge_case=True  target_minutes=4.1  disclosure_style=guarded
+
+Caller: Hi, um, is this Willow Creek... uh, Property... something?
+Agent: Yes, this is Willow Creek Property Management, how can I assist you today?
+Caller: Oh, okay, uh, I'm calling because there's, uh, sort of a problem with my, um, unit.
+Agent: I see, can you tell me what seems to be the issue?
+Caller: Well, I've noticed some, er, bugs. Like, kinda a lot of them.
+Agent: Yikes, I'm sorry to hear that! Can you describe what kind of bugs they are?
+Caller: I think they're... they might be roaches or something. Not sure though.
+Agent: Got it. And can I have your name and unit number so we can log this and send maintenance out?
+Caller: Um, it's, uh, Mary—Mary Johnson. My unit is... uh, 203... I think?
+Agent: Alright, Mary. Just to confirm, Unit 203?
+Caller: Yeah, pretty sure that's right.
+Agent: Thank you. We’ll definitely want to get someone over there soon. Do we have your permission to enter the unit if you're not home?
+Caller: Uh, maybe could you call me first? I, um, have a pretty irregular schedule.
+Agent: Sure, I can note that we should call first. Do you have pets we should know about, in case we send someone?
+Caller: Oh, uh, yeah, but I, uh, keep my cat in the bedroom mostly.
+Agent: Okay, good to know. And just to help maintenance prioritize, how bad is the infestation would you say?
+Caller: It's not like a plague or whatever, but enough that I've seen them around.
+Agent: Understood. We'll make sure it's addressed as soon as possible. Is there anything else we can assist with today?
+Caller: No, just, uh, just get those bugs, please.
+Agent: Of course, thank you for letting us know, Mary. We'll be in touch soon.
+Caller: Thanks... I guess.

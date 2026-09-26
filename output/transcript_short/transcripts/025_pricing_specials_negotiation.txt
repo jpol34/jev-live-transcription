@@ -1,0 +1,18 @@
+# Call 025 — prospect / pricing_specials_negotiation
+# edge_case=False  target_minutes=3.3  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Kelly, how can I assist you today?
+Caller: Uh hi, yeah, I was er, looking to... you know, get some information about your apartments, um, and the pricing?
+Agent: Absolutely, I can help with that. Are you specifically interested in Willow Creek Apartment Homes or one of our other communities?
+Caller: Hmm, I think, uh, Willow Creek Apartments, yeah. What's the, um, pricing like?
+Agent: Sure, just to give you an idea, our one-bedroom apartments start around $1,200 a month. Are you looking at a specific move-in date?
+Caller: Oh, uh, I dunno, maybe in... like a couple of months? I’m not really sure yet.
+Agent: That's perfectly fine. So around November or December, perhaps?
+Caller: Yeah, maybe somewhere in there. Um, are there any, like, specials or discounts?
+Agent: We do have a few specials right now. Depending on your leasing duration, there's a potential discount on the first month’s rent. Do you have an idea of what your budget might be?
+Caller: Uh, I haven't really put too much thought into it, maybe around, I dunno, $1,000 or so? Is that, uh, possible?
+Agent: Let me check... hmm, well, $1,200 is our starting point for one-bedrooms. However, with good timing and the right leasing terms, we might be able to help adjust the first month's cost.
+Caller: Okay, I, uh, need to think about that. Maybe, um, I'll call back or... email?
+Agent: Of course. Feel free to reach back out anytime. Can I help with anything else today?
+Caller: No, that's, uh, that's it for now. Thanks.
+Agent: You're welcome. Have a great day!

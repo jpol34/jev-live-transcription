@@ -1,0 +1,16 @@
+# Call 076 — prospect / application_status_check
+# edge_case=False  target_minutes=3.5  disclosure_style=cooperative
+
+Agent: Willow Creek Property Management, this is Lisa. How can I help you today?
+Caller: Hi, Lisa! This is Alex Thompson. I was calling to check on the status of my apartment application.
+Agent: Sure, Alex, let me pull up your file real quick. Could you provide me with your phone number just to verify?
+Caller: Yeah, it's 555-0199.
+Agent: Alright, give me just a moment... Okay, found it. Looks like you applied for one of our two-bedroom units, right?
+Caller: Yes, that's correct.
+Agent: Great. So, it seems like your application is still under review, but we should have a decision by the end of this week. Did you give us an email during your application for updates?
+Caller: Uh, I believe I did. It's alex.t@gmail.com.
+Agent: Got it. We'll send an update there as soon as we have everything finalized.
+Caller: Perfect, thanks! I was just getting a little anxious to hear back.
+Agent: Totally understandable. If you have any other questions while you wait, feel free to reach out.
+Caller: Sure thing. Thanks for the help, Lisa!
+Agent: You're welcome, Alex. Have a great day!

@@ -1,0 +1,20 @@
+# Call 027 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.2  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah speaking. How can I help you today?
+Caller: Hi Sarah, this is Tim. I'm calling to check on the availability at the Willow Creek Apartment Homes. I'm looking to move next month.
+Agent: Great, thanks for reaching out, Tim. Could you let me know your preferred move-in date?
+Caller: Uh, yeah, I was thinking around the 15th of November.
+Agent: Alright, the 15th. Let me check our availability... please hold on for just a moment.
+Caller: Sure, no problem.
+Agent: Okay, thank you for holding. We do have a couple of units that might fit your timeline. What kind of amenities are you looking for?
+Caller: I'm definitely interested in, um, a place with a gym and maybe a pool.
+Agent: Got it, both a gym and a pool. We have units that come with access to both these amenities. Can I also ask what your budget might be?
+Caller: Uh, I was hoping to keep it under $1500 a month, if possible.
+Agent: Under $1500. I think we might have something that works. Have you had a chance to tour the property before, or would you like to schedule a visit?
+Caller: I haven't toured yet. I'd like to schedule a visit sometime next week.
+Agent: Sure thing. Let me take down your phone number so we can give you a call to confirm the schedule.
+Caller: It’s 555-0199.
+Agent: Perfect, 555-0199. We'll get in touch soon to finalize the tour. Is there anything else I can assist you with today?
+Caller: No, that's all for now. Thanks a lot for your help, Sarah.
+Agent: My pleasure, Tim. Have a great day! Goodbye.

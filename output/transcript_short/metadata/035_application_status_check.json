@@ -1,0 +1,36 @@
+{
+  "scenario": {
+    "id": 35,
+    "category": "prospect",
+    "subtype": "application_status_check",
+    "edge_case": false,
+    "target_minutes": 3.7,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Steven Thompson",
+    "email": "steven.t34@gmail.com",
+    "phone_number": "555-0192",
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "application status checked, pending review",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 220
+  }
+}

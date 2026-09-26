@@ -1,0 +1,20 @@
+# Call 060 — resident / work_order_status_check
+# edge_case=False  target_minutes=3.0  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jessica speaking, how can I assist you today?
+Caller: Hi, uh, this is Lisa... um, Lisa Garner. I'm calling to check on a maintenance request I put in a few days ago.
+Agent: Alright Lisa, I can help with that. Let me just pull up your information really quickly. Can you, uh, remind me of your unit number, please?
+Caller: Yeah, it's uh, 203B.
+Agent: 203B, got it. Hold on just a moment while I look it up in our system...
+Agent: Alright, I see a work order here. Can you tell me what issue it was related to? Just so I can make sure I have the right one.
+Caller: Yes. It's the... um, it's about the heating. It's been not kicking in properly, you know? Like, it makes noise but doesn't heat up.
+Agent: Ah, yes, I see that here. It's marked as pending. Let me just... hmm, it looks like the technician was scheduled to check it yesterday, uh, afternoon. Did they manage to stop by?
+Caller: No, I didn't hear from anyone and no notice was left, so I'm not sure.
+Agent: Oh, I'm sorry about that. Let me follow up with our maintenance team... Would you like me to schedule another visit for you?
+Caller: Yeah, that would be great. I just wanna make sure it'll get fixed, it's getting pretty chilly...
+Agent: Absolutely, let me just check the earliest availability... Okay, looks like we can have someone come by tomorrow morning. Does that work for you?
+Caller: Tomorrow morning works for me, yes. Oh, and could they possibly call me before they arrive? Just to make sure I'm home.
+Agent: Sure thing, I’ll add a note for them to give you a call beforehand.
+Caller: Perfect, thank you so much.
+Agent: No problem at all, Lisa. If you have any more questions, feel free to call us back. Have a nice day!
+Caller: You too, bye!

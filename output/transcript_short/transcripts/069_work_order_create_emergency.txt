@@ -1,0 +1,18 @@
+# Call 069 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=3.1  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. How can I help you today?
+Caller: Uh, yeah hi, this is Sarah, I'm in, uh, unit uh... what was it again? 304B. Yeah, 304B.
+Agent: Okay, Sarah, 304B. What can we do for you today?
+Caller: There's, uh, water everywhere in the kitchen. I don't know if a pipe burst or what.
+Agent: I'm sorry to hear that. Let me just get a few details before we can send someone over. Did you say the kitchen is flooded?
+Caller: Yeah, it's, uh, the kitchen. Water all over the floor and, uh, seeping out...
+Agent: Okay, sounds like an emergency. Can you tell if it's coming from the sink or maybe the fridge?
+Caller: Um, no, it's just… gushing out. Honestly, I'm not sure. But it's everywhere!
+Agent: Alright, got it. And can we send maintenance in immediately, or do you need us to call first?
+Caller: Yes, just send them in! Please, it's spreading fast!
+Agent: Alright, we'll dispatch them right away. Just to confirm, Sarah, is your contact number still the one ending in 4967?
+Caller: Uh, I think so. Just hurry, please!
+Agent: Of course. Maintenance is on the way. They'll be there as soon as possible. Is there anything else I can assist with?
+Caller: Just, uh, no, that's it. Just make it fast. Thanks.
+Agent: Absolutely. Thanks for letting us know. We'll handle it quickly.

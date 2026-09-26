@@ -1,0 +1,21 @@
+# Call 094 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.2  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Uh, hi. I’m, um, trying to report, uh, an issue with my apartment.
+Agent: Of course. Can I have your name, please?
+Caller: Sure, it’s Mike. Uh, Mike Patterson.
+Agent: Thanks, Mike. And could you tell me your unit number?
+Caller: Uh, yeah, it’s 12B, I think... Yeah, 12B.
+Agent: Alright, got it. What seems to be the problem?
+Caller: It's, um, the heater? It's not working properly. Keeps making these weird noises.
+Agent: Okay, thanks for letting us know. We’ll get that sorted for you. Do you have a phone number on file, or would you like to update it?
+Caller: Uh, it should be there... but just in case, it's 555-0183.
+Agent: Great, and do you have any pets that we should be aware of when the maintenance crew comes by?
+Caller: No, uh, no pets.
+Agent: And do we have permission to enter if you’re not home, or should we call first?
+Caller: Uh, I’d prefer if you, uh, call first, just to be safe.
+Agent: Sure, we can do that. Is there anything else you need?
+Caller: Um, no, no, that's all for now. Thanks.
+Agent: Alright, Mike. Our team will be in touch shortly to arrange a time. Thank you for calling, and have a great day.
+Caller: Thanks, you too. Bye.

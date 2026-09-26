@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 15,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.5,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Ben",
+    "phone_number": "555-0199",
+    "unit_number": "304C",
+    "work_order_issue": "leaking shower",
+    "permission_to_enter": "yes",
+    "pet_info": null,
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [
+      "pet_info"
+    ],
+    "estimated_call_seconds": 210
+  }
+}

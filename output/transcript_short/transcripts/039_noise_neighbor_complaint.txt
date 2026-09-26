@@ -1,0 +1,23 @@
+# Call 039 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=4.8  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah speaking. How can I assist you today?
+Caller: Hi, um, yeah, I'm actually calling about some noise issues from, I think, the apartment above me.
+Agent: Oh, I'm sorry to hear that. Can I have your name, please?
+Caller: It's Mark. Uh, Mark Davis.
+Agent: Thank you, Mark. And can I confirm your unit number, so I can take a closer look for you?
+Caller: Yeah, it's 207A.
+Agent: 207A, got it. Could you maybe describe what kind of noise you've been experiencing?
+Caller: It's mostly like, loud music and, uh, some... some banging sounds, mostly late at night. It's been really disturbing my sleep.
+Agent: I'm really sorry to hear that. We definitely want to make sure you’re comfortable in your home. Do you know if this happens every night or is it just certain days?
+Caller: I... I'd say it's pretty much every weekend, maybe starting Friday night?
+Agent: Alright, and have you had a chance to maybe speak with the neighbor or address this yourself before reaching out to us?
+Caller: No, I haven’t, uh, talked to them directly. I'm not really comfortable with confrontation, you know?
+Agent: I completely understand. What we can do is reach out to them and send a reminder about our noise policy. Can you confirm your phone number just in case we need to follow up?
+Caller: Sure, it's, uh, 555-3618.
+Agent: Great, thank you. And it's alright if it's a little noisy around my end here— our phones are just a tad busy today. Anything else you'd like to mention?
+Caller: Not really, just... just if it could... you know, be quieter.
+Agent: I’ll make a note of that. If the issue persists after we’ve reached out to them, feel free to give us another call.
+Caller: Alright, uh, thanks for your help.
+Agent: You're welcome, Mark. Have a good day.
+Caller: You too, bye.

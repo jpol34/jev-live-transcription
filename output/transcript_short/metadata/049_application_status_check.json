@@ -1,0 +1,36 @@
+{
+  "scenario": {
+    "id": 49,
+    "category": "prospect",
+    "subtype": "application_status_check",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Donnelly",
+    "email": "marc.donnelly@gmail.com",
+    "phone_number": "555-0136",
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Caller informed that application is being processed.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 130
+  }
+}

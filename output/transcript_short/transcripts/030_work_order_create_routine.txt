@@ -1,0 +1,21 @@
+# Call 030 — resident / work_order_create_routine
+# edge_case=False  target_minutes=4.0  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I help you today?
+Caller: Uh, hi... I need to, um, schedule a maintenance request for my apartment.
+Agent: Sure, I can assist with that. Can I have your name, please?
+Caller: It's, uh, James. James Felton.
+Agent: Thank you, James. And your unit number?
+Caller: Uh, it's... hmm, 214. Yeah, 214.
+Agent: Got it. What seems to be the issue you’re having?
+Caller: So, um, the heater's not working. It’s getting kinda chilly at night.
+Agent: Oh, I'm sorry to hear that. We'll get someone over to fix that as soon as possible. Do we have permission to enter if you're not home?
+Caller: Uh, actually, can you call me first? I’d just prefer to know when someone’s coming.
+Agent: Absolutely, we can do that. What's the best number to reach you at?
+Caller: Oh, uh, it’s 555-0143... no, wait, sorry, it’s 555-0134.
+Agent: Okay, 555-0134. And do you have any pets we should be aware of?
+Caller: Um, no, no pets.
+Agent: Alright. We'll get that work order submitted right away and keep you updated. Is there anything else I can assist you with today?
+Caller: No, that should be all for now. Thanks, Sarah.
+Agent: You're welcome, James. Have a great day!
+Caller: You too. Bye.

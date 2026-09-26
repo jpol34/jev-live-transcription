@@ -1,0 +1,20 @@
+# Call 044 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.8  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah. How can I help you today?
+Caller: Hi, uh, Sarah, I was calling to check on a work order. I, um, it was for my apartment?
+Agent: Of course, I can help with that. Can I have your name, please?
+Caller: Oh, right, yeah, it's Doug. Doug Marvin.
+Agent: Thank you, Doug. And can you remind me of your unit number?
+Caller: Yeah, sorry, it's uh... 214. No, wait, sorry, it's 215. My bad.
+Agent: Got it, unit 215. And what was the work order for?
+Caller: Um, it was for my, um, the dishwasher. It wasn't, like, cleaning the dishes properly.
+Agent: Alright, let me just check the status of that for you, one moment please.
+Caller: Okay, sure.
+Agent: (background typing) Alright, Doug, it looks like the work order is still open. Uh, our maintenance team should have it scheduled for tomorrow morning.
+Caller: Tomorrow morning? Oh, okay, I thought it would- uh, they might come today. But that works.
+Agent: Yeah, sorry for any confusion. They should be there between 9 and 12. Does that work for you?
+Caller: Yeah, yeah, that's fine. Thanks, Sarah.
+Agent: You're welcome. If there's anything else you need, just give us a call back.
+Caller: Great, thanks again. Bye.
+Agent: Bye, Doug.

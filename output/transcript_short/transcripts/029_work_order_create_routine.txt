@@ -1,0 +1,17 @@
+# Call 029 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.4  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa. How can I assist you today?
+Caller: Hi, uh, this is Janet... uh, Windham, and I'm calling about, um, a maintenance issue in my apartment.
+Agent: Sure thing, Janet. Can I start by getting your unit number, please?
+Caller: Of course, it's, um, 12A... oh, wait, sorry, it's actually 12B.
+Agent: No problem, 12B. And what seems to be the issue today?
+Caller: Uh, our water heater isn’t working very well. It's, um, not really heating the water properly.
+Agent: I see. And just to confirm, do I have your phone number as 555-0143?
+Caller: Oh, no, I actually changed that recently. It's now 555-0178.
+Agent: Got it, thanks for the update. Now, do we have permission to enter your unit if you're not home, or would you prefer we call first?
+Caller: Uh, yeah, you can just enter, that's okay.
+Agent: Great, and do you have any pets we should be aware of?
+Caller: Yes, there's a cat, but she’s pretty friendly. Her name's Whiskers.
+Agent: Perfect, thank you for letting us know. We'll send someone over to take a look at the water heater as soon as possible.
+Caller: Alright, thanks so much!

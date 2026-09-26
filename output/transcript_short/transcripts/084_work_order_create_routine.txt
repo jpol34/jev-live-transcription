@@ -1,0 +1,20 @@
+# Call 084 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.8  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Hi, uh, yes, this is Mark. I live in the Willow Creek Apartments, and I think I need to put in a work order for my unit.
+Agent: Of course, Mark. Could you tell me your unit number?
+Caller: Sure, it's uh, 3B.
+Agent: Thanks for that. And what seems to be the issue in your unit?
+Caller: Well, my kitchen faucet has been leaking... like, uh, dripping water constantly.
+Agent: Got it. A leaking kitchen faucet. Can I just confirm your phone number in case we need to reach you for any updates?
+Caller: Yeah, it's 555-4829.
+Agent: Great, and do you have any pets in the unit that we should be aware of?
+Caller: Nope, no pets here.
+Agent: Okay, and will it be okay for maintenance to enter the unit if you're not home, or do you prefer we call first?
+Caller: Hmm, better call me first, just in case.
+Agent: Alright, we'll give you a call before they arrive. Is there anything else you'd like to report, or any other issues?
+Caller: No, I think that's it for now.
+Agent: Alright, Mark, I've got everything noted. We'll put in that work order for you, and someone should reach out soon to schedule a time. Thank you for calling.
+Caller: Thanks so much! Bye.
+Agent: You're welcome. Have a great day. Goodbye!

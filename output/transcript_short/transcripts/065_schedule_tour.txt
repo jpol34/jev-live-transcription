@@ -1,0 +1,19 @@
+# Call 065 — prospect / schedule_tour
+# edge_case=False  target_minutes=2.7  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa, how can I help you today?
+Caller: Uh, yeah, hi. I was...um, I'm interested in maybe scheduling a tour of the Willow Creek Apartment... homes you guys have. Can you, uh, help with that?
+Agent: Of course! I'd be happy to help you schedule a tour. Do you have a particular day in mind?
+Caller: Uh, I'm thinking maybe, like, next week? But, um, I'm not sure yet.
+Agent: No worries. We can tentatively set something up and adjust if needed. Could I have your name, please?
+Caller: Yeah, it's, um, Dan. Dan Morgan.
+Agent: Alright, Dan, and a phone number where we can reach you, just in case we need to confirm or reschedule?
+Caller: Uh, sure, it’s 555-0143. No wait, actually, that’s, uh 555-0144.
+Agent: Got it, 555-0144. And did you have an ideal move-in date in mind, if you do decide on one of our apartments?
+Caller: Hmm, not exactly. Maybe... early December? But, you know, it's, uh, flexible.
+Agent: That’s completely fine. We’ll work around your schedule. Is there an email address you’d like us to send the tour details?
+Caller: Um, I’ll need to... uh, yeah, I'll email you that later. I don't have it handy right now.
+Agent: No problem, Dan. We’ll await your email. For now, I’ll pencil you in for next week. If you have any specific days in mind later, feel free to call us back or reply to the email.
+Caller: Great, yeah, thanks. I’ll, uh, I’ll do that. Appreciate the help!
+Agent: You're welcome! We look forward to seeing you. Have a great day!
+Caller: You too, bye.

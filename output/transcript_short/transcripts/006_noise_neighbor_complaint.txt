@@ -1,0 +1,22 @@
+# Call 006 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=4.8  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa. How can I assist you today?
+Caller: Uh, hi, yeah, this is uh... Kelly Harper? I, um, live in uh... Willow Creek Apartments and I'm calling about, uh, some noise?
+Agent: Hi Kelly, I'm sorry to hear that. Could you tell me a bit more about the noise issue?
+Caller: Yeah, so, uh, it's like... really loud music? I think? It's coming from, um, maybe the unit above mine? It's just been, like, constant, you know?
+Agent: I see. Could you tell me which unit you're in? That way, I can try to figure out where the noise might be coming from.
+Caller: Oh, right, um, I'm in, uh, unit... 204? Yeah, 204.
+Agent: Okay. And just to confirm, that's building 3, right?
+Caller: Uh, yeah? I think so. I mean, I'm not exactly sure about the building number though.
+Agent: No worries, I'll check our records to ensure we have the right one. Do you happen to know the unit above yours?
+Caller: Um... I don't, I think it might be 304?  But I'm not sure. It's just, really disruptive, you know? I work from home and I can't concentrate.
+Agent: I understand. I’ll definitely notify the resident of the noise concern. Can I have a contact number just in case we need to follow up with you?
+Caller: Oh sure, uh, let me just... it's 555-0134. That's my cell.
+Agent: Thank you. And just to clarify, when is the noise mainly happening? Morning, evening, or all day?
+Caller: Uh... mostly in, like, the evenings? Sometimes during the day too though.
+Agent: Got it, I'll make a note of that. Is there anything else I can help with regarding this?
+Caller: No, I think that's it. Just hope it can, like, stop soon, you know?
+Agent: We'll do our best to resolve this quickly, Kelly. Thank you for bringing it to our attention. If it continues, feel free to call us again.
+Caller: Okay, thanks a lot. Bye.
+Agent: You're welcome. Have a good day.

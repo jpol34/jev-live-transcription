@@ -1,0 +1,24 @@
+# Call 088 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=4.0  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa. How can I assist you today?
+Caller: Hi, um, yeah, I'm calling about my rent payment, I think there's been some kind of error or confusion.
+Agent: I’m sorry to hear that. Can I get your name first, please?
+Caller: It's, uh, Mark... Mark Stevens.
+Agent: Thank you, Mark. And do you have your unit number handy?
+Caller: Yeah, it's, uh, 2...D3, wait, sorry, I meant 2D13.
+Agent: Alright, let me pull that up... Just a moment.
+Caller: *muffled phone clatter* Oh, sorry, just dropped my phone.
+Agent: No worries at all. Okay, I have your information here. What's going on with your rent payment?
+Caller: Uh, so, I paid it on the first, but I got this email saying I'm overdue, and I'm just... kinda confused here.
+Agent: Okay, let's confirm some details. By any chance, can you check which email you received that notice on?
+Caller: Oh, um, yeah, but... could I get back to you on that? I don't have the email pulled up.
+Agent: Sure, no problem. I can tell you that our records don't show a payment for this month yet. Did you perhaps use a different method this time?
+Caller: Uh, I think I did use the... usual portal. Could it just be a glitch?
+Agent: It's possible. Sometimes the system updates are delayed. Could you just double-check your payment method and receipt when you get a chance?
+Caller: Yeah, I'll do that. Sorry for being a bit all over the place.
+Agent: No worries, Mark. Take your time. Feel free to call back once you have the details ready, and we'll clear it up together.
+Caller: Alright, sounds good, um, thanks a lot for your help.
+Agent: You're very welcome. Have a great day!
+Caller: You too. Bye.
+Agent: Goodbye.

@@ -1,0 +1,31 @@
+{
+  "scenario": {
+    "id": 22,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 4.2,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Sandra Klein",
+    "phone_number": "555-0193",
+    "unit_number": "4B",
+    "work_order_issue": "Plumbing issue; constant dripping sound from the kitchen sink.",
+    "outcome": "Issue escalated for priority handling.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 250
+  }
+}

@@ -1,0 +1,23 @@
+# Call 036 — prospect / edge_language_barrier
+# edge_case=True  target_minutes=5.6  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sam, how can I help you today?
+Caller: Uh, hello, yes, um, I am look... looking for apartment uh... Willow Creek?
+Agent: Yes, we manage Willow Creek Apartment Homes. Are you looking to rent an apartment there?
+Caller: Yes, yes, rent. Uh, I... uh... new here, need... how say... place to live?
+Agent: Of course, we can help with that. Can I get your name, please?
+Caller: Uh, Yeong... Yeong Lee.
+Agent: Thank you, Yeong. And could you spell your first name for me?
+Caller: Y... E... O... N... G.
+Agent: Got it. Do you have a preferred move-in date in mind?
+Caller: Move-uh date... uh, soon? Maybe, uuuh... two weeks?
+Agent: Okay, we can certainly check availability for that timeframe. May I have your phone number so we can reach out once we have suitable options?
+Caller: Phone number, yes. It is 555... uh, 123, uh... 7890.
+Agent: Thank you, and could you please repeat that once more to confirm?
+Caller: Yes, uh, 555... 123... 7890.
+Agent: Perfect, thank you. So, you're looking to move in about two weeks, is that correct?
+Caller: Yes, yes, two weeks.
+Agent: Great, I'll let our leasing consultant know and they'll reach out with more details. Is there anything else you need help with today?
+Caller: Uh, no, just... apartment soon. Thank you, thank you.
+Agent: You're welcome, Yeong! We'll be in touch soon. Have a great day!
+Caller: Yes, you too, bye.

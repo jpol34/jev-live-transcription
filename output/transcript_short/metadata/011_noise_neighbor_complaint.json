@@ -1,0 +1,36 @@
+{
+  "scenario": {
+    "id": 11,
+    "category": "resident",
+    "subtype": "noise_neighbor_complaint",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Michael Rodriguez",
+    "email": null,
+    "phone_number": "555-0134",
+    "unit_number": "104",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Noise complaint lodged; follow-up promised.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 195
+  }
+}

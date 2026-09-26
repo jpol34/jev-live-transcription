@@ -1,0 +1,19 @@
+# Call 086 — resident / edge_pest_infestation
+# edge_case=True  target_minutes=4.3  disclosure_style=confused
+
+Agent: Good afternoon, Willow Creek Property Management, this is Linda, how can I assist you today?
+Caller: Hi, um, this is, uh, Mike. I live in, uh, Willow Creek Apartments, and... there's an issue with, uh... bugs. In my apartment.
+Agent: Oh, okay, I'm sorry to hear that, Mike. Can you tell me more about the problem you're experiencing?
+Caller: Yeah, they're, just kind of everywhere, and I don't even know what they are. Maybe ants or, um, something else, uh... they're really small and... uh, it's kind of gross.
+Agent: I understand, we'll definitely help sort that out. Could you please provide your full address or unit number, so I can log your case correctly?
+Caller: Oh, uh, right. It's, uh, let's see... 22B, I think? Or maybe it's 22D... I always mix them up without seeing it.
+Agent: No worries, 22B, right? Or D? I'll double-check on our system with just your name then. And could you confirm if you have any pets? Just for our pest control team.
+Caller: Pets? Uh no, no pets. But... oh, wait, I do have fish. Does that count?
+Agent: No, that's fine. Fish shouldn't be a problem. Now, regarding entry for pest control, do we have permission to enter if you're not home, or would you like us to call first?
+Caller: Uh, I prefer if you, um, called first. I think. Yeah, call first to be sure.
+Agent: Got it. I'll note that as well. Anything else you'd like to report or ask about?
+Caller: Oh, uh, I think that's it... unless, well, uh, do you know when they might come around, just in case?
+Agent: Absolutely. I'll file the request right away. Someone usually contacts you within 24 to 48 hours to schedule a visit.
+Caller: Alright, that, uh, sounds good. Thanks for... helping out.
+Agent: You're welcome, Mike. We'll get this taken care of. Have a great day!
+Caller: Yeah, you too.

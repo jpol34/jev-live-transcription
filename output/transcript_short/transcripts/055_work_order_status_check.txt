@@ -1,0 +1,17 @@
+# Call 055 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.2  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah. How can I help you today?
+Caller: Uh, hi, Sarah, I'm just calling to check on, uh, the work order I put in for my unit.
+Agent: Sure thing, can I get your name and unit number, please?
+Caller: Oh, right, sorry. It's Mike, uh, Walters. I live in unit, uh, 204.
+Agent: Thank you, Mike. Let me just pull that up for you. Please hold on for a moment.
+Agent: (background typing) Alright, I see here that there was a request for, um, the leaky faucet? Is that correct?
+Caller: Yeah, that's it. The kitchen sink's been dripping, like, constantly.
+Agent: Got it. Looks like maintenance should be, uh, stopping by today in the afternoon. Does that work for you?
+Caller: This afternoon? Uh, sure, I guess that's fine. Should I be home for that?
+Agent: Um, you don't need to be, but would you like to give permission for them to enter if you're not there?
+Caller: Uh, yeah, I... I suppose that's alright. They can go in.
+Agent: Perfect, I'll note that down. Anything else I can help with?
+Caller: No, that's... that's all. Thanks, Sarah!
+Agent: You're welcome, Mike. Have a great day!

@@ -1,0 +1,19 @@
+# Call 046 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=4.6  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, where we manage Willow Creek Apartment Homes. How can I help you today?
+Caller: Hi, uhh, this is Brenda. I, I have a problem with a maintenance request that's still not fixed, and it's getting pretty frustrating.
+Agent: I'm sorry to hear that, Brenda. Let's see what we can do to get that sorted. Could you tell me your unit number, please?
+Caller: Yeah, it's... oh, wait, it's 306. Sorry, I always mix that up with my old place.
+Agent: Alright, Unit 306. And could you remind me what the issue was, exactly?
+Caller: It's the leak in the kitchen ceiling. They were supposed to fix it last week, but nothing's changed. Water's still dripping sometimes.
+Agent: I see, a leak in the kitchen ceiling. Let me pull up your work order. Um, one moment, please.
+Agent: (hold music in the background) Thanks for holding, Brenda. It looks like the request was marked as resolved last Thursday. But it sounds like—uh, clearly that's not right.
+Caller: Yeah, definitely not. I mean, no one's even come by to look at it as far as I know.
+Agent: I apologize for the inconvenience. I'll escalate this to our maintenance team immediately. Could I have a good phone number to reach you, just in case they need to schedule a time to access the unit?
+Caller: Oh, yeah, it's uh, you'll have to give me a sec. Um, it's, oh right: 555-3412... hold on, there's a 7 in there. 555-7341, that's it. Gosh, I can't even remember my own number today.
+Agent: No worries at all, 555-7341. Got it. And is there a certain time that's best for them to come by?
+Caller: I'll be in and out, but that's my cell, so they can just call me when they're on their way; that'll be fine.
+Agent: That's perfect, we'll make sure to do that. Again, really sorry about the confusion. We'll make this a priority. Anything else I can help with?
+Caller: No, just please get this fixed, it's driving me nuts. Thanks.
+Agent: Absolutely, Brenda. Have a nice day, and we'll be in touch soon.

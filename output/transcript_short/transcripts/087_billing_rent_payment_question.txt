@@ -1,0 +1,18 @@
+# Call 087 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=3.9  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking. How can I help you today?
+Caller: Uh, hi Lisa. This is, um, Ben Sanchez. I just had a question about my rent bill this month. It's, uh, it looks a little different than usual.
+Agent: Alright, Ben, let me just pull up your account real quick. Can I have your unit number to verify?
+Caller: Oh, sure, um, it's 202... No, wait, sorry, it's actually 302.
+Agent: 302, got it. Just give me a moment here. Could you maybe tell me what looks different about it?
+Caller: Yeah, it, uh, usually it says $1,200, but this month it's saying $1,400. I’m not sure why that's the case. I... I didn't receive any notice about a change.
+Agent: Okay, let me check on that for you. Would you like me to send any follow-up details to your email if needed?
+Caller: Um, yeah, sure, but wait, I think you guys have my old email, come to think of it. I’ll, uh, I'll give you the new one if you don't mind.
+Agent: Of course, I can update that for you. What's the new email address?
+Caller: It's ben.sanchez... uh, at... let me see, yeah, at silvermail dot com.
+Agent: Alright, thank you. I have that updated now. So, let’s see here... It looks like there was an added fee this month for a small maintenance issue charge from last month. Does that ring a bell?
+Caller: Ohh, you know what, yeah. I forgot about that... that extra window repair. They did tell me, but it slipped. Uh, so that explains it.
+Agent: No worries, Ben. Is there anything else I can help you with today?
+Caller: Nah, I think that's it. Thanks a lot, Lisa.
+Agent: You're welcome! Have a great day!

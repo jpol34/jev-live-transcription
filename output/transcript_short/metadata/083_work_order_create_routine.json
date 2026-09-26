@@ -1,0 +1,42 @@
+{
+  "scenario": {
+    "id": 83,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.4,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Brian Mendoza",
+    "email": null,
+    "phone_number": "555-0199",
+    "unit_number": "204B",
+    "amenities_requested": null,
+    "pet_info": "No pets",
+    "permission_to_enter": "yes",
+    "work_order_issue": "Leaking kitchen faucet",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Work order created",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 128
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 88,
+    "category": "resident",
+    "subtype": "billing_rent_payment_question",
+    "edge_case": false,
+    "target_minutes": 4.0,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Stevens",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "2D13",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Caller was informed of missing payment records and advised to re-check payment details.",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 240
+  }
+}

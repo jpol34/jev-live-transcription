@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 74,
+    "category": "prospect",
+    "subtype": "submit_application_over_phone",
+    "edge_case": false,
+    "target_minutes": 4.1,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "George",
+    "email": "george.m@bluesky.com",
+    "phone_number": "555-0123",
+    "move_in_date": "First week of December",
+    "price_quoted": "$1,500",
+    "pet_info": "No pets",
+    "outcome": "Caller submitted application and will receive further instructions via email.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 240
+  }
+}

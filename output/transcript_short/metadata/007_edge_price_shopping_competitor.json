@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 7,
+    "category": "prospect",
+    "subtype": "edge_price_shopping_competitor",
+    "edge_case": true,
+    "target_minutes": 3.8,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": null,
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": "$1,400-$1,800",
+    "budget_amount": null,
+    "outcome": "Caller received price range information but did not provide contact details",
+    "fields_disclosed": [
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "caller_name",
+      "budget_amount"
+    ],
+    "estimated_call_seconds": 228
+  }
+}

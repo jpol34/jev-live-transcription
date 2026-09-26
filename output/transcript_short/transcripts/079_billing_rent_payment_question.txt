@@ -1,0 +1,20 @@
+# Call 079 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=3.8  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Carly, how can I help you today?
+Caller: Hi, uh, Carly, hi. Uh, this is Mark? Uh—Mark Johnson. I'm calling about a billing issue, I think. It's about my rent payment?
+Agent: Okay, Mark, uh, could you please provide your unit number, so I can pull up your account?
+Caller: Sure, um, it's B203. Wait, no, sorry, B230. I always mix those up.
+Agent: No worries, happens all the time. Let me just look that up real quick... Alright, I see your account here. What seems to be the issue with your payment?
+Caller: So I, uh, noticed on my bank statement that this month's rent was higher than usual? I usually pay, like, $1,200, but it was, like, $1,250 this time. I mean, I don't recall any notice of an increase?
+Agent: I understand. Let me double-check the system here. Uh, could you hold for just a moment?
+Caller: Yeah, no problem.
+Agent: Thanks for holding. So it looks like there was a late fee applied to your account for this month. The rent wasn’t processed by the due date. Could that be why?
+Caller: Oh—uh, y'know, I thought I'd sent that in on time. Um, my email address should get those reminders but I… I might’ve missed it. It’s mark.j.wrong@domain.com, right?
+Agent: Let me check... Actually, it shows here as mark.j.johnson@domain.com. Maybe that's the mix-up?
+Caller: Oh shoot, I see. I must've mistyped it—yeah, that's why I haven't been getting them, huh?
+Agent: It seems like it. Would you like me to, uh, correct that for you now in our system to make sure you get the notifications?
+Caller: Uh, yes, please. Thank you. And, sorry for the confusion.
+Agent: No problem at all! I’ve updated it to mark.j.johnson@domain.com. Anything else I can assist you with today?
+Caller: No, I think that's all. Thanks again, Carly.
+Agent: You're welcome, and have a great day!

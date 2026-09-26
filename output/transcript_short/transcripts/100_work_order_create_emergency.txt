@@ -1,0 +1,17 @@
+# Call 100 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=2.3  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. My name is Sara. How can I assist you today?
+Caller: Hi, uh, this is Thomas. I'm, uh, in unit, um, 315, I think? Yeah.
+Agent: 315, got it. How can we help you today, Thomas?
+Caller: Uh, yeah, there's, there's water... um, looks like it's leaking through from the ceiling and I, I'm worried there's gonna be some major damage if it keeps going.
+Agent: Oh dear, that sounds urgent. I’ll set it as an emergency work order. Can you confirm your number in case we need to reach you?
+Caller: Sure, it's 555-0123. Uh, should I do something about the water? Like place some buckets or... uh...
+Agent: It's a good idea to place a bucket or a towel to minimize the damage for now, but our maintenance team will need to take a look at that as soon as possible. Do they have permission to enter your unit if you’re not home?
+Caller: Oh, uh, yeah, but, can they, um, I’d rather they call me first if possible? I just, just so I know when they’re coming.
+Agent: Sure, we can have them call you first. And just to double-check, you said your unit number was 315, correct? I heard it might be 316 being in the background just now.
+Caller: Oh, no! Sorry, I misspoke earlier, it's actually 316. We've got a bit of chaos here.
+Agent: No problem, Thomas, these things happen. I've got unit 316 noted now. Is there anything else I can do for you today?
+Caller: No, that's it. Thank you for the quick response. I’ll wait for their call.
+Agent: You're welcome. Stay safe and we'll get someone out there soon. Take care now.
+Caller: Thanks, bye!

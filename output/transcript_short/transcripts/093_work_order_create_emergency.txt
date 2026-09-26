@@ -1,0 +1,19 @@
+# Call 093 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=3.2  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Hi, um, this is Kyle, uh, from, uh, unit... oh gosh, uh, 12B. It's—this is, uh, an emergency, I think. My—my ceiling is leaking water, like a lot. I don't know what to—
+Agent: Okay, Kyle, I’m sorry to hear that. Did you say unit 12B?
+Caller: Uh, yes, well, yeah, I think it's 12B. Sorry, I'm a bit—it's leaking all over the place. I can barely think!
+Agent: Alright, let me just confirm, is this the unit at Willow Creek Apartment Homes?
+Caller: Yes, yes, that's right, Willow Creek. What should I do? There's water everywhere!
+Agent: I'll create an emergency work order right away. Just to confirm, is it coming from a specific place in the ceiling? Can you see any pipes?
+Caller: Uhh, it's—it's right in the middle of the living room. I can't see any pipes. Just a lot of water.
+Agent: I'm getting a team out there as fast as possible. Meanwhile, can you try to, if it's safe, move any valuable items or electronics out of the way?
+Caller: Alright, um, okay, yeah, I'll try. But, uh, do you—can they like, uh, enter if I'm not, uh, you know, here?
+Agent: Yes, we can arrange entry if you're okay with it. Is it alright for maintenance to come in if you're not home, or should they call you first?
+Caller: Oh man, just—just let them in, I can't—I can't deal with this! Let them in, please.
+Agent: Understood. I’ll have them enter directly. Can I just verify your phone number quickly?
+Caller: Uh... it's 555-0178, I think? Sorry, my mind's everywhere right now.
+Agent: Got it, 555-0178. Okay, Kyle, our team will be there shortly. Hang in there and try to stay calm, alright?
+Caller: Yeah, okay, thanks. I’ll try. Just please hurry!

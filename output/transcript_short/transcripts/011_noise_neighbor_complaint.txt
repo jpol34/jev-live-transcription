@@ -1,0 +1,18 @@
+# Call 011 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=3.2  disclosure_style=cooperative
+
+Agent: Good afternoon, Willow Creek Property Management. This is Lisa speaking. How can I help you today?
+Caller: Hi, um, this is Michael Rodriguez, and I'm... I live in the community and, um, I've been having some problems with noise from my neighbors.
+Agent: Oh, I'm sorry to hear that, Michael. Can you tell me a bit more about the issue?
+Caller: Yeah, sure. It's the people, uh, right above me, in uh, I think it's unit 204? I’m in 104, and it’s just... it’s been really loud, especially at night.
+Agent: Alright, so just to confirm, you're in 104?
+Caller: Yes, that's right.
+Agent: And it's the noise from unit 204 that’s bothering you?
+Caller: Yeah, that’s right. It sounds like they have, like, late night parties or something? And, um, sometimes music, and... well, it's been tough to get any sleep.
+Agent: I understand, that sounds really frustrating. Let me just make a note of this. And could I please have your phone number to follow up if needed?
+Caller: Sure, it’s 555-0134.
+Agent: Great, thank you. We’ll reach out to the residents of 204 to address the issue. It might take a day or two, but we'll do our best to resolve this quickly.
+Caller: Alright, thank you. I appreciate it. Um, if it keeps happening, should I call back or...?
+Agent: Yes, definitely let us know if the situation doesn't improve. We want to make sure you’re comfortable in your home. Anything else I can help with today?
+Caller: No, that’s it. Thanks again, Lisa.
+Agent: You're welcome, Michael. Have a good day!

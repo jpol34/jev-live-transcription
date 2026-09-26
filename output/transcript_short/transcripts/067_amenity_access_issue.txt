@@ -1,0 +1,22 @@
+# Call 067 — resident / amenity_access_issue
+# edge_case=False  target_minutes=2.2  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa, how can I help you today?
+Caller: Uh, hi Lisa, yeah, I've, uh, got an issue with, um, accessing one of the amenities, and it's a bit... frustrating, to be honest.
+Agent: I’m sorry to hear that! Which amenity are you having trouble with?
+Caller: It's the gym—I, uh, tried swiping my card and it just keeps... not working, I guess?
+Agent: Got it. Let's see what we can do. Could I have your unit number to verify which account we're looking at?
+Caller: Uh, yeah, sure, it's uh... 23B. But this—this has never happened before.
+Agent: Okay, 23B. Let me pull that up. And just to confirm, is this Sarah Thompson I'm speaking with?
+Caller: Yes, that's me!
+Agent: Great, thank you, Sarah. Alright, it seems there might be a temporary issue with your card. Have you had any other issues using it elsewhere?
+Caller: No, um, everything else seems fine... just the gym.
+Agent: Alright, well, in the meantime, could you try accessing the door panel again and let me know what it says exactly?
+Caller: It just says 'Invalid', I guess? It—it's the same spot I've always used it, though.
+Agent: Thanks for that. I'll create a work order to check the reader and we'll get maintenance on it. If there's anything urgent, you can visit the main office and they'll buzz you in until it's resolved.
+Caller: Okay, that sounds... uh, alright, I guess. How long do you think it will take to fix?
+Agent: Typically it doesn’t take too long. I'll flag it as urgent, and maintenance will look into it today. Can I reach you at this number if we need updates?
+Caller: Yeah, that’s fine. And, uh, thanks, I really appreciate it.
+Agent: No problem at all, Sarah. We’ll get this sorted out as quickly as possible. Anything else I can assist you with today?
+Caller: No, that's it. Thanks, Lisa.
+Agent: You’re welcome. Bye now.

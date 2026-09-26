@@ -1,0 +1,20 @@
+# Call 023 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.1  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa speaking. How can I assist you today?
+Caller: Uh, hi, Lisa. This is...um, Robert? I think there was a, uh, work order or something?
+Agent: Hi Robert, sure thing! Let me check that for you. Can I have your unit number, please?
+Caller: Oh, uh, yes...it's, um, 14C, I believe.
+Agent: Got it. Let me put you on a brief hold while I pull up the details. One moment, please.
+Caller: Sure, I can wait.
+Agent: (on hold music) Okay, thanks for holding. I see that there was a work order submitted for a leaky faucet. Is that right?
+Caller: Oh, um, yes, that sounds like it. I think it's still leaking though.
+Agent: I understand. It looks like a maintenance technician was scheduled to check on that yesterday. Did they manage to stop by?
+Caller: Uh, no, not that I noticed. Maybe I missed them?
+Agent: Alright, let me see what I can find out. Sometimes we need to reschedule. Could I confirm your phone number too, just in case we need to reach out?
+Caller: Oh, right. It's, um, my cell, 555-0198.
+Agent: Thank you, Robert. I'll make sure we follow up on this today and get back to you.
+Caller: Great, thank you. Uh... do you know when, like, today, um, it might happen?
+Agent: I can't promise an exact time, but I'll have maintenance prioritize this and give you a call with an update.
+Caller: Okay, that, um, works. Thanks again.
+Agent: You're welcome, Robert. Have a great day!

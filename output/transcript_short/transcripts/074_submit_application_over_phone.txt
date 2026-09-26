@@ -1,0 +1,20 @@
+# Call 074 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=4.1  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa, how can I help you today?
+Caller: Hi Lisa, my name is George. I was hoping to submit an application for the Willow Creek Apartment Homes.
+Agent: Great to hear, George! Do you have a unit in mind or were you hoping to discuss some options?
+Caller: Yeah, I was looking at the two-bedroom units, uh, that one on Tanglewood Drive, I think. I got a quote a few days ago but... might need it again.
+Agent: Alright, and you mentioned you have a quote already? Could you just confirm the price we gave you to make sure we're on the same page?
+Caller: I think it was $1,500 a month maybe, but I'm not a hundred percent sure.
+Agent: Not a problem, let me just look that up... okay, yes, $1,500 is correct for the two-bedroom unit. And, um, when are you hoping to move in?
+Caller: Ideally looking at, uhm, the first week of December.
+Agent: December—okay, that sounds good. Do you have any pets that would be moving with you?
+Caller: No, no pets.
+Agent: Great. Could I get a phone number and maybe an email address to attach to your application?
+Caller: Sure, my number is 555-0123 and my email, uh, george.m@bluesky.com.
+Agent: Perfect. Just to confirm—George M as in Mike at bluesky dot com, right?
+Caller: Yes, that's right.
+Agent: Thanks! I'll draft up the application with this info, and you'll get an email shortly to fill out any additional details. Anything else I can help you with?
+Caller: No, that's all. Thanks, Lisa!
+Agent: You're welcome, George. Have a great day!

@@ -1,0 +1,32 @@
+{
+  "scenario": {
+    "id": 46,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 4.6,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Brenda",
+    "phone_number": "555-7341",
+    "unit_number": "306",
+    "work_order_issue": "leak in the kitchen ceiling",
+    "permission_to_enter": "call_first",
+    "outcome": "work order escalated to maintenance",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 276
+  }
+}

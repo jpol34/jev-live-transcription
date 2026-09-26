@@ -1,0 +1,22 @@
+# Call 034 — resident / edge_irate_legal_threat
+# edge_case=True  target_minutes=5.7  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Anna. How can I help you today?
+Caller: Hi, I'm, uh, I'm really upset right now. My name's Daniel Foster, and I'm in unit 3B at Willow Creek Apartment Homes.
+Agent: Oh, I'm sorry to hear that, Daniel. What seems to be the issue?
+Caller: It’s this constant water leak in my ceiling! I reported it last week, and still no one's come to fix it.
+Agent: Let me check on that for you. Could you please hold for a moment?
+Caller: Yeah, sure, but make it quick.
+Agent: (brief hold music) Thanks for holding, Daniel. It looks like our maintenance team did try to reach out on Thursday, but they didn’t get a response when they visited your unit.
+Caller: What? I was at work, and I didn't get any call. Can they come in even when I’m not home?
+Agent: Uh, generally, we need permission to enter. Did you give any authorization before?
+Caller: Nope, didn't know I had to. Can someone just... like, deal with it? This is turning into a legal thing.
+Agent: I understand it's frustrating. I can schedule them to come when you're available or if you could give permission to enter...
+Caller: I'd rather be there. Can they come tomorrow early evening?
+Agent: Let me see... (brief pause) Yes, we do have an opening tomorrow around 5:00 PM. Would that work for you?
+Caller: Yeah, that's fine. But if they don't fix it, I'm reaching out to my lawyer. This is unacceptable.
+Agent: I completely understand your concerns, Daniel. We'll make sure it's addressed promptly. Can I confirm your phone number, just in case we need to reach you?
+Caller: Yeah, it's 555-0198. Thanks for sorting this.
+Agent: Thank you. We'll see you tomorrow at 5 PM. Is there anything else I can help you with today?
+Caller: Nope, just get that leak fixed. Bye.
+Agent: Absolutely, Daniel. Have a good day.

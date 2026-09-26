@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 81,
+    "category": "prospect",
+    "subtype": "pet_policy_inquiry",
+    "edge_case": false,
+    "target_minutes": 2.6,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "pet_info",
+      "amenities_requested"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jake",
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": "medium-sized lab mix, 55 pounds",
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "caller informed of pet policy, weight may require approval",
+    "fields_disclosed": [
+      "caller_name",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [
+      "move_in_date"
+    ],
+    "estimated_call_seconds": 155
+  }
+}

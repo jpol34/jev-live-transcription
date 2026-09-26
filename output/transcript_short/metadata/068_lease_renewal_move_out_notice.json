@@ -1,0 +1,34 @@
+{
+  "scenario": {
+    "id": 68,
+    "category": "resident",
+    "subtype": "lease_renewal_move_out_notice",
+    "edge_case": false,
+    "target_minutes": 4.4,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email",
+      "move_in_date",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Katherine Taylor",
+    "email": "ktaylor18@gmail.com",
+    "unit_number": "218",
+    "move_in_date": null,
+    "price_quoted": null,
+    "outcome": "Caller intends to move out and will confirm move-out date later.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "move_in_date"
+    ],
+    "estimated_call_seconds": 265
+  }
+}

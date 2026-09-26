@@ -1,0 +1,30 @@
+{
+  "scenario": {
+    "id": 58,
+    "category": "resident",
+    "subtype": "edge_maintenance_staff_misconduct",
+    "edge_case": true,
+    "target_minutes": 6.7,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Dillon",
+    "phone_number": "555-0199",
+    "unit_number": "12B",
+    "work_order_issue": "Unprofessional conduct by maintenance staff; left a mess and was on phone.",
+    "outcome": "Complaint report escalated to management for review and action.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 352
+  }
+}

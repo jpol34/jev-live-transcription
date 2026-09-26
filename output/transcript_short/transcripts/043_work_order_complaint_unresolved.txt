@@ -1,0 +1,21 @@
+# Call 043 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=4.7  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jenna. How can I assist you today?
+Caller: Uh, yeah... hi. I'm calling because, uh, there's an issue with my work order? It's been, um, a week and nobody's shown up.
+Agent: I'm sorry to hear that. Let's get that sorted out for you. Can I have your name and unit number, please?
+Caller: Oh, it's Richard. Uh, I don't... really feel comfortable giving my unit number right now.
+Agent: That's okay, Richard. Could you tell me a bit about the issue you're having?
+Caller: Yeah, so it's, um... there's a leak under my sink and it’s really starting to cause some damage.
+Agent: Alright, a leak under the sink. Let me check to see if we have any records of that work order. Can I, uh, put you on hold for a moment?
+Caller: Sure, I guess.
+Agent: (hold music)
+Agent: Thanks for holding, Richard. I found a work order submitted for the sink issue, but it looks like it wasn't, uh, processed correctly. Can you confirm the phone number associated with the account?
+Caller: Uh, I... don't have it on me. Can I use another number?
+Agent: Um, it's best if we can have the one linked to your account. But you can provide another one, and I can note it down.
+Caller: Alright, uh, 555-0199.
+Agent: Thanks, I'll make a note of that. I’ll escalate this and make sure someone gets to your unit. When would be a convenient time for a maintenance technician to come by?
+Caller: Yeah, it’s, um... a bit tricky right now. Maybe just call first?
+Agent: We can definitely do that. Is there anything else I can help with today, Richard?
+Caller: No, just please make sure someone comes. It's, uh, really getting bad.
+Agent: Of course. We'll resolve this as quickly as possible. Thanks for your patience.

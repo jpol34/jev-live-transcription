@@ -1,0 +1,24 @@
+# Call 048 — prospect / pricing_specials_negotiation
+# edge_case=False  target_minutes=4.3  disclosure_style=rushed
+
+Agent: Hello, thank you for calling Willow Creek Property Management. This is Sarah speaking, how can I assist you today?
+Caller: Hi, yeah, um, I'm looking at possibly moving into Willow Creek Apartment Homes and was wondering about any pricing specials you might have?
+Agent: Sure, I can help with that. May I have your name, please?
+Caller: Oh, it's uh, James. James Harlow.
+Agent: Great, thank you, James. Are you looking to move in at a specific time, or are you flexible?
+Caller: Uh, yeah, I need to move in by, uh, the first of next month, if possible. Kind of in a rush, y'know?
+Agent: Alright, let me check what we have available around that time. Hold on just a moment, please.
+Caller: Sure, no problem.
+Agent: Thanks for waiting. So, it looks like we do have some units available. Right now, we are offering, uh, a half-month off the first month’s rent if you sign a lease by this weekend.
+Caller: Okay, alright, uh, what's the rent normally run?
+Agent: For a one-bedroom, you're looking at around $1,200 to $1,350, depending on the unit.
+Caller: Hmm. That kinda stretches my budget a little. Is there anything, like, like any wiggle room?
+Agent: I understand. Let me see... with the current special, it does bring it down a bit for the first month. Um, were you looking at one bedroom or...
+Caller: One bedroom, yes, yeah.
+Agent: Okay, well, with the special, it’s about, uh, $1,100 effectively for the first month.
+Caller: Alright, yeah, that helps, I guess. Uh, do you need anything else from me right now?
+Agent: No rush, but whenever you're ready, we would need some basic documentation, but I can send you an email with everything to get started, if you want.
+Caller: Yeah, I'll, uh, probably get back to you soon. Thanks a lot.
+Agent: You're welcome, James! Feel free to call us back if you need more info.
+Caller: Got it. Take care.
+Agent: Bye now!

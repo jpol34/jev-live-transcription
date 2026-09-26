@@ -1,0 +1,20 @@
+# Call 096 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=4.5  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah. How can I help you today?
+Caller: Hi, um, my name is Jess, and I think I need to give notice for moving out. I'm not entirely sure about the process and all that.
+Agent: Of course, Jess. I can help you with that. Can I start by getting your unit number?
+Caller: Oh sure, it's um... 203, I believe?
+Agent: Great, let me just pull up your information... Alright, 203. And it looks like you moved in on... one second... right, May of last year?
+Caller: Actually, I think it was April? Yeah, sorry, I get the dates mixed up sometimes.
+Agent: No worries, April it is. So, can I just confirm your email address? We’ll need that to send you the notice forms and additional info.
+Caller: Oh, um, sure. It's jess.livingston89@gmail.com.
+Agent: Let me just repeat that back to you... jess.livingston89@gmail.com?
+Caller: Yes, that's correct.
+Agent: Perfect. Now, regarding the lease terms, were you hoping to finish the full term, or is this an early notice?
+Caller: I'm planning to finish the term, actually. Just wanted to make sure I give the notice in time, you know?
+Agent: Absolutely. Our standard policy is to provide at least 30-days' notice, but since you're planning on staying until your lease ends, there’s no issue there. Do you have your target move-out date by any chance?
+Caller: I'm thinking around April 30th, but I might need to confirm that later on.
+Agent: That's perfectly fine, Jess. Just keep us posted once you're sure. In the meantime, I'll email over those details we talked about, including the notice form.
+Caller: Great, thank you so much. I appreciate your help!
+Agent: You're welcome! Feel free to reach out if you have any more questions. Have a great day!

@@ -1,0 +1,17 @@
+# Call 038 — prospect / edge_price_shopping_competitor
+# edge_case=True  target_minutes=3.2  disclosure_style=cooperative
+
+Caller: Hi, um, I was just calling to get a sense of your pricing for the Willow Creek Apartment Homes.
+Agent: Sure thing! You're interested in the pricing for apartments here? Uh, may I start with your name?
+Caller: Oh, right, it's Allison. I'm just, uh, trying to compare different places at the moment.
+Agent: Got it, Allison. Are you looking for any specific unit types or features—maybe one-bedroom, two-bedrooms? Any preferences that might help narrow it down?
+Caller: Um, one-bedroom sounds about right. I'm, uh, mostly curious about the rent range, if you don't mind.
+Agent: Of course, for a one-bedroom, they usually range from $1,200 to $1,500 per month, depending on the specific unit and its location within the community.
+Caller: Okay, um, is that with utilities or without?
+Agent: That's just the base rent, utilities would be additional. Have you set a budget you're aiming to stay within?
+Caller: Uh, I'd like to keep it under $1,300, if possible. But, uh, if you have any promotions, that could... y'know, help too.
+Agent: I completely understand. Sometimes we have promotional offers but currently, nothing specific for the one-bedrooms. I can keep you posted if any come up. Would you like to provide an email for updates?
+Caller: Uh, maybe not right now. I'll just, y’know, check back.
+Agent: Absolutely, feel free to call anytime. Just to confirm, you said your budget is around $1,300—if there's anything else I can help with today?
+Caller: No, I think that covers it. Thanks for your help!
+Agent: You're welcome, Allison. Have a great day!

@@ -1,0 +1,42 @@
+{
+  "scenario": {
+    "id": 95,
+    "category": "resident",
+    "subtype": "work_order_create_emergency",
+    "edge_case": true,
+    "target_minutes": 2.8,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jamie Phillips",
+    "email": null,
+    "phone_number": "512-555-0912",
+    "unit_number": "17C",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "yes",
+    "work_order_issue": "burst pipe causing water leak",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "emergency work order created",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 135
+  }
+}

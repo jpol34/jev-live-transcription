@@ -1,0 +1,20 @@
+# Call 054 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=4.6  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I help you today?
+Caller: Hi, um, I'm, uh, calling because of a, well, a noise issue. It's been really... ugh, just nonstop the past few nights.
+Agent: I'm sorry to hear that. Can I have your name please?
+Caller: Oh, right, sorry. It's, uh, Matt... Matthew Brooks.
+Agent: Alright, Matthew, and can you tell me your unit number?
+Caller: Yeah, it's, um, 2B... no, wait, I mean, 2D. It's 2D.
+Agent: Got it, 2D. What's been going on exactly?
+Caller: There's just, like, this loud music and shouting. It's coming from, I think, upstairs. It starts kinda late, around 10 PM... goes on till midnight or later.
+Agent: Oh, that's definitely disruptive. Have you had a chance to speak with your neighbor about it?
+Caller: I haven't, um, honestly, I'm not sure who exactly it is and I don't really want to, uh, confront them.
+Agent: Okay, totally understand. We can handle that for you. Could I get your phone number just in case we need to follow up?
+Caller: Sure, uh, it's 555-0187.
+Agent: Thanks. We'll reach out to the upstairs neighbor and see if we can resolve the issue. Is there anything else you need help with?
+Caller: No, uh, just... well, if you could please get back to me about... if it gets fixed.
+Agent: Of course, we'll keep you updated. Thank you for bringing this to our attention, Matthew.
+Caller: Alright, yeah, thank you, Sarah. Bye.
+Agent: Bye.

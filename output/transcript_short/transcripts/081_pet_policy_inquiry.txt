@@ -1,0 +1,19 @@
+# Call 081 — prospect / pet_policy_inquiry
+# edge_case=False  target_minutes=2.6  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah speaking. How can I help you today?
+Caller: Hi, uh, yeah, my name is Jake. I was calling to ask about, uh, your pet policy for the Willow Creek Apartment Homes.
+Agent: Sure thing, Jake. I can help with that. Are you looking to move in with a pet, or just gathering some info at this time?
+Caller: Oh, yeah, um, I have a dog. He's a, uh, medium-sized lab mix. Just wondering about any restrictions or fees.
+Agent: Got it. We do allow pets, but there are some breed restrictions, and we have a pet deposit as well as a monthly pet rent. Would you need details on those?
+Caller: Yeah, that'd be great. I just, um, want to make sure everything's clear before, you know, getting too far along.
+Agent: Absolutely, I understand. So, typically, we don't allow aggressive breeds. Your lab mix should be fine, but you might need to provide some vet papers just confirming the breed. Our pet deposit is, uh, $300 per pet and the monthly pet rent is $25.
+Caller: Okay, I see. And, uh, what about, like, if the dog is a bit over—the weight limit, is there a weight limit, actually?
+Agent: There is a weight limit, it's usually around 50 pounds. How much does your pup weigh?
+Caller: Uh, he’s about 55 pounds. Is that going to be a problem?
+Agent: Hmm, it might be, but sometimes we can make exceptions with manager approval. I’d recommend discussing it further with them to see what can be worked out.
+Caller: Okay, thanks for letting me know. I'll, uh, definitely do that.
+Agent: No problem at all. Is there anything else I can assist you with, like amenities or other apartment details?
+Caller: No, that's all for now. I think I got what I need. Thank you!
+Agent: You're welcome, Jake. Feel free to call us back if you have any more questions. Have a great day!
+Caller: Thanks, you too. Bye!

@@ -1,0 +1,21 @@
+# Call 024 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.7  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Amber, how can I assist you today?
+Caller: Hi, um, I'm looking into the Willow Creek Apartment Homes, trying to see if you have any available units. Uh, do you have any info on that?
+Agent: Absolutely, I'd be happy to help. Can I get your name, please?
+Caller: Yeah, it's, uh, Rob. Just Rob is fine.
+Agent: Thank you, Rob. Do you have a particular move-in date in mind, or are you just starting to look?
+Caller: Uh, I'm thinking around, let's say, mid, uh... November. Is that too early or...?
+Agent: Mid-November, okay. Let me check our availability for that time frame. Could you hold on for just a moment?
+Caller: Sure, no problem.
+Agent: [Background typing] Thanks for holding, Rob. It looks like we do have a few options opening up around then. Do you have a budget range you're working with?
+Caller: Uh, I haven't really nailed it down yet... maybe around, um, under $1,500 if possible.
+Agent: Alright, under $1,500. We definitely have some options that fit within that range. Are there any specific amenities you're interested in, like, uh, laundry in-unit, fitness center, things like that?
+Caller: Uh, well, I guess, a fitness center would be nice. And, um, parking is kind of important.
+Agent: Got it, fitness center and parking. That's pretty standard with us, so I think you'll be covered there. Is there a best number to reach you at, in case something comes up or changes?
+Caller: Um, you know, I'd prefer to just call back... if that's alright. Just checking things out right now.
+Agent: Of course, you're welcome to call us anytime. So, just to recap, you're looking for a unit around mid-November, budget under $1,500, with a fitness center and parking. Anything else I can assist you with today?
+Caller: Uh, no, that's all for now. Thanks for the info!
+Agent: You're welcome, Rob! Have a great day.
+Caller: Thanks, you too.

@@ -1,0 +1,22 @@
+# Call 047 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.1  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Hi, uh, yeah, I need to report an issue in my apartment.
+Agent: Sure, I can help with that. Can I have your name, please?
+Caller: Oh, right, it's Lisa. Lisa Thompson.
+Agent: Thank you, Lisa. And which unit are you in?
+Caller: Uh, I think it's 204, uh, wait... yeah, 204.
+Agent: Got it. So, what's the issue you're facing?
+Caller: It's the, um, the kitchen sink. It's, like, clogged or something. Water's not draining.
+Agent: Alright, a clogged sink. I’ll note that down. Do you have any pets we need to be aware of when sending someone over?
+Caller: Oh, no, no pets.
+Agent: Great, and do we have permission to enter if you're not home, or would you prefer a call first?
+Caller: Uh, just call first, please. My number's on file, right?
+Agent: Let me verify, can you give me your phone number just to double-check?
+Caller: Sure, it's 555-3492.
+Agent: Perfect, I'll make sure to note that. We'll get someone over there as soon as possible.
+Caller: Okay, thanks. I hope it's quick. It's kind of urgent.
+Agent: We’ll do our best to address it quickly. Anything else I can help with today, Lisa?
+Caller: No, that's good. Thanks.
+Agent: You're welcome. Have a great day!

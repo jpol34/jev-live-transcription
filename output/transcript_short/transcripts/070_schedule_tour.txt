@@ -1,0 +1,23 @@
+# Call 070 — prospect / schedule_tour
+# edge_case=False  target_minutes=2.6  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah, how can I assist you today?
+Caller: Uh, yeah, hi. I'm looking to, um, schedule a tour for the Willow Creek Apartment Homes. Do you have any, uh, spots available this week?
+Agent: Sure, I can help with that. May I get your name, please?
+Caller: It's Jack, Jack Elliott.
+Agent: Great, thanks, Jack. And, uh, just to get a few details, when are you looking to move in, roughly?
+Caller: Hmm, hopefully by the end of next month but that's, uh, kinda flexible really.
+Agent: Gotcha. And let's see, uh, are there any specific dates or times this week that work best for you for a tour?
+Caller: Uh, geez, I'm kinda all over the place this week. Maybe Friday afternoon? Not sure, can you send me some open slots?
+Agent: Of course, I can email over available times. What's your email address for that, please?
+Caller: Ah, it's j.elliott at, uh, gmail dot com.
+Agent: Alright, just to confirm, that's j dot e-l-l-i-o-t-t at gmail dot com, right?
+Caller: Yes, that's correct. And uh, what's the... wait, do you need my phone number too?
+Agent: If you could, that'd be helpful just in case we need to reach you quickly for any changes.
+Caller: Sure, it's 555-0198.
+Agent: Could I get the area code for that?
+Caller: Oh right, sorry, it's 310.
+Agent: Perfect. So, I'll send over that email with available slots, and you can just reply with what works. Sound good?
+Caller: Yeah, that'll work, thanks so much. Uh, guess I'll keep an eye out for that email.
+Agent: Absolutely, Jack. Looking forward to helping you find a new home! Have a great day.
+Caller: You too, bye!

@@ -1,0 +1,18 @@
+# Call 015 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.5  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Hi, yeah, this is Ben. I live in uh, Willow Creek Apartment Homes and I need to report something.
+Agent: Sure thing, Ben. What seems to be the issue?
+Caller: Um, well, my shower’s been leaking and it's... uh, it's getting worse.
+Agent: Got it, leaking shower. We can have someone take care of that. Can I get your unit number?
+Caller: Oh sure, it’s, um, let me think... right, 304C. Sorry, I keep mixing it up. It's definitely 304C.
+Agent: No worries! 304C. And is there a number we can reach you at if needed?
+Caller: Yes, it’s 555-0198. Actually, wait, I think it's 555-0199. Yeah, sometimes I forget which one I put down.
+Agent: Okay, just to confirm, 555-0199. We'll make sure we call if there are any updates. Do you have any pets we should be aware of when the maintenance team visits?
+Caller: Uh, nope, no pets. Unless my plants count?
+Agent: Haha, alright, noted. And would you like to give permission for our team to enter if you're not home, or would you prefer a call first?
+Caller: You can go ahead and enter. I trust you guys.
+Agent: Great, thank you. I’ll get that work order processed right away. Anything else I can help you with today?
+Caller: Nah, that’s it. Thanks a lot, Sarah.
+Agent: You're welcome, Ben. Have a great day!

@@ -1,0 +1,16 @@
+# Call 072 — resident / amenity_access_issue
+# edge_case=False  target_minutes=2.0  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Uh, hi, yes—I’m trying to, uh, get into the gym... um... I'm, I'm in the apartments, the Willow Creek Apartments. The key fob isn't working?
+Agent: Oh, I’m sorry to hear that. Let’s see if we can sort this out. Can I have your, uh, unit number please?
+Caller: Oh, sure, um... it’s, uh, 403B. Yeah, 403B. Just moved in a couple of months ago.
+Agent: Got it. Alright, let me check on that for you... could I also have your name, please?
+Caller: Yeah, it’s Mike. Mike Thompson.
+Agent: Thank you, Mike. Can I just confirm your phone number on file, in case we get disconnected?
+Caller: Uh, yeah, it's, um... 555-0198. Or wait—no, it’s 555-0189. Sorry. New phone.
+Agent: No worries! Give me a moment here...It looks like there might be a glitch with your access permissions. I’ll reset that on our end, okay? Is there anything else I can help with while we sort that out?
+Caller: No, that’d be great. Uh, thanks. Do I need to do anything on my end?
+Agent: Nope, nothing from your side. Just try using your fob again in about... 10 minutes. If it's still not working, give us a call back.
+Caller: Okay, uh, thanks a lot. I hope it works!
+Agent: You're welcome, Mike! Have a great day.

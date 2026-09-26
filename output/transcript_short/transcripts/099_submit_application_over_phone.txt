@@ -1,0 +1,22 @@
+# Call 099 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=5.5  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa. How can I assist you today?
+Caller: Uh, hi Lisa, my name is Sam. I was looking to, um, submit an application for the Willow Creek Apartment Homes?
+Agent: Of course, Sam. I can help you with that. Have you already visited the apartment or spoken to one of our leasing agents?
+Caller: Yeah, I took a tour last week. I just... need to get this application in.
+Agent: Great. Let me just pull up your info... Alright. Can I get your phone number just to verify your identity?
+Caller: Sure, it's, um, 987-654-3210.
+Agent: Thank you. And do you know which move-in date you're looking for?
+Caller: Uh... I think it was, let me see... October 15th? Yeah, that should be it.
+Agent: Perfect. And just to double-check, we quoted you a price based on your preferences, right?
+Caller: I think so, it was around... uh, $1,600 a month, right?
+Agent: Yes, $1,600 per month sounds right for the unit you toured. Did you have any pets that you wanted to list?
+Caller: Oh, uh, no pets. Not at the moment, anyway.
+Agent: Got it. Do you have an email address you’d like the application confirmation sent to?
+Caller: Uh, yeah, it's sam...smith@gmail.com. Uh, just make sure you spell Smith with an 'i'.
+Agent: Perfect, I'll make sure the confirmation goes out to the correct address. Is there anything else you need assistance with today?
+Caller: No, I think that's it. Just needed to make sure everything's set.
+Agent: Alright, Sam. I'll process your application and send over the confirmation shortly. If you have any other questions, feel free to reach out.
+Caller: Thanks, Lisa. Appreciate the help.
+Agent: You're welcome. Have a great day!

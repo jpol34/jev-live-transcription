@@ -1,0 +1,21 @@
+# Call 016 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.9  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. My name is Megan, how can I help you today?
+Caller: Hi, uh, I need to, uh, put in a, um, maintenance request.
+Agent: Sure! I can help with that. Can I have your name, please?
+Caller: Oh, uh, it's Jacob. Jacob Mendez.
+Agent: Thanks, Jacob. And what unit are you in?
+Caller: Hmm, I’m in unit A-203.
+Agent: Got it. And what's the issue you're experiencing?
+Caller: It's my shower. It, uh, keeps dripping no matter what I do. Tried, you know, the basics, but it just won’t stop.
+Agent: I see, a leaky shower. We can definitely get someone out to take a look at that. Could I also have a contact phone number in case the maintenance team needs to reach you?
+Caller: Uh, sure. It’s 555-6932... oh, wait, I think it’s actually 555-6933. Sorry about that.
+Agent: No worries, thank you. And, um, do you have any pets in the apartment?
+Caller: Uh, yeah, I have a cat, but she usually hides under the bed.
+Agent: Alright, and do we have permission to enter if you’re not home, or would you prefer we call you first?
+Caller: Uh, yeah... hmm, could you call me first before anyone comes in? Just in case.
+Agent: Absolutely, we’ll make sure to call you first. I’ve noted everything down. Is there anything else I can assist you with?
+Caller: No, that should be it. Thanks for the help.
+Agent: You're welcome, Jacob. We’ll get on that as soon as possible. Have a great day!
+Caller: You too, bye.

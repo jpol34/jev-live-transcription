@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 64,
+    "category": "prospect",
+    "subtype": "pricing_specials_negotiation",
+    "edge_case": false,
+    "target_minutes": 4.4,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Calvin",
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "next month",
+    "price_quoted": "$1,250/mo",
+    "budget_amount": "$1,000",
+    "outcome": "wants to be kept informed of specials",
+    "fields_disclosed": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 260
+  }
+}

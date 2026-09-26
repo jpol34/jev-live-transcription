@@ -1,0 +1,18 @@
+# Call 080 — resident / edge_duplicate_work_order
+# edge_case=True  target_minutes=2.6  disclosure_style=corrects_mistake
+
+Agent: Good afternoon, Willow Creek Property Management, this is Sarah speaking. How can I assist you today?
+Caller: Uh, hi, this is Mike—but um, actually, my full name is Michael Clancy—I'm calling from 3B, and, um, I've got an issue with the heater. I think there's already a work order, but, oh gosh, I'm, uh, not sure if it’s been logged correctly.
+Agent: Sure, Michael, let me check that for you. Hold on just a moment, please.
+Caller: Of course, thank you.
+Agent: [pause] Thank you for waiting. I see we have a work order for unit 3B related to heating. Is it for the heater not turning on, or is it another issue?
+Caller: Uh, well, it actually turns on, but it’s like, um, not getting warm enough? Maybe there was a mistake. I wanted to update it, I guess.
+Agent: I understand. I'll make a note that the heater isn't warming properly. Just to confirm, it is unit 3B, right?
+Caller: Yes, yes, 3B. I think I, uh, maybe listed it as 8B by mistake in a previous call. Not sure how that happened, but yeah, 3B.
+Agent: Not a problem, Michael. Let me correct that for you and make sure the right apartment is listed. Anything else while we're at it?
+Caller: No, uh, that’s really it for now. I just wanted to make sure it’s not getting mixed up, uh, again.
+Agent: Got it, thank you for clarifying. Our maintenance team will be notified about the correction. Is there a specific time you’d prefer them to stop by?
+Caller: As soon as possible would be best. It’s getting pretty chilly in here. Uh, just give me a call first. I work odd hours.
+Agent: Absolutely, we'll call before they arrive. Thank you for letting us know. Anything else you need today, Michael?
+Caller: No, that’s all. Thanks so much for your help. Really appreciate it.
+Agent: You're welcome! Have a great day.

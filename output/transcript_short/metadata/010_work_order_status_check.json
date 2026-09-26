@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 10,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 2.9,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jennifer Martinez",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "14B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": "Leaking faucet in the kitchen",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Caller informed work order due by tomorrow",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "phone_number"
+    ],
+    "estimated_call_seconds": 152
+  }
+}

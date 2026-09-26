@@ -1,0 +1,21 @@
+# Call 075 — resident / edge_irate_legal_threat
+# edge_case=True  target_minutes=5.0  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jenna, how can I assist you today?
+Caller: Uh, yeah, h-hi. I'm, um, I'm really frustrated and... a little upset. My name's Stephen, and I live, uh—you know what, let's just say I'm one of your tenants.
+Agent: I’m sorry to hear that. Could you tell me more about what's going on?
+Caller: Well, sure. It's about my water heater. It’s been out for days, and no one's come to fix it!
+Agent: Oh, I'm really sorry to hear that, Stephen. Can you confirm your unit number for me, so I can look up the work order?
+Caller: Uh, I’m at, um... 3C but shouldn't you guys already know this? I’ve called multiple times.
+Agent: Yes, I understand. Let me check the status on that for unit 3C. Please hold for just a moment.
+Caller: Alright, sure, but make it quick. I’m really—just really upset.
+Agent: *(hold music plays briefly)* Thank you for waiting. I see that a work order was placed but it seems there might have been a scheduling issue. I apologize for the inconvenience.
+Caller: Scheduling issue? I've been freezing in my own apartment for days!
+Agent: I completely understand your frustration, Stephen. Let me escalate this to our maintenance manager so we can prioritize—
+Caller: Yeah, you better escalate it. If this isn't fixed by tomorrow, I might have to talk to my lawyer about withholding rent!
+Agent: I’m really sorry it has come to this. I will make sure it's marked urgent. Could I have your phone number, just to ensure we can keep you updated?
+Caller: Yeah, it's 555-0123. But like I said, you guys should already have this stuff.
+Agent: Understood. We do have your info, just confirming. We'll follow up as soon as we have a maintenance appointment confirmed.
+Caller: Alright, please, just make sure it happens soon.
+Agent: Absolutely. Thank you for your patience, Stephen.
+Caller: Yeah, thanks. Bye.

@@ -1,0 +1,41 @@
+{
+  "scenario": {
+    "id": 96,
+    "category": "resident",
+    "subtype": "lease_renewal_move_out_notice",
+    "edge_case": false,
+    "target_minutes": 4.5,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email",
+      "move_in_date",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jess",
+    "email": "jess.livingston89@gmail.com",
+    "phone_number": null,
+    "unit_number": "203",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "April",
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "information provided for move-out notice",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 260
+  }
+}

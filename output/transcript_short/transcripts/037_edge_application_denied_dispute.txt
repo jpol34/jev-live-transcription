@@ -1,0 +1,20 @@
+# Call 037 — prospect / edge_application_denied_dispute
+# edge_case=True  target_minutes=5.5  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management, this is Angela, how can I assist you today?
+Caller: Hi, um, this is... oh sorry, Anne. Anne Thompson. I'm calling because I, um, got a rejection for my application to Willow Creek Apartment Homes, and I really don't understand why.
+Agent: I'm sorry to hear that, Anne. Let me pull up your application. Could you please verify your phone number for me?
+Caller: Yeah, sure, it's uh... 555-0198... wait, 555-0197. Sorry about that.
+Agent: Thank you. Alright, I see your application here. It seems there was an issue with the, um, credit check and income verification process.
+Caller: Oh, but my, uh, my credit is fine. I mean, it's not the best, but it's okay. And I thought I gave all the needed paperwork?
+Agent: I understand. Sometimes there might be a disparity in the documents received. Would you be able to check if there was anything missing from your end or some documents that might have been sent incorrectly?
+Caller: Uh, I can check but honestly, I'm sure my friend sent everything. They handled it last week.
+Agent: I recommend going over the submission again on your end. Meanwhile, if there were any particular concerns, I can escalate this to a supervisor to review. Did they provide you with a contact email, just in case we need to email the decision?
+Caller: Uh, let me just... right, yes, it's annie.t@gmail.com. I used my nickname, oops!
+Agent: Thank you. If you can reverify everything and then send a quick email, we can try to get this sorted for you.
+Caller: Alright, that sounds good. Can you tell me, can they really deny just because of a slight, um, income issue? I mean, I was told $1,400?
+Agent: I'm not in a position to say for sure over the phone, but typically, income and credit checks are standard criteria. I can definitely have someone review it to ensure everything was considered appropriately.
+Caller: Okay, I just really hope something can be done. It's just been stressful.
+Agent: I completely understand, Anne. Let's try to get this to the right person and see if we can have more clarity on your application.
+Caller: Thank you so much, I appreciate it.
+Agent: You're welcome. We'll be in touch soon. Have a great day!

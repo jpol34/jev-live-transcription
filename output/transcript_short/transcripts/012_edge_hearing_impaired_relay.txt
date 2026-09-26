@@ -1,0 +1,20 @@
+# Call 012 — prospect / edge_hearing_impaired_relay
+# edge_case=True  target_minutes=4.5  disclosure_style=rushed
+
+Agent: Hello! Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Uh, yes, hi— I'm uh, looking for information on the apartments— I'm hearing impaired so there might be, um, some delay with my responses.
+Agent: Oh, no problem at all, take your time. Can I get your name, please?
+Caller: It's, uh— Tom, Tom Jacobs. Sorry if I speak fast, just used to it.
+Agent: Got it, Tom. And are you interested in a specific unit or just gathering information about what we have available?
+Caller: Uh, yeah, just, just looking for now. I think— something for December maybe, but not sure... Mmm.
+Agent: Alright, so possibly December. Are you looking for a one-bedroom or two-bedroom?
+Caller: Sorry, could you repeat that? I heard some noise on my end.
+Agent: Sure, no problem. I asked if you were looking for a one-bedroom or two-bedroom apartment.
+Caller: Oh, uh, yeah! Two-bedroom, if they're in, you know, my price range. Budget's, uh, tight right now.
+Agent: Understood. Do you, by any chance, know your email so I can send some listings?
+Caller: Oh, hold on, it's, um— gonna have to email that later. Is there— what's the best you can quote right now?
+Agent: Sure, the typical range for December is around $1,400 to $1,700, but it's always subject to change as we get closer to the date.
+Caller: That's— okay, yeah, I might— might give a call back. Gotta check with— to see if I can— okay, thanks.
+Agent: Of course, Tom. Feel free to reach out anytime. You can also email us whenever you're ready. Anything else I can help with?
+Caller: No, that's all. Thanks— for your, uh, patience. Bye.
+Agent: You're welcome. Bye now.

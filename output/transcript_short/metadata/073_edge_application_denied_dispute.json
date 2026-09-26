@@ -1,0 +1,32 @@
+{
+  "scenario": {
+    "id": 73,
+    "category": "prospect",
+    "subtype": "edge_application_denied_dispute",
+    "edge_case": true,
+    "target_minutes": 5.4,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Ben James",
+    "email": "applications@willowcreekpm.com",
+    "phone_number": "303-555-4892",
+    "price_quoted": null,
+    "outcome": "Caller will email updated credit report for review",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ],
+    "fields_withheld_or_unknown": [
+      "price_quoted"
+    ],
+    "estimated_call_seconds": 320
+  }
+}

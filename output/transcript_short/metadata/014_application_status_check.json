@@ -1,0 +1,36 @@
+{
+  "scenario": {
+    "id": 14,
+    "category": "prospect",
+    "subtype": "application_status_check",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Karen",
+    "email": "karendavis123@gmail.com",
+    "phone_number": "555-0123",
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Application status communicated",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 154
+  }
+}

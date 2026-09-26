@@ -1,0 +1,19 @@
+# Call 013 — resident / amenity_access_issue
+# edge_case=False  target_minutes=2.2  disclosure_style=corrects_mistake
+
+Agent: Good afternoon, Willow Creek Property Management. This is Lisa speaking, how can I help you today?
+Caller: Hi, uh, this is Mike, uh, Michael Donahue, from unit uh... 3B? Yeah, 3B.
+Agent: Hi Michael, thanks for calling. What can I do for you today?
+Caller: So, um, there's this thing with the gym access... I tried to use my key fob yesterday but it wouldn't let me in.
+Agent: Hmm, that's odd. Just to confirm, you're in 3B, right?
+Caller: Uh, yeah, 3B. Sorry about that.
+Agent: No problem! Can you hang on a sec while I look into this for you? There might be a quick reset we can try.
+Caller: Sure, no worries.
+Agent: Thank you... one moment.
+Agent: Okay, thanks for holding, Michael. It looks like there might have been a temporary issue with the system. Can you please try your fob again now?
+Caller: Oh, okay, let me give it another shot then... um, do I need to do anything special or just use it like normal?
+Agent: Just use it like normal, and if it still doesn’t work, let us know. But it should be all set.
+Caller: Alright, I'll check it out later today. Uh, if it doesn't, should I call back here?
+Agent: Yes, you can call us back or shoot us an email if that’s easier for you. We’ll make sure it gets sorted.
+Caller: Alright, great. Thanks, Lisa.
+Agent: You're welcome, Michael. Have a great day!

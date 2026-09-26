@@ -1,0 +1,20 @@
+# Call 090 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.6  disclosure_style=corrects_mistake
+
+Agent: Good afternoon! Thank you for calling Willow Creek Property Management. This is Kara, how can I assist you today?
+Caller: Hi, uh, this is, um, Ashley. I'm calling to ask about apartment availability at, uh, Willow Creek Apartment Homes.
+Agent: Great! Hi Ashley. Happy to help with that. Are you looking for a specific move-in date?
+Caller: Yeah, hopefully by January. Uh, yeah, January first ideally.
+Agent: Alright, January first. Let me just check here... okay, looks like we do have some availability for that period. Are you interested in a particular type of unit or specific amenities?
+Caller: Um, I think a two-bedroom would be, you know, ideal. And, uh, do you have anything with in-unit laundry?
+Agent: Yes, many of our units do have that feature. Can I ask what your budget range is so I can see what matches best?
+Caller: Oh, uh, sure. I was thinking somewhere around... uh, maybe fifteen hundred to eighteen hundred a month?
+Agent: Perfect, that gives us some good options. And just to confirm your phone number in case we get disconnected...
+Caller: Oh, right! Sorry, it's 555-0192—oh wait, sorry, it's 555-0191.
+Agent: Thanks for the correction. I'll keep that noted. Let me put you on hold for just a moment to gather more detailed information.
+Caller: Sure, no problem.
+Agent: Okay, thanks for holding. We have a few options within your budget and with the amenities you're looking for. Would you like to schedule a tour, or have any further questions?
+Caller: Uh, I'd be interested in seeing them first for sure. Can I call back to set something up? I’m just not at my computer right now.
+Agent: Absolutely, just give us a call back when you're ready, and we can schedule that tour for you. Anything else I can help you with today?
+Caller: Nope, that's it for now. Thanks, Kara!
+Agent: You're welcome, Ashley! Looking forward to hearing from you again soon. Have a great day!

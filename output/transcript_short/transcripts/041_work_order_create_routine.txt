@@ -1,0 +1,19 @@
+# Call 041 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.4  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Samantha, how can I assist you today?
+Caller: Hi, um, this is Tyler... uh, Tyler Benson? I'm calling from, uh, Willow Creek Apartment Homes. I've got a, uh, maintenance issue.
+Agent: Of course, Tyler. Can you let me know your unit number, please?
+Caller: Oh right, it's, uh, unit 17... no, sorry, unit 217. I always mix that up.
+Agent: No problem at all. And what seems to be the issue?
+Caller: It's the, um, heater… it’s not working properly. It's, like, blowing cold air instead of warm.
+Agent: Got it, we'll definitely need to check that out. And do you have any pets we should be aware of when entering your apartment?
+Caller: Uh, yeah, I’ve got a cat, but she’s, uh, usually hiding when strangers come in.
+Agent: Sounds good, and do we have permission to enter if no one is home or should we call first?
+Caller: You can enter if, uh, I'm not there. That's fine.
+Agent: Alright, let me just confirm your phone number, in case our maintenance team needs to contact you. We have 555-348-2910, correct?
+Caller: Oh, actually, that was my old number. It's now 555-339-2810. Sorry about that.
+Agent: No worries, I'll update that for you. Is there anything else you need help with today?
+Caller: Uh, nope, that should be it. Thanks.
+Agent: You're welcome, Tyler. We'll have someone take a look at the heater as soon as possible. Have a great day!
+Caller: Thanks, you too!

@@ -1,0 +1,42 @@
+{
+  "scenario": {
+    "id": 53,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.0,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mike",
+    "phone_number": "555-123-4567",
+    "unit_number": null,
+    "amenities_requested": [
+      "fitness center",
+      "pool",
+      "community lounge"
+    ],
+    "budget_amount": "1600",
+    "move_in_date": "early December",
+    "price_quoted": "1500",
+    "outcome": "prospect interested, information provided",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [
+      "unit_number"
+    ],
+    "estimated_call_seconds": 160
+  }
+}

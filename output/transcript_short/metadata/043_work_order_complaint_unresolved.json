@@ -1,0 +1,34 @@
+{
+  "scenario": {
+    "id": 43,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 4.7,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Richard",
+    "phone_number": "555-0199",
+    "unit_number": null,
+    "work_order_issue": "leak under sink",
+    "permission_to_enter": "call_first",
+    "outcome": "escalated work order",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [
+      "unit_number"
+    ],
+    "estimated_call_seconds": 290
+  }
+}

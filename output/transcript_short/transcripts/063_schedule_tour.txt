@@ -1,0 +1,20 @@
+# Call 063 — prospect / schedule_tour
+# edge_case=False  target_minutes=2.8  disclosure_style=cooperative
+
+Agent: Good afternoon, uh, thank you for calling Willow Creek Property Management! This is Lisa. How can I assist you today?
+Caller: Hi Lisa, um, my name is Kevin, and I was just, like, uh, looking to schedule a tour of the Willow Creek Apartment Homes?
+Agent: Of course, Kevin! I'd be happy to help with that. Is there a particular day or time you're looking at?
+Caller: Uh, yeah. Ideally sometime next week? Um, maybe mid-week in the afternoon?
+Agent: Alright, let's see. How about Wednesday at, say, 2 PM? Does that work for you?
+Caller: Uh, yeah, that sounds good. Let me just—actually, can we do Thursday instead? Same time?
+Agent: Sure thing, Thursday at 2 PM works as well. I’ll jot that down. Can I have your last name to finalize the booking?
+Caller: Oh, right! It's Kevin Marshall. Sorry, I should've mentioned that earlier.
+Agent: No worries at all, Mr. Marshall. And could I get a contact number in case anything comes up?
+Caller: Yeah, it’s 555-0198.
+Agent: Great, 555-0198. And do you have an email address you'd like us to use for a confirmation?
+Caller: Oh, absolutely. It’s kevin.marshall... uh, at... let’s see, gmail.com.
+Agent: Perfect, I'll send over the confirmation shortly. Um, are you planning a move-in date, or still just exploring at this point?
+Caller: I’m looking for maybe the beginning of December? But I'm... uh, kind of flexible on that.
+Agent: Got it. That gives us some good time to find something that fits. Alright then, we'll see you on Thursday at 2 PM!
+Caller: Great, thanks, Lisa! Looking forward to it.
+Agent: You’re welcome, Kevin. Have a great day!

@@ -1,0 +1,34 @@
+{
+  "scenario": {
+    "id": 93,
+    "category": "resident",
+    "subtype": "work_order_create_emergency",
+    "edge_case": true,
+    "target_minutes": 3.2,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Kyle",
+    "phone_number": "555-0178",
+    "unit_number": "12B",
+    "work_order_issue": "Ceiling leak with water pouring into living room",
+    "permission_to_enter": "yes",
+    "outcome": "Emergency work order created; maintenance dispatched",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 210
+  }
+}

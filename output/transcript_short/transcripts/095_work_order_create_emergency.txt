@@ -1,0 +1,16 @@
+# Call 095 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=2.8  disclosure_style=rushed
+
+Caller: Uh, hello? Is— Is this um, Willow Creek Apartments?
+Agent: Yes, hello! This is Willow Creek Property Management. How can I help you today?
+Caller: Okay, um, listen! There's water—water everywhere in my kitchen! I think a pipe burst or something.
+Agent: Oh no! I'm sorry to hear that. We'll get someone out there as soon as possible. Can I get your unit number?
+Caller: It's, uhh... 17C, I think? I mean, yeah, 17C! I'm pretty sure that's right.
+Agent: Alright. And could you tell me your name, please?
+Caller: It's, um, Jamie. Jamie Phillips.
+Agent: Thank you, Jamie. And just to confirm, a phone number we can reach you at?
+Caller: Yeah, uh, it's... hold on, 512-555-0912. Hurry, I'm worried about the floor getting ruined!
+Agent: I understand. I'll need to confirm—do we have permission to enter your unit if you're not there?
+Caller: Uh, yes, yes, just please get someone here quick!
+Agent: Absolutely. I'm sending a maintenance request as an emergency. They should be there very shortly. Hang tight, okay?
+Caller: Okay, thanks! I'll be waiting. There's stuff everywhere!

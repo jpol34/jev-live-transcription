@@ -1,0 +1,19 @@
+# Call 018 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.9  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, this is Tina speaking. How can I help you today?
+Caller: Uh, hi Tina, this is Mark Robinson. I think I've got a maintenance issue in my apartment.
+Agent: Oh, I'm sorry to hear that, Mark. Could you give me a little more detail about what's going on?
+Caller: Yeah, it's the kitchen sink. It, uh, seems to be leaking underneath. It just started this morning.
+Agent: Got it. That certainly sounds like something we need to take care of. Can I get your unit number, please?
+Caller: Sure, it's 204B. Oh no, actually, wait, it's 204D. Sorry about that.
+Agent: No problem, Mark. So unit 204D. And just to confirm, is there a phone number we can reach you at, in case the maintenance team needs to contact you?
+Caller: Uh, yeah, that would be, um, 555-0137. I mean, 555-0107. Sorry, I keep mixing those up.
+Agent: All good, thanks for clarifying. And do we have permission to enter your apartment if you're not there?
+Caller: Um, yeah, that's fine. Go ahead.
+Agent: Perfect. And just to check, do you have any pets we should be aware of?
+Caller: No pets, it's just me.
+Agent: Great. Well, it sounds like everything we need is here. Our maintenance team will get on it and should reach out within the next day or two. Anything else I can assist you with?
+Caller: Nope, that's all for now. Thanks for the help, Tina.
+Agent: You're welcome, Mark! Have a good day.
+Caller: You too, bye.

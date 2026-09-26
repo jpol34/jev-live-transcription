@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 80,
+    "category": "resident",
+    "subtype": "edge_duplicate_work_order",
+    "edge_case": true,
+    "target_minutes": 2.6,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Michael Clancy",
+    "phone_number": null,
+    "unit_number": "3B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "heater not warming properly",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "corrected work order unit and issue",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 156
+  }
+}

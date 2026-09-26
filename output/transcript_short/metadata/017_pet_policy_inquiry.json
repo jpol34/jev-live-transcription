@@ -1,0 +1,42 @@
+{
+  "scenario": {
+    "id": 17,
+    "category": "prospect",
+    "subtype": "pet_policy_inquiry",
+    "edge_case": false,
+    "target_minutes": 2.5,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "pet_info",
+      "amenities_requested"
+    ]
+  },
+  "metadata": {
+    "caller_name": null,
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": [
+      "green areas for pets"
+    ],
+    "pet_info": "Considering getting a dog, specifics unknown",
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": "$25 monthly pet rent, $300 fee",
+    "budget_amount": null,
+    "outcome": "Caller received general pet policy information",
+    "fields_disclosed": [
+      "pet_info",
+      "amenities_requested",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "caller_name",
+      "email",
+      "phone_number"
+    ],
+    "estimated_call_seconds": 150
+  }
+}

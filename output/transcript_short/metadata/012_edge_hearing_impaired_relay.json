@@ -1,0 +1,33 @@
+{
+  "scenario": {
+    "id": 12,
+    "category": "prospect",
+    "subtype": "edge_hearing_impaired_relay",
+    "edge_case": true,
+    "target_minutes": 4.5,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Tom Jacobs",
+    "email": null,
+    "move_in_date": "December",
+    "price_quoted": "$1,400 to $1,700",
+    "budget_amount": null,
+    "outcome": "gathered preliminary rental info",
+    "fields_disclosed": [
+      "caller_name",
+      "move_in_date",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "budget_amount"
+    ],
+    "estimated_call_seconds": 270
+  }
+}

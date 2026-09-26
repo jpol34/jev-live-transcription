@@ -1,0 +1,16 @@
+# Call 049 — prospect / application_status_check
+# edge_case=False  target_minutes=2.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking, how can I assist you today?
+Caller: Hi, uh, this is Mark... Mark Donnelly. I, uh, wanted to check on the status of the, um, application I submitted for the Willow Creek Apartments.
+Agent: Of course, Mark. Let me pull that up for you. May I have your phone number to help me find your application?
+Caller: Oh sure, it's 555-0134. Uh, actually, wait—sorry, it's 555-0136.
+Agent: Got it, thank you. One moment please.
+Caller: No problem.
+Agent: Alright, I have it here. Looks like your application is still being processed. We usually have an update within 48 hours from submission.
+Caller: Oh, okay. I thought it might have been faster. Do you, um, need anything else from me to speed it up?
+Agent: Not at this time, everything seems to be in order. Could you confirm your email just in case we need to reach out?
+Caller: Yeah, sure, it's uh, m.donnelly... at gmail.com. Sorry, that's actually m-a-r-c dot donnelly at gmail dot com.
+Agent: Perfect, thank you. We'll be in touch as soon as there's an update. Anything else I can help you with today?
+Caller: No, that's it. Thanks a lot, Lisa.
+Agent: You're welcome, Mark. Have a great day!

@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 13,
+    "category": "resident",
+    "subtype": "amenity_access_issue",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Michael Donahue",
+    "phone_number": null,
+    "unit_number": "3B",
+    "amenities_requested": [
+      "gym access"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Caller instructed to retry key fob.",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "amenities_requested"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 132
+  }
+}

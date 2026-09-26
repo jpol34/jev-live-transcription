@@ -1,0 +1,34 @@
+{
+  "scenario": {
+    "id": 67,
+    "category": "resident",
+    "subtype": "amenity_access_issue",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Sarah Thompson",
+    "phone_number": null,
+    "unit_number": "23B",
+    "amenities_requested": [
+      "gym"
+    ],
+    "work_order_issue": "Gym access card not working",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "amenities_requested",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 130
+  }
+}

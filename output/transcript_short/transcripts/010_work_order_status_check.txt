@@ -1,0 +1,19 @@
+# Call 010 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.9  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Stacy, how can I assist you today?
+Caller: Hi, this is Jennifer Martinez. I'm calling to check on the status of a work order I placed a few days ago.
+Agent: Of course, Jennifer. Could you please confirm your unit number for me?
+Caller: Sure, it's 14B.
+Agent: Great, and do you remember what the issue was about or the ticket number, if you have it handy?
+Caller: Uh, yeah, it was for a leaking faucet in the kitchen. I don’t have the ticket number, sorry.
+Agent: No worries, I can look it up with the details you provided. Let me just check here, can you hold on for a moment?
+Caller: Sure thing.
+Agent: (Background typing sounds) Alright, I found the work order. It looks like it’s been assigned to maintenance and they should be handling it by the end of tomorrow.
+Caller: Oh good, I was just worried it got lost or something. Should I be at home when they come by?
+Agent: Since it's a minor repair, you don't need to be there unless you'd prefer to be. Do you have any specific instructions for them, like call before they arrive?
+Caller: Uh no, no special instructions. Just as long as it's fixed soon, that sounds great.
+Agent: Alright, I'll make a note of it. Is there anything else I can help you with today?
+Caller: No, that's it, thank you for your help!
+Agent: You're welcome, Jennifer! Have a great day.
+Caller: You too, bye.

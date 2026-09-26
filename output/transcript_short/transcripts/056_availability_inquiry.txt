@@ -1,0 +1,20 @@
+# Call 056 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.1  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, how can I assist you today?
+Caller: Hi, I'm calling to see if there are any available units at the Willow Creek Apartments.
+Agent: Sure, I can help with that. Can I get your name please?
+Caller: Oh, uh, it's Kevin. Kevin James.
+Agent: Thanks, Kevin. Can I also get your phone number just in case we get disconnected?
+Caller: It's 555-0198... oh wait, sorry, that's my home number. Let me give you my cell... it's 555-0133.
+Agent: Alright, thank you. So, you're looking for an available unit. Did you have a specific move-in date in mind?
+Caller: Um, yeah, we're hoping for, uh, mid-December, around the 15th maybe.
+Agent: Okay, I see. We do have a few options around that time. What's your budget, if you don't mind me asking?
+Caller: Yeah, we're looking to keep it under $1,500 a month.
+Agent: Got it. Are there any specific amenities you're interested in?
+Caller: Actually, yes, we really need access to a fitness center and, uh, a pool would be a great bonus.
+Agent: Perfect, we do have some units that fit those criteria. I can send you more details via email if that's okay?
+Caller: Uh, yeah sure... oh, you need my email, don't you? It's kjames at email dot com.
+Agent: Thank you. I'll get those details over to you. Is there anything else I can help with right now?
+Caller: No, I think that's about it. Thanks for your help!
+Agent: You're welcome, Kevin. Have a great day and watch out for that email from us.

@@ -1,0 +1,28 @@
+{
+  "scenario": {
+    "id": 6,
+    "category": "resident",
+    "subtype": "noise_neighbor_complaint",
+    "edge_case": false,
+    "target_minutes": 4.8,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Kelly Harper",
+    "phone_number": "555-0134",
+    "unit_number": "204",
+    "outcome": "Noise complaint noted, follow-up with resident planned",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 282
+  }
+}

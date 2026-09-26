@@ -1,0 +1,18 @@
+# Call 040 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.7  disclosure_style=cooperative
+
+Agent: Willow Creek Property Management, this is Lisa speaking. How can I help you today?
+Caller: Hi, this is Mark Kennedy. I'm calling to check on a work order status for my apartment.
+Agent: Sure thing, Mark. Can you give me your unit number, please?
+Caller: Oh, sure, it's 204B.
+Agent: Okay, 204B... Got it. And what was the work order regarding?
+Caller: Uh, it's about the kitchen sink. It's been leaking for a few days now.
+Agent: Oh, okay. Let me just pull that up... one moment.
+Agent: Alright, it looks like the order for the sink leak was placed on Monday. Mmm... okay, yeah, our maintenance team is scheduled to take a look today, actually.
+Caller: Oh, perfect! I was worried it might take longer. Do they usually call before they come over, or...?
+Agent: Uh, in most cases, they don't, unless you specifically requested it. But typically, they'll knock first.
+Caller: Gotcha, thanks. I just wanted to make sure, since I work from home and, you know, want to be prepared for when they arrive.
+Agent: Absolutely. Is there anything else I can assist you with today?
+Caller: No, that's all. Thanks for the update, Lisa.
+Agent: You're welcome, Mark. Have a great day!
+Caller: You too, bye-bye!

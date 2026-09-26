@@ -1,0 +1,21 @@
+# Call 061 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=5.1  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. This is Susan speaking. How can I assist you today?
+Caller: Uh, hi. I'm calling about, um, some ongoing issues with my, uh, HVAC. It's, uh, not resolved and it's getting really frustrating.
+Agent: I’m sorry to hear that. Can I have your name, please?
+Caller: Uh, John. John but I'd rather not say my last name right now.
+Agent: No problem, John. Could I get your unit number to pull up your records?
+Caller: Umm, yeah, I think it's 303, unless... yeah, should be 303.
+Agent: Thank you. Let me check our system... okay, I see there was a work order placed for your HVAC. It looks like it was marked as completed. Is that correct from your end?
+Caller: Well, they came over... but it's still blowing warm air. I mean, it's not... whatever they did, it's not working.
+Agent: I see. Let me grab some more details. Do you remember when the maintenance team came over? Any specific day or time?
+Caller: Honestly, um, it was maybe last week? Or the week before? It's all kind of blurry now with all this stress.
+Agent: Understandable. I’ll make a note of that. And can I confirm your phone number in case we need to reach you for further updates?
+Caller: Uh, I'd rather not give it out again. You should have it on file.
+Agent: Alright, not a problem. I will flag this for our maintenance supervisor so we can escalate the issue and get a technician back out there as soon as possible.
+Caller: Okay, but can you make sure they really fix it? It's been super inconvenient, especially with having guests over and it's just awkward.
+Agent: We’ll do our best to ensure this is taken care of properly. I apologize for the repeated inconvenience. Can you let me know if there are specific times when you’re usually at home?
+Caller: Better if they just call first. My schedule's kind of all over these days.
+Agent: Understood, John. I’ve noted that down. We’ll update you once we have the appointment scheduled.
+Caller: Alright. Thanks for your help. Just... hoping to get this sorted, you know?

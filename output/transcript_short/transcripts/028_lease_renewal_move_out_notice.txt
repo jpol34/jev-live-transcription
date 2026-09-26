@@ -1,0 +1,18 @@
+# Call 028 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=3.9  disclosure_style=corrects_mistake
+
+Agent: Willow Creek Property Management, this is Amanda speaking. How can I assist you today?
+Caller: Hi, Amanda, uh, this is, uh, Mark Johnston. I'm calling about my lease renewal, um, for my apartment at 204.
+Agent: Hi Mark, thanks for calling. Let me quickly bring up your file. Can you confirm... um, did you say unit 204?
+Caller: Oh, sorry, it's actually 240. I always mix those up.
+Agent: No worries, let me fix that here. Okay, so you're looking into renewing... or are you considering a move-out?
+Caller: Uh, yeah, I've decided to move out at the end of the lease.
+Agent: Alright, I understand. Could you remind me when your current lease ends?
+Caller: Uh, it's... I think November 30th, if I'm not mistaken.
+Agent: Let me verify that for you... Yes, that's correct, November 30th. So, we'll need a formal notice, preferably in writing, 30 days prior.
+Caller: Sure, I’ll send an email over to your office. Do you need my email details now?
+Agent: That's fine, just include it in your email. Do you need any info regarding your current rent or any final details about moving out?
+Caller: Uh, no, I think I'm good there. Just wanted to make sure I'm on record about moving out.
+Agent: Great, and just to wrap up, is there anything else you need help with? Maybe the deposit procedure or transferring utilities?
+Caller: Nope, I should be good. Thanks, Amanda!
+Agent: You're welcome, Mark! Feel free to reach out if anything comes up before your move.

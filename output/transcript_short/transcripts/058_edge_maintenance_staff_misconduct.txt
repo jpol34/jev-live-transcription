@@ -1,0 +1,21 @@
+# Call 058 — resident / edge_maintenance_staff_misconduct
+# edge_case=True  target_minutes=6.7  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa, how can I assist you today?
+Caller: Hi, uh, Lisa. My name is Mark, Mark Dillon. Um, I'm calling because I... I had kinda a weird experience the other day with one of your maintenance staff.
+Agent: Oh, I'm sorry to hear that, Mark. Can you tell me what happened?
+Caller: Yeah, so, um, I'm in unit 12B, and there was uh, a problem with my kitchen sink. And the maintenance guy, uh, James I think? He came by and, um, everything was fixed, which is fine. But he... uh, how do I put this... he acted really unprofessionally.
+Agent: I see. Could you be more specific? What did he do?
+Caller: Right, so, um, he... he was like... kinda rude, and he left a real mess. There were tools and some, uh, dirt I guess, all over the floor. Also, he spent a lot of time on his phone. Like, he was chatting or something.
+Agent: Oh, that's definitely not the service we aim to provide. I'm sorry you experienced that. Let me take down some details. You mentioned your unit is 12B, correct?
+Caller: Uh, yes, that's right. 12B.
+Agent: And you said the maintenance technician's name was James?
+Caller: Yeah, I think that was his name. I'm not totally sure, sorry.
+Agent: No problem at all. Thank you for bringing this to our attention. Um, just for our records, could I have your phone number in case our manager needs to follow up?
+Caller: Oh, sure, it's, uh, 555-0199.
+Agent: Got it. 555-0199. And, just for clarity, did James fix the issue with the sink?
+Caller: Yeah, I mean, it's working fine now, but... uh, the cleanup was the issue. And, you know, the, um, the attitude.
+Agent: We definitely want to ensure our service is professional and respectful. I'll escalate this to our property manager right away. Is there anything else we can do for you right now?
+Caller: No, just... just make sure this sort of thing doesn't happen again. It was pretty off-putting.
+Agent: Absolutely. We’ll address it promptly. Thank you for your call, Mark, and I'm sorry once again for the inconvenience. Have a good day.
+Caller: Thanks, Lisa. I appreciate the help. Bye.

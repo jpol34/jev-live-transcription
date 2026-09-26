@@ -1,0 +1,29 @@
+{
+  "scenario": {
+    "id": 79,
+    "category": "resident",
+    "subtype": "billing_rent_payment_question",
+    "edge_case": false,
+    "target_minutes": 3.8,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Johnson",
+    "email": "mark.j.johnson@domain.com",
+    "unit_number": "B230",
+    "work_order_issue": null,
+    "outcome": "Email corrected; issue resolved",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 220
+  }
+}

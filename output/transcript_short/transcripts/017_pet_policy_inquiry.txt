@@ -1,0 +1,17 @@
+# Call 017 — prospect / pet_policy_inquiry
+# edge_case=False  target_minutes=2.5  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Linda speaking. How can I help you today?
+Caller: Uh, hi Linda. I was, um, just calling to find out about your pet policy at, uh, Willow Creek Apartment Homes?
+Agent: Sure thing! We are a pet-friendly community. Did you have a specific kind of pet in mind?
+Caller: Uh, well, I'm considering getting a dog. Just wanted to see what the rules are, you know?
+Agent: Absolutely, we allow dogs! There is a size limit and a couple of breed restrictions. Are you familiar with any—
+Caller: Sorry, there's some noise here, can you repeat that part?
+Agent: Of course! We do allow dogs but there's a size limit, usually up to 50 pounds, and some breed restrictions. Do you know what kind of dog you might be bringing?
+Caller: Uh, not sure yet. Still deciding... Alright, um, do you have any fees or extra deposits for pets?
+Agent: Yes, there's a $300 non-refundable pet fee and a monthly pet rent of $25. Anything else you might want to know?
+Caller: Okay, that's helpful. Uh, what about amenities for pets?
+Agent: We do have some green areas for pets to play in. Is there anything specific you'll need for your pet?
+Caller: No, no, I think that's all I need right now. I'll... I'll think it over.
+Agent: Great, feel free to call us back if you have any more questions. Have a good day!
+Caller: Thanks, bye.

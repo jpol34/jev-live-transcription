@@ -1,0 +1,35 @@
+{
+  "scenario": {
+    "id": 89,
+    "category": "resident",
+    "subtype": "lease_renewal_move_out_notice",
+    "edge_case": false,
+    "target_minutes": 5.0,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email",
+      "move_in_date",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Todd Renner",
+    "email": "t.renner78@gmail.com",
+    "unit_number": "3D",
+    "move_in_date": null,
+    "price_quoted": "$1,650",
+    "outcome": "Caller undecided between lease renewal and move out",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "move_in_date"
+    ],
+    "estimated_call_seconds": 270
+  }
+}

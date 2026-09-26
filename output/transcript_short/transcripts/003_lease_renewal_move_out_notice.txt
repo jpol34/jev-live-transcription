@@ -1,0 +1,23 @@
+# Call 003 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=3.9  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa, how can I assist you today?
+Caller: Uh, yeah, hi, Lisa. I think I need to, um... discuss my lease renewal? Or maybe it's, uh, something about moving out? I'm not really sure where to start.
+Agent: No worries, let's figure it out together. Can I have your full name, please?
+Caller: It's, uh, George Kellen. But, uh, I guess it might be under like a Geo? I usually go by that.
+Agent: Okay, Geo. And can you tell me your apartment unit number?
+Caller: Oh, um, I think it’s 324? Wait, no, maybe 342.
+Agent: Let me look that up for you... Alright, I found you in our system. You're at unit 342. Now, are you looking to renew your lease or are you thinking about moving out?
+Caller: Right, I was trying to figure out if, uh, maybe I could get a better rate if I renew, but at the same time, I'm considering, you know, if it’s time to move on.
+Agent: Got it. Well, let's discuss both options. For renewal, we do offer, uh, some discounts depending on the length of the lease you choose. Have you received your renewal notice yet?
+Caller: Uh, I think I did? Or maybe my roommate did. I'm not really sure, it’s been a busy month.
+Agent: Understandable. We usually send these out via email. Do you know if it was sent to geo.kellen, or maybe a different email?
+Caller: Probably to geo.kellen at, uh, gmail? Or maybe a work email? I’ll need to check that.
+Agent: Okay. If you need us to resend it, just let me know. As for moving out, we usually require a 30-day notice. Have you thought about your move-out date if you decide to leave?
+Caller: Oh, I haven't really set a date. Maybe late next month? I guess, I just need to know the price first.
+Agent: Of course. Our renewal rates have stayed fairly consistent, but let me find what was quoted to you. It looks like... uh, I see a note here... $1300 if you stay with your current lease terms. Does that sound about right?
+Caller: Ohhh, I actually thought it was lower. Um, I might need to check those emails again.
+Agent: Sure thing, Geo. Feel free to call back once you’ve got more clarity, and I can help you sort through your options then.
+Caller: Thanks, Lisa. I’ll do that. It’s just been one of those weeks, you know?
+Agent: Totally get it. Don't hesitate to reach out if anything else comes up. Take care!
+Caller: Will do. Bye.

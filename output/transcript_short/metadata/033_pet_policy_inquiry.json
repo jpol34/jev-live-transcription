@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 33,
+    "category": "prospect",
+    "subtype": "pet_policy_inquiry",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "pet_info",
+      "amenities_requested"
+    ]
+  },
+  "metadata": {
+    "caller_name": null,
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": [
+      "dog park",
+      "pet stations"
+    ],
+    "pet_info": "Small dog, Terrier mix, around 20 pounds",
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Interest in pet policy; no commitment",
+    "fields_disclosed": [
+      "pet_info",
+      "amenities_requested"
+    ],
+    "fields_withheld_or_unknown": [
+      "caller_name"
+    ],
+    "estimated_call_seconds": 132
+  }
+}

@@ -1,0 +1,18 @@
+# Call 073 — prospect / edge_application_denied_dispute
+# edge_case=True  target_minutes=5.4  disclosure_style=corrects_mistake
+
+Agent: Good afternoon, thanks for calling Willow Creek Property Management. This is Sarah. How can I help you today?
+Caller: Uh, hi, Sarah. This is Ben. Uh, my last name's James. I, um, applied for an apartment, but I got an email saying my application was denied. I'm not sure why, I'm... kind of frustrated, to be honest.
+Agent: I’m sorry to hear that, Ben. Let me pull up your application and see if I can provide any clarity. Can you give me your last name again?
+Caller: Yeah, it’s James. J-a-m-e-s. And, um, the phone number I used was 303-555-4892.
+Agent: Great, let me just look that up... Okay, it looks like, uh, your application was reviewed, but it, um, seems like there were discrepancies with your credit report?
+Caller: That’s strange. My credit score should be fine. Are you sure? I think there might be a mistake.
+Agent: I understand your concern, Ben. Sometimes there can be errors in these reports. Did you receive, uh, anything specific in the notification email?
+Caller: I, well, it just said denied due to credit reasons, but I had checked it recently, and it seemed okay. Um, can I email something over to you, like an updated report?
+Agent: Sure, you can send any additional information to our applications team at applications@willowcreekpm.com. I can also have someone look more closely at your case if that would help.
+Caller: Yeah, please, that would be great. Could you spell out that email again, just to make sure I got it right?
+Agent: Of course, it’s a-p-p-l-i-c-a-t-i-o-n-s at willowcreekpm dot com. Once you send it over, we'll get someone on it and then update you with any progress.
+Caller: Thank you, Sarah. I just... really want to make sure everything's all good. Is there anything else I need to send over?
+Agent: No, just the updated credit report should be fine. We’ll handle the rest from there. Once we confirm receipt, you should hear back within a couple of days.
+Caller: Okay, I’ll do that right away. Thanks for your help!
+Agent: You’re welcome, Ben. Thank you for calling Willow Creek Property Management. Have a nice day.

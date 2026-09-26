@@ -1,0 +1,31 @@
+{
+  "scenario": {
+    "id": 50,
+    "category": "prospect",
+    "subtype": "pricing_specials_negotiation",
+    "edge_case": false,
+    "target_minutes": 3.4,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Paul Stevens",
+    "budget_amount": "1500",
+    "price_quoted": "1350",
+    "move_in_date": "December 2023",
+    "outcome": "Caller plans to consider and possibly schedule a tour.",
+    "fields_disclosed": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 220
+  }
+}

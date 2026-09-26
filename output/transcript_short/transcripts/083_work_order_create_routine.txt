@@ -1,0 +1,20 @@
+# Call 083 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.4  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. How can I help you today?
+Caller: Uh, hi, um, I need to, uh, put in a maintenance request for my, um, my apartment.
+Agent: Sure, I can help with that. Can I get your name, please?
+Caller: Oh, right, it's Brian Mendoza.
+Agent: Thank you, Brian. And your unit number?
+Caller: Uh, let's see, it's... ah, yeah, 204B.
+Agent: Okay, got it. What's the issue you're experiencing?
+Caller: Uh, so the kitchen, um, faucet is, like, leaking or something... and it’s, uh, getting worse.
+Agent: Got it, a leaking faucet. We can take care of that. Can maintenance enter your apartment if you're not home?
+Caller: Uh, yeah, yeah, sure. That's fine.
+Agent: Alright, and do you have any pets that we should be aware of?
+Caller: No, no, uh, no pets.
+Agent: Alright, we'll have someone come take a look at it soon. Is there a phone number we should call if we need to reach you?
+Caller: Yeah, it's, um, 555-0199.
+Agent: Perfect. Thank you, Brian. We've got your request in. Anything else I can help you with today?
+Caller: No, nope, that's it, thanks a lot.
+Agent: You're welcome. Have a great day!

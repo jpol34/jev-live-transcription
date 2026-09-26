@@ -1,0 +1,31 @@
+{
+  "scenario": {
+    "id": 37,
+    "category": "prospect",
+    "subtype": "edge_application_denied_dispute",
+    "edge_case": true,
+    "target_minutes": 5.5,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Anne Thompson",
+    "email": "annie.t@gmail.com",
+    "phone_number": "555-0197",
+    "price_quoted": "$1,400",
+    "outcome": "Escalation requested via supervisor for application review",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 330
+  }
+}

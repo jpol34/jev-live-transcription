@@ -1,0 +1,18 @@
+# Call 091 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.7  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lucy. How can I assist you today?
+Caller: Hi, Lucy. This is Mark Johnson. I'm just checking on the status of a work order I submitted last week.
+Agent: Sure, Mark. Could you provide me with your unit number, please?
+Caller: Oh, yeah, it's 204B.
+Agent: Great, thank you. Let me just pull up your information... Alright, could you remind me what the issue was related to?
+Caller: It's the, uh, the leaking kitchen faucet.
+Agent: Got it. Let me check on that for you.
+Agent: Okay, so it looks like the part needed for the repair came in yesterday and the maintenance team has scheduled you for tomorrow afternoon. Does that time work for you?
+Caller: Yeah, I think that should be fine. Do you know what time exactly?
+Agent: It’s scheduled between 1 and 3 PM. Will someone be home or do you need us to give you a call beforehand?
+Caller: I'll be at work, but my, uh, my girlfriend might be there. If not, you guys can call me and I'll coordinate it with her.
+Agent: Alright, I'll put a note that we'll call if no one answers. Is there anything else I can help you with today?
+Caller: Nope, that covers it. Thanks for your help, Lucy.
+Agent: You're welcome, Mark. Have a great day and good luck with the repair.
+Caller: Thanks, you too. Bye!

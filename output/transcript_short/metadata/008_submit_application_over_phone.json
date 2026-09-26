@@ -1,0 +1,42 @@
+{
+  "scenario": {
+    "id": 8,
+    "category": "prospect",
+    "subtype": "submit_application_over_phone",
+    "edge_case": false,
+    "target_minutes": 5.2,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Randy Lewis",
+    "email": "RandyL@mail.com",
+    "phone_number": "555-0342",
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": "No pets, possible cat later",
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "Mid-November",
+    "price_quoted": "$1,200",
+    "budget_amount": null,
+    "outcome": "Application started",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 312
+  }
+}

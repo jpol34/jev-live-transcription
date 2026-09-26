@@ -1,0 +1,25 @@
+# Call 062 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=4.8  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah. How can I assist you today?
+Caller: Hi Sarah, this is Mark Douglas, umm, calling about, uh, submitting an application for Willow Creek Apartment Homes.
+Agent: Great, Mark! I can certainly help with that. Have you already toured the community or are you just calling based on some online information?
+Caller: Oh, I actually did a tour last week. Really loved the place, so I'm kind of eager to move forward.
+Agent: Perfect! Let's see, uh, I can start by checking if we have your details in our system. Could I have your email address, please?
+Caller: Sure, it's mark.douglas1985... no, sorry, it's markdouglas@simplymail.com.
+Agent: Got it, markdouglas@simplymail.com. And just to confirm, your phone number, Mark?
+Caller: Yeah, it's 555-0379. Um, wait, yeah, that's right.
+Agent: Alright, I’ve got that. And were you looking at a specific, uh, move-in date?
+Caller: We were thinking about November 1st, if that's possible?
+Agent: November 1st should be doable. Let me just—could you hold on for just a moment while I check availability?
+Caller: Sure, no problem.
+Agent: (holds for a few seconds) Alright, it looks like we do have units available for that date. Now, were you quoted a price during your tour, or should I provide that info?
+Caller: I think I was told around $1,200 for a two-bedroom, but not completely sure.
+Agent: Let's say around $1,200 then, and we'll double-check when we process the application. Umm, do you have any pets that you'd need to mention on the application?
+Caller: No pets for now, but we might get a cat later on. Is that gonna be an issue?
+Agent: Not at all, we’re pet-friendly. You just need to let us know and there’ll be a small pet fee. So no pet to register right now.
+Caller: Great, that's good to know.
+Agent: Alright, Mark, you're all set on my end. You’ll receive an email shortly with a link to complete your application online. If you have any questions, feel free to call back.
+Caller: Awesome, thanks so much for the help, Sarah.
+Agent: You're welcome! Have a great day, Mark.
+Caller: You too, bye!

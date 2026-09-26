@@ -1,0 +1,35 @@
+{
+  "scenario": {
+    "id": 52,
+    "category": "resident",
+    "subtype": "work_order_create_emergency",
+    "edge_case": true,
+    "target_minutes": 3.6,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Allen",
+    "phone_number": null,
+    "unit_number": "241",
+    "work_order_issue": "Ceiling leak in the living room",
+    "permission_to_enter": "call_first",
+    "outcome": "Work order created, emergency response initiated",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 210
+  }
+}

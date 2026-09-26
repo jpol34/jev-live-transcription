@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 25,
+    "category": "prospect",
+    "subtype": "pricing_specials_negotiation",
+    "edge_case": false,
+    "target_minutes": 3.3,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": null,
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "November or December",
+    "price_quoted": "$1200+",
+    "budget_amount": "$1000",
+    "outcome": "Caller to think and call back",
+    "fields_disclosed": [
+      "move_in_date",
+      "price_quoted",
+      "budget_amount"
+    ],
+    "fields_withheld_or_unknown": [
+      "caller_name"
+    ],
+    "estimated_call_seconds": 190
+  }
+}

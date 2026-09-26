@@ -1,0 +1,38 @@
+{
+  "scenario": {
+    "id": 38,
+    "category": "prospect",
+    "subtype": "edge_price_shopping_competitor",
+    "edge_case": true,
+    "target_minutes": 3.2,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Allison",
+    "email": null,
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": "$1,200 to $1,500 per month",
+    "budget_amount": "$1,300",
+    "outcome": "Pricing information provided, caller will check back later.",
+    "fields_disclosed": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 195
+  }
+}

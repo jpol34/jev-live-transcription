@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 84,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.8,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark",
+    "phone_number": "555-4829",
+    "unit_number": "3B",
+    "work_order_issue": "Leaking kitchen faucet",
+    "permission_to_enter": "call_first",
+    "pet_info": "none",
+    "outcome": "Work order created for maintenance",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 230
+  }
+}

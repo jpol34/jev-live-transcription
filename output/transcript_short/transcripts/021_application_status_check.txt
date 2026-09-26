@@ -1,0 +1,19 @@
+# Call 021 — prospect / application_status_check
+# edge_case=False  target_minutes=2.2  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Hi, um, I'm trying to figure out what's going on with my apartment application for uh... Willow Creek Apartment Homes. I submitted it last week, and haven't heard back yet.
+Agent: Sure, I can help with that. Could I have your name, please?
+Caller: Oh, right, sorry! It's Jess... Jessica Parker.
+Agent: Thank you, Jessica. Do you have an email address you used for the application?
+Caller: Yeah, it's j.parker123, at, uh, gmail.com.
+Agent: Got it, j.parker123@gmail.com. Let me put you on a brief hold while I look this up.
+Caller: Sure. Umm, I hope it's good news.
+Agent: (hold music) All right, Jessica, thank you for waiting. I see here that your application is still under review. It usually takes about 7 to 10 business days to process.
+Caller: Oh, okay. I was just, uh, worrying a bit. Is there anything else needed from my side?
+Agent: Everything seems to be in order. If anything comes up, we'll reach out. Could I have a contact number just to confirm we have the right one on file?
+Caller: Yeah, it's, um, 555-0198. Uh, 555, and then 0198.
+Agent: Great, I'll make sure we've got that noted. Remember, if you haven't heard back in a few more days, give us a call. Is there anything else I can assist you with today?
+Caller: No, that's all. Thanks, you've been helpful!
+Agent: My pleasure, Jessica. Have a wonderful day!
+Caller: You too!

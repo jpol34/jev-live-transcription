@@ -1,0 +1,16 @@
+# Call 078 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=5.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, this is Jason speaking. How can I assist you today?
+Caller: Uh, yeah, hi Jason. This is Alex... uh, sorry, Alex Gonzalez. I'm calling from unit... uh, 204B, I think? Look, I've reported this leaking sink issue twice, and nothing's been done. It's kinda getting frustrating.
+Agent: Oh, I'm really sorry to hear that, Alex. Let me just pull up your file to take a closer look. Can I quickly confirm your phone number for verification?
+Caller: Yeah, right, it’s 555-0194... uh, no, wait, 555-0193, sorry! I keep mixing it up.
+Agent: Got it. Just one moment while I check this... Okay, I see here the work order for the leaking sink was logged. Did the maintenance team leave any note for you at any point?
+Caller: No notes, no calls, nothing. It’s been a week already. I just, I need this fixed soon. Can you get someone to actually, like, call me or something before they come by?
+Agent: Of course. We typically schedule maintenance between 9 AM and 5 PM. Is there a specific time that works best for you to receive a call first, or would you prefer them just to show up when available?
+Caller: Definitely call first. I'm in and out for work, so that's kind of important.
+Agent: Understood. I'll make sure that's noted. I'll escalate this directly to our maintenance manager to prioritize your issue. Could I get a bit more detail on how severe the leak is?
+Caller: Uh, yeah... it’s really a steady drip, to the point there’s a bit of a puddle sometimes. I had to, like, put a bowl under it. It's not flooding, but it's annoying and probably not... energy efficient?
+Agent: Absolutely, Alex. That's definitely something we need to fix promptly. Let me ensure all this is updated in our system as top priority, and I'll have someone reach out to you shortly. If there's anything else you remember or if it gets worse, do let us know straight away.
+Caller: Alright, I'll keep an eye on it. Thanks, Jason. Hopefully, this gets sorted this time.
+Agent: You're welcome, Alex. I'm really sorry for the delay, and we'll do our best to get this handled. Thanks for your patience.

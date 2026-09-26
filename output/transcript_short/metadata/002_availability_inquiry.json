@@ -1,0 +1,43 @@
+{
+  "scenario": {
+    "id": 2,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.0,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Linda Thompson",
+    "email": null,
+    "phone_number": "555-234-6789",
+    "unit_number": null,
+    "amenities_requested": [
+      "parking",
+      "gym"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "early November 2023",
+    "price_quoted": null,
+    "budget_amount": "under $1,500",
+    "outcome": "Potential future contact",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "amenities_requested",
+      "move_in_date",
+      "budget_amount"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 150
+  }
+}

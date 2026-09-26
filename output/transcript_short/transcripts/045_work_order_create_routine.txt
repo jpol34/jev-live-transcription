@@ -1,0 +1,21 @@
+# Call 045 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.2  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jamie, how can I assist you today?
+Caller: Uh, hi, Jamie. This is, uh, Sam. I, um, have an issue with my...what's it called...the sink? Yeah, the sink in the kitchen, it's leaking.
+Agent: Oh, I'm sorry to hear that, Sam. We'll definitely get that sorted out for you. Can I have your unit number, please?
+Caller: My unit? Uh, I think it's 3B...or maybe 3D? Uh, it's probably 3B.
+Agent: Alright, got it. And just to confirm, is this unit number 3B or 3D?
+Caller: Yes, yes, 3B. Sorry, it's—I'm kinda frazzled today.
+Agent: No worries at all! We’ll take care of it. Can I also get your phone number in case we need to reach you later?
+Caller: Oh, right, it's, uh, 555-123-7890.
+Agent: Great, thank you. Do you have any pets we should be aware of when we enter your apartment?
+Caller: Uh, no pets. Nope, no pets.
+Agent: Okay, got it. And do we have your permission to enter your apartment if you're not home, or would you prefer to be contacted first?
+Caller: Um, could you call me first? Just so I know when someone's coming by?
+Agent: Absolutely, we can do that. Is there anything else you’d like to add about the issue with the sink?
+Caller: Um, I think that's it. It's just, you know, leaking and all.
+Agent: Got it, thank you, Sam. We'll get this reported and have maintenance reach out to you soon. Is there anything else I can help you with today?
+Caller: No, that's everything. Thanks a bunch, Jamie.
+Agent: You're welcome! Have a great day, Sam.
+Caller: You too, bye!

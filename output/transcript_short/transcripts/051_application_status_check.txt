@@ -1,0 +1,23 @@
+# Call 051 — prospect / application_status_check
+# edge_case=False  target_minutes=3.2  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa. How can I help you today?
+Caller: Hi, uh, this is... um, Michelle Rodriguez. I wanted to check on the status of my application.
+Agent: Sure thing, Michelle. Let me pull up your information here. Could you remind me which property you applied for? Was it the Willow Creek Apartment Homes?
+Caller: Yes, yes, that's correct, the Willow Creek... Apartments.
+Agent: Great, and just to confirm I have the right Michelle, can I have your phone number on file?
+Caller: Umm, let me, uh, find it... one sec. It's 555-0198. I think? Or maybe it's 555-0188... they’re so similar.
+Agent: No problem, I'll try both. And your last name was Rodriguez, correct?
+Caller: Yes, yes, Rodriguez with a Z.
+Agent: Got it, thank you. Let me just put you on a brief hold while I check that for you.
+Caller: Okay, sure. No rush, I guess.
+Agent: [pause, hold music] Alright, thank you for holding, Michelle. I see here your application is still under review. It usually takes about 3 to 5 business days. When did you submit it?
+Caller: Uh, I submitted it, um, last Tuesday, I think. Or was it the week before? Gosh, I can never keep track.
+Agent: No worries, so it sounds like it might be getting close to a decision. You should hear soon. Is there an email we can use to notify you of the decision?
+Caller: Sure, it's, um, m.r.odriguez at Gmail dot com. Did you, uh, get all that?
+Agent: Yes, m.r.odriguez at Gmail dot com, right?
+Caller: Exactly.
+Agent: Perfect! We’ll update you by email once a decision is made. Anything else I can help with today?
+Caller: No, that's it. Thanks for the help.
+Agent: Anytime! Have a great day, Michelle.
+Caller: You too, bye!

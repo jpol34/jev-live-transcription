@@ -1,0 +1,27 @@
+# Call 085 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sandra, how can I assist you today?
+Caller: Hi Sandra, this is Robert. I wanted to check on apartment availability at, um, Willow Creek... uh, Apartment Homes.
+Agent: Sure, I can help with that. Are you looking for a particular move-in date?
+Caller: Um, yeah, probably around... oh, mid-November, I think.
+Agent: Great! And what type of apartment are you interested in? Like a one-bedroom, two-bedroom...
+Caller: Two-bedroom, if possible.
+Agent: Got it. Let me take a quick look...
+Caller: [faint background noise] Oh, sorry, Sandra, could you repeat that? My dog started barking.
+Agent: Absolutely. Please hold for just a moment while I check.
+Agent: [hold music]
+Agent: Alright, Robert, thanks for holding. We do have a two-bedroom available around mid-November. What's your budget, if you don't mind my asking?
+Caller: Uh, yes, so around $1,800. Is that in the range?
+Agent: Yes, that's within the usual range for our two-bedroom units. Are there any specific amenities you're looking for?
+Caller: Definitely a, um, pet-friendly place, since, you know, the dog.
+Agent: Of course! We are pet-friendly. Anything else, like a pool or maybe a gym?
+Caller: A pool would be nice, but not necessarily a deal-breaker.
+Agent: Great! Well, it sounds like we have some options that fit what you're looking for. Would you like to schedule a tour?
+Caller: Yeah, let me, uh, check my calendar and get back to you. Do I need to call back or...?
+Agent: You can definitely call back or just send us an email. Would you like my direct number, or do you already have it?
+Caller: Uh, just give me your number again, just in case.
+Agent: Sure, it's 555-0148. And feel free to email if that's easier.
+Caller: Awesome, thanks, Sandra. I'll get in touch soon.
+Agent: Thank you, Robert. Looking forward to hearing from you. Bye now!
+Caller: Bye!

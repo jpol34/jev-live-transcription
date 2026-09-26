@@ -1,0 +1,43 @@
+{
+  "scenario": {
+    "id": 86,
+    "category": "resident",
+    "subtype": "edge_pest_infestation",
+    "edge_case": true,
+    "target_minutes": 4.3,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mike",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "22B or 22D",
+    "amenities_requested": null,
+    "pet_info": "fish",
+    "permission_to_enter": "call_first",
+    "work_order_issue": "bug infestation",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Work order for pest control was filed",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "pet_info",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "email",
+      "phone_number"
+    ],
+    "estimated_call_seconds": 255
+  }
+}

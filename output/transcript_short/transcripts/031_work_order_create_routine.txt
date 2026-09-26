@@ -1,0 +1,21 @@
+# Call 031 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.5  disclosure_style=guarded
+
+Agent: Willow Creek Property Management, this is Anna speaking. How can I assist you today?
+Caller: Uh, hey, this is Kevin. I live in the uh—Willow Creek Apartments.
+Agent: Hi Kevin, what can I help you with?
+Caller: Yeah, um, I've got a problem with my bathroom sink. It's just... dripping a lot.
+Agent: I see. Sounds like a leaky faucet. Can I have your unit number to make sure we know exactly where to send maintenance?
+Caller: Uh, yeah, it's uh... 307. I think that's right.
+Agent: Thank you. And just to confirm, that's the Willow Creek Apartment Homes at 307?
+Caller: Yeah, that's right.
+Agent: Great. And Kevin, do we have a number on file we can use to reach you? Just in case the maintenance team needs to follow up.
+Caller: Uh, you probably do. It's the... same one I've always used.
+Agent: Okay, let me just verify. It's—uh, never mind, I'll see if it's on our system. Would you like us to enter the unit if no one's home, or should we call first?
+Caller: Oh, um, call me first, please. I, uh, have a cat, so...
+Agent: Got it, we'll make sure to call before we head in. Sounds like we’ll want to avoid startling your cat.
+Caller: Yeah, exactly. Thanks.
+Agent: Alright, Kevin, we'll get someone out to take a look at your sink. Is there anything else you need help with?
+Caller: No, that's it. Thanks.
+Agent: You're welcome, have a great day!
+Caller: You too.

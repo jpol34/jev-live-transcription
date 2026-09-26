@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 19,
+    "category": "resident",
+    "subtype": "edge_non_english_speaker",
+    "edge_case": true,
+    "target_minutes": 5.0,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Eduardo Gonzales",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "230",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "call_first",
+    "work_order_issue": "Leaking pipe under bathroom sink",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Urgent work order created; call-first permission obtained; immediate dispatch planned",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number",
+      "email"
+    ],
+    "estimated_call_seconds": 320
+  }
+}

@@ -1,0 +1,14 @@
+# Call 020 — prospect / application_status_check
+# edge_case=False  target_minutes=3.8  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah speaking. How can I help you today?
+Caller: Hi, uh, this is Mark Douglas. I'm calling to check on the status of my application for, um, Willow Creek Apartment Homes.
+Agent: Sure thing, Mark. Let me pull up your application. Can I have your phone number to verify your application?
+Caller: Yeah, it's 555-0199. Uh, sorry—my brain's all over the place—it's actually 555-0198.
+Agent: No worries, got it. Let me check here... Okay, I see your application. Could you also confirm your email address, just to make sure we've got everything correct?
+Caller: Oh, sure. It's m.douglas@example.com.
+Agent: Great, thanks. Give me just a moment while I review the status here. It'll only take a sec...
+Caller: Alright, sure.
+Agent: Okay, I see here that your application is under review. We should have a decision by this coming Monday. Is there anything else you'd like to go over?
+Caller: No, that's everything. Thanks for the update, Sarah!
+Agent: You're welcome, Mark! Have a great day!

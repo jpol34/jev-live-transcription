@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 65,
+    "category": "prospect",
+    "subtype": "schedule_tour",
+    "edge_case": false,
+    "target_minutes": 2.7,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Dan Morgan",
+    "email": null,
+    "phone_number": "555-0144",
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "early December",
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Tour tentatively scheduled",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 160
+  }
+}

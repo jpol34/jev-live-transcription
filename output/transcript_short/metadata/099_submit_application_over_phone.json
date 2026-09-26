@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 99,
+    "category": "prospect",
+    "subtype": "submit_application_over_phone",
+    "edge_case": false,
+    "target_minutes": 5.5,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Sam",
+    "email": "sam...smith@gmail.com",
+    "phone_number": "987-654-3210",
+    "move_in_date": "October 15th",
+    "price_quoted": "$1,600",
+    "pet_info": "no pets",
+    "outcome": "application submitted",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 320
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "scenario": {
+    "id": 59,
+    "category": "resident",
+    "subtype": "billing_rent_payment_question",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "James Monroe",
+    "email": "james.monroe83@gmail.com",
+    "phone_number": null,
+    "unit_number": "12B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "issue resolved, email updated",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "email"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 192
+  }
+}

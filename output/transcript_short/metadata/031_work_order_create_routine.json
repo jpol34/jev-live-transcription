@@ -1,0 +1,38 @@
+{
+  "scenario": {
+    "id": 31,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.5,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Kevin",
+    "phone_number": null,
+    "unit_number": "307",
+    "work_order_issue": "leaky faucet",
+    "permission_to_enter": "call_first",
+    "pet_info": "cat",
+    "outcome": "work order created",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 210
+  }
+}

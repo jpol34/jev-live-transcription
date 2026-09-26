@@ -1,0 +1,26 @@
+# Call 008 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=5.2  disclosure_style=confused
+
+Agent: Good afternoon, Willow Creek Property Management. This is Sarah. How can I help you today?
+Caller: Uh, hi, yeah, I was looking to, um, maybe submit an application for one of the apartments.
+Agent: Sure, I can assist with that. Have you already toured an apartment, or are you still in the early stages?
+Caller: I, uh, I did a virtual tour online. I think it was the Maple... Maple something.
+Agent: Oh, the Maplewood layout, right? Great choice! Let's get started with the application. Can I get your name?
+Caller: Yeah, it's... It's Randy, Randy Lewis.
+Agent: Thanks, Randy. And your phone number, so we can reach out if needed?
+Caller: Oh, sure, um, it's 555-0432—no, wait—555-0342. Sorry about that.
+Agent: No worries, that's 555-0342, correct?
+Caller: Yeah, that's right.
+Agent: Great. And do you have an email where we can send you a confirmation?
+Caller: Uh, sure, it's, uh, randlewik... er, RandyL at mail.com. Spelled R-A-N-D-Y-L at mail.com.
+Agent: Perfect. And when are you planning to move in?
+Caller: Hmm... probably next month, but I'm not totally sure yet. Around mid-November, maybe?
+Agent: Alright, we can tentatively note that. Now, did you happen to receive a price quote during the virtual tour?
+Caller: Um, I did but, you know, I forgot. Do you know what it usually runs?
+Agent: For the Maplewood, it's usually around $1,200, depending on the specific unit.
+Caller: Right, right, that sounds about right.
+Agent: And do you have any pets, or do you plan on having any?
+Caller: No pets, just me. I might think about a cat later but not at the moment.
+Agent: Okay, just let us know if that changes. And, uh, is there anything else you need help with today?
+Caller: No, I think that's everything. Thanks for your help!
+Agent: You're welcome, Randy. We'll process this and be in touch soon. Have a great day!

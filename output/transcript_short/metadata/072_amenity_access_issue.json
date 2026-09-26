@@ -1,0 +1,29 @@
+{
+  "scenario": {
+    "id": 72,
+    "category": "resident",
+    "subtype": "amenity_access_issue",
+    "edge_case": false,
+    "target_minutes": 2.0,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mike Thompson",
+    "phone_number": "555-0189",
+    "unit_number": "403B",
+    "work_order_issue": "key fob access to gym not working",
+    "outcome": "fob access permissions reset, advised to try again in 10 minutes",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 124
+  }
+}

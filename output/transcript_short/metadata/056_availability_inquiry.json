@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 56,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.1,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Kevin James",
+    "email": "kjames@email.com",
+    "phone_number": "555-0133",
+    "amenities_requested": [
+      "fitness center",
+      "pool"
+    ],
+    "move_in_date": "2023-12-15",
+    "budget_amount": "1500",
+    "outcome": "Details to be emailed to the caller",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "move_in_date",
+      "budget_amount",
+      "amenities_requested",
+      "email"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 186
+  }
+}

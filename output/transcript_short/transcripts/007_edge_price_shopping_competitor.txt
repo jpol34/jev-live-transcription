@@ -1,0 +1,17 @@
+# Call 007 — prospect / edge_price_shopping_competitor
+# edge_case=True  target_minutes=3.8  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Amy speaking. How may I assist you today?
+Caller: Uh, hi, um, I was... I think I was trying to get some information... you know, about, uh, how much it costs to live at, um, Willow Something Apartments? Uh, do you have those?
+Agent: Yes, you're likely referring to Willow Creek Apartment Homes. I can definitely help with that. Are you looking for availability or just pricing at the moment?
+Caller: Well, uh, pricing mainly, I... I think, but maybe both? I’m not, uh, really sure. Just kinda gathering all the info right now.
+Agent: Got it. And do you have a specific unit size in mind? Like one bedroom, two bedrooms... Or are you just starting to look around?
+Caller: Oh, um, let's see... maybe a two-bedroom. But, uh, not really certain yet. What... what's the range, like price-wise?
+Agent: For a two-bedroom, you're generally looking at between $1,400 and $1,800 per month, depending on the specific features and location within the complex.
+Caller: Hmm, okay, um... And that's, that's all inclusive or... or what? I mean, do I, uh, gotta pay for other stuff?
+Agent: That's the base rent. Utilities and any additional services like parking would be extra, but we can provide detailed information on those once you're ready to proceed further. Is there a specific move-in date you're considering?
+Caller: Uh, no, not yet. Still, um, figuring things out. Just, uh, can you just remind me what, uh, this place is again?
+Agent: Of course, it's Willow Creek Apartment Homes. Is there anything else I can help you with?
+Caller: No, uh, that was it, I think. Um, I might call back—or, uh, can I maybe email you if I have more questions?
+Agent: Absolutely, feel free to reach out anytime! You can also visit our website for more details. Thank you for calling, and have a great day!
+Caller: Yeah, thanks, bye.

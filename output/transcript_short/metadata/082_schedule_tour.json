@@ -1,0 +1,31 @@
+{
+  "scenario": {
+    "id": 82,
+    "category": "prospect",
+    "subtype": "schedule_tour",
+    "edge_case": false,
+    "target_minutes": 3.0,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Martin",
+    "phone_number": "555-0184",
+    "move_in_date": "January 2024",
+    "outcome": "tour scheduled tentatively",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 150
+  }
+}

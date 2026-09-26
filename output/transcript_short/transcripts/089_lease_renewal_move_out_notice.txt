@@ -1,0 +1,21 @@
+# Call 089 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=5.0  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I help you today?
+Caller: Hi, yeah, this is, uh, Todd Renner. I need to talk about my lease, um, renewal or possibly moving out?
+Agent: Alright, Todd. Can I get your unit number to pull up your details?
+Caller: Uh, yeah, it's 3B... I think, or uh, hold on, sorry, that's 3D. Got it mixed up, sorry.
+Agent: No worries! Let me just pull that up... Okay, and when is your current lease set to end?
+Caller: Oh, um, I think it's end of November? It might say on there, sorry I don’t have the paperwork with me.
+Agent: Yes, I see it here. November 30th. Are you thinking about renewing, or are you planning to move out?
+Caller: Uh, well, I'm actually not sure. Can you remind me of the new rent, if I stay?
+Agent: Certainly. For your unit, the new monthly rent would be $1,650 if you decide to renew. Would you like some time to think about that, or are you considering moving out?
+Caller: Gosh, $1,650? That's a bit more than I expected. But, uh, I might need to think about it. Do you send, uh, emails about this? 'Cause I don't remember getting one.
+Agent: Let me check... It seems we sent a renewal offer email to the address we have on file. Could you confirm your email for me?
+Caller: Oh, um, it's t.renner78@gmail.com. But honestly, I'm bad at checking. I'll have to see.
+Agent: Got it. I'll resend the details there. You can have a little more time to decide. If you choose to move out, please remember to give us a 30-day notice.
+Caller: Right, 30 days, um, got it. Thanks for the reminder. Is there anything else I need to do for that, besides the notice?
+Agent: Just ensure your account is settled up, and return the keys on your move-out date. But, if you have further questions, feel free to call us back.
+Caller: Okay, will do. I might call back after I think this through. Thanks, Sarah.
+Agent: You're welcome, Todd. Take care and let us know what you decide.
+Caller: Alright, bye.

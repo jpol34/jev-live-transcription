@@ -1,0 +1,32 @@
+{
+  "scenario": {
+    "id": 48,
+    "category": "prospect",
+    "subtype": "pricing_specials_negotiation",
+    "edge_case": false,
+    "target_minutes": 4.3,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "James Harlow",
+    "move_in_date": "next month, first",
+    "price_quoted": "$1,100 for first month with special",
+    "budget_amount": null,
+    "outcome": "James is considering the quote and special, may call back",
+    "fields_disclosed": [
+      "caller_name",
+      "move_in_date",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "budget_amount"
+    ],
+    "estimated_call_seconds": 256
+  }
+}
