@@ -19,6 +19,12 @@ edge case flag, target length, caller disclosure style).
   - `config.py` — shared constants (call clock, concurrency, pricing
     estimates).
   - `corpus.py` — loads the 100 transcript/ground-truth pairs from `output/`.
+  - `pacer.py`, `db.py`, `pipeline_core.py` — replays a call's transcript
+    paced to wall-clock time (or as fast as possible for batch runs), and
+    captures both pipelines' per-tick activity to a SQLite database.
+  - `cli.py`, `tui.py` — the `jlt` command-line entry point; `jlt tui
+    <call_id>` replays one call live in a terminal UI showing both
+    pipelines' current committed field values side by side.
 - `scripts/scenarios.py` — deterministic scenario builder for the 100 calls.
 - `scripts/generate.py` — async OpenAI-based transcript + ground-truth
   generator that writes into `output/transcripts/` and `output/metadata/`.
@@ -55,6 +61,17 @@ uv run python -c "from jev_live_transcription import corpus; print(len(corpus.lo
 ```
 
 Should print `100`.
+
+## Watching a call live
+
+```
+uv run jlt tui 036
+```
+
+Replays call `036`'s transcript paced to wall-clock time and shows both pipelines' current
+committed value and confidence for all 11 fields, updating roughly once per simulated second.
+Requires `OPENAI_API_KEY` and `TYPESAFE_API_KEY` (loaded from Strongbox, same as above). Writes
+its capture DB to `output/tui_captures/call_<id>.db` by default (`--db-path` overrides this).
 
 ## Tests
 

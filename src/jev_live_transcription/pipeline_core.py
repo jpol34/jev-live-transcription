@@ -26,6 +26,7 @@ import logging
 import re
 import time
 from pathlib import Path
+from typing import Callable
 
 from . import config, corpus, gliner_pipeline, llm_baseline
 from .jev_pipeline import JevFieldResolver
@@ -427,6 +428,7 @@ async def run_call(
     pacer_mode: str = "batch",
     calls: dict[int, dict] | None = None,
     resolver: JevFieldResolver | None = None,
+    on_tick: Callable[[int, int, _CommittedState], None] | None = None,
 ) -> None:
     """Replay `call_id`'s transcript and capture both pipelines' activity to the capture DB.
 
@@ -441,6 +443,13 @@ async def run_call(
 
     `pacer_mode` is `"batch"` (replay every tick back-to-back, no sleeping) or `"realtime"`
     (replay paced to wall-clock time).
+
+    `on_tick`, if given, is called synchronously after every tick (whether or not the transcript
+    grew that tick) with `(tick_number, total_ticks, committed_snapshot)`, where
+    `committed_snapshot` is a shallow copy of the internal `(pipeline, field_name) -> (value,
+    confidence)` carry-forward state at that point -- e.g. for a live-progress display. Exceptions
+    raised by `on_tick` propagate, so a caller that wires this up to UI rendering is responsible
+    for its own error handling.
     """
     calls = calls if calls is not None else corpus.load_all()
     if call_id not in calls:
@@ -508,34 +517,35 @@ async def run_call(
 
                 grew = offset > previous_offset
                 previous_offset = offset
-                if not grew:
-                    continue
-
-                steps = [
-                    _run_gliner_jev_step(
-                        store,
-                        call_id=call_id,
-                        pipeline_call_id=pipeline_call_id,
-                        tick_id=tick_id,
-                        tick_number=tick_number,
-                        snapshot=snapshot,
-                        resolver=resolver,
-                        committed=committed,
-                    )
-                ]
-                if tick_number % config.LLM_CADENCE_TICKS == 0:
-                    steps.append(
-                        _run_llm_step(
+                if grew:
+                    steps = [
+                        _run_gliner_jev_step(
                             store,
                             call_id=call_id,
                             pipeline_call_id=pipeline_call_id,
                             tick_id=tick_id,
                             tick_number=tick_number,
                             snapshot=snapshot,
+                            resolver=resolver,
                             committed=committed,
                         )
-                    )
-                await asyncio.gather(*steps)
+                    ]
+                    if tick_number % config.LLM_CADENCE_TICKS == 0:
+                        steps.append(
+                            _run_llm_step(
+                                store,
+                                call_id=call_id,
+                                pipeline_call_id=pipeline_call_id,
+                                tick_id=tick_id,
+                                tick_number=tick_number,
+                                snapshot=snapshot,
+                                committed=committed,
+                            )
+                        )
+                    await asyncio.gather(*steps)
+
+                if on_tick is not None:
+                    on_tick(tick_number, call_pacer.total_ticks, dict(committed))
         finally:
             # Each cleanup step is isolated so one raising (e.g. a GLiNER session that was never
             # created because every tick had grew=False) doesn't skip the rest -- in particular,
