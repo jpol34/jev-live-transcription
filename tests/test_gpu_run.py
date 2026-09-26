@@ -54,6 +54,8 @@ def _patch_ssh_flow(monkeypatch, *, exit_code=0):
             return Mock(returncode=0, stdout="", stderr="")
         if "nvidia-smi" in joined:
             return Mock(returncode=0, stdout="NVIDIA L40S, 49140 MiB", stderr="")
+        if gpu_run._REMOTE_ENV_PATH in joined and "umask" in joined:
+            return Mock(returncode=0, stdout="", stderr="")
         if "nohup" in joined:
             return Mock(returncode=0, stdout="LAUNCHED\n", stderr="")
         if "cat" in joined:
@@ -213,6 +215,30 @@ def test_run_gpu_injects_public_key_from_ssh_key_pub_file(monkeypatch, tmp_path)
     assert spec.extra_env["PUBLIC_KEY"] == "ssh-ed25519 AAAAtestkey test@example.com"
 
 
+def test_run_gpu_excludes_public_key_from_remote_env_file(monkeypatch, tmp_path):
+    _patch_secrets(monkeypatch)
+    _patch_hangar(monkeypatch)
+
+    write_remote_env_mock = Mock()
+    monkeypatch.setattr(gpu_run, "_write_remote_env", write_remote_env_mock)
+    _patch_ssh_flow(monkeypatch)
+
+    gpu_run.run_gpu(
+        subset=None,
+        db_path=tmp_path / "out.sqlite3",
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+        pod_state_path=tmp_path / "state.json",
+        ssh_key=_fake_ssh_key(tmp_path),
+        keep_pod=False,
+    )
+
+    _, _, written_env = write_remote_env_mock.call_args[0]
+    assert "PUBLIC_KEY" not in written_env
+    assert written_env["TYPESAFE_API_KEY"] == "typesafe-test-key"
+
+
 def test_run_gpu_raises_clear_error_without_ssh_key(monkeypatch, tmp_path):
     _patch_secrets(monkeypatch)
     _patch_hangar(monkeypatch)
@@ -313,3 +339,34 @@ def test_wait_for_ssh_connectable_raises_on_timeout(monkeypatch):
 
     with pytest.raises(TimeoutError, match="Connection refused"):
         gpu_run._wait_for_ssh_connectable(ssh_direct, None)
+
+
+def test_write_remote_env_sends_secrets_via_stdin_not_argv(monkeypatch):
+    """A secret value must never appear as a subprocess argument (visible in the pod's own `ps`
+    output) -- it has to travel as piped stdin content instead."""
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    captured = {}
+
+    def fake_run(cmd, **kwargs):
+        captured["cmd"] = cmd
+        captured["input"] = kwargs.get("input")
+        return Mock(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(gpu_run.subprocess, "run", Mock(side_effect=fake_run))
+
+    gpu_run._write_remote_env(ssh_direct, None, {"TYPESAFE_API_KEY": "super-secret-value"})
+
+    assert not any("super-secret-value" in part for part in captured["cmd"])
+    assert "export TYPESAFE_API_KEY=super-secret-value" in captured["input"]
+    assert gpu_run._REMOTE_ENV_PATH in " ".join(captured["cmd"])
+    assert "umask 077" in " ".join(captured["cmd"])
+
+
+def test_write_remote_env_raises_on_failure(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    monkeypatch.setattr(
+        gpu_run.subprocess, "run", Mock(return_value=Mock(returncode=1, stdout="", stderr="disk full"))
+    )
+
+    with pytest.raises(RuntimeError, match="failed to write remote env file"):
+        gpu_run._write_remote_env(ssh_direct, None, {"FOO": "bar"})

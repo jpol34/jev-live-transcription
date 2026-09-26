@@ -1,9 +1,11 @@
 """`jlt gpu-run`: runs the benchmark on a real RunPod GPU pod instead of this machine's CPU.
 
 Creates (or resumes) a pod via `hangar`, waits for it to be SSH-reachable, runs a fast CUDA
-preflight, then launches `jlt batch` on the pod detached over SSH (not held open for the run's
-full duration -- a dropped local network connection must not kill a real, paid, potentially
-hours-long remote run) and polls for completion. The resulting capture DB is copied back over scp.
+preflight, writes this run's secrets to a file on the pod for `jlt batch` to source (sshd doesn't
+pass the container's own environment into an SSH session, so they aren't otherwise visible there),
+then launches `jlt batch` on the pod detached over SSH (not held open for the run's full duration
+-- a dropped local network connection must not kill a real, paid, potentially hours-long remote
+run) and polls for completion. The resulting capture DB is copied back over scp.
 The pod is always terminated on the way out, success or failure, unless `--keep-pod` -- this is a
 dev-benchmarking tool, so there's no data-center pinning, network volume, or GPU-type fallback
 list here: `config.RUNPOD_GPU_TYPE_ID` is a single best-effort choice, and a capacity failure is
@@ -15,6 +17,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import shlex
 import subprocess
 import time
 from pathlib import Path
@@ -30,6 +33,7 @@ _POD_NAME = "jev-live-transcription-gpu-run"
 _REMOTE_DB_PATH = "/root/benchmark.sqlite3"
 _REMOTE_LOG_PATH = "/root/gpu-run.log"
 _REMOTE_EXIT_MARKER = "/root/gpu-run.exit"
+_REMOTE_ENV_PATH = "/root/.jlt_env"
 
 _POD_READY_TIMEOUT_S = 600.0
 _POD_READY_POLL_S = 5.0
@@ -88,10 +92,18 @@ def _ssh_target(ssh_direct: dict, ssh_key: str | None) -> list[str]:
     return base
 
 
-def _run_ssh(ssh_direct: dict, ssh_key: str | None, command: str, *, timeout_s: float = 30.0) -> subprocess.CompletedProcess:
+def _run_ssh(
+    ssh_direct: dict,
+    ssh_key: str | None,
+    command: str,
+    *,
+    timeout_s: float = 30.0,
+    input: str | None = None,
+) -> subprocess.CompletedProcess:
     target = f"{ssh_direct['username']}@{ssh_direct['host']}"
     return subprocess.run(
         ["ssh", *_ssh_target(ssh_direct, ssh_key), "-p", str(ssh_direct["port"]), target, command],
+        input=input,
         capture_output=True,
         text=True,
         timeout=timeout_s,
@@ -139,6 +151,25 @@ def _cuda_preflight(ssh_direct: dict, ssh_key: str | None) -> None:
     _LOGGER.info("CUDA preflight ok: %s", result.stdout.strip())
 
 
+def _write_remote_env(ssh_direct: dict, ssh_key: str | None, env: dict[str, str]) -> None:
+    """Writes `env` to `_REMOTE_ENV_PATH` on the pod as shell `export` lines, for `jlt batch` to
+    source before running.
+
+    sshd only passes through the client's `LANG`/`LC_*` environment into a session by default
+    (`AcceptEnv` in `sshd_config`) -- a container's own `ENV` values (this project's secrets among
+    them) are visible to the container's PID 1 and its own child processes, but not to a fresh SSH
+    session, which gets a minimal environment of its own. The env content is sent over stdin rather
+    than as a shell argument so a secret value is never visible in the pod's own process listing.
+    """
+    lines = "\n".join(f"export {key}={shlex.quote(value)}" for key, value in env.items())
+    # `umask 077` before creating the file, rather than a separate `chmod 600` afterward, so there
+    # is never a window where the file exists at the shell's default (often world-readable)
+    # permissions.
+    result = _run_ssh(ssh_direct, ssh_key, f"umask 077 && cat > {_REMOTE_ENV_PATH}", input=lines)
+    if result.returncode != 0:
+        raise RuntimeError(f"failed to write remote env file: {result.stderr}")
+
+
 def _launch_batch_detached(
     ssh_direct: dict,
     ssh_key: str | None,
@@ -158,7 +189,7 @@ def _launch_batch_detached(
         batch_cmd += " --enable-llm-baseline"
 
     remote_command = (
-        f"nohup sh -c '{batch_cmd}; echo $? > {_REMOTE_EXIT_MARKER}' "
+        f"nohup sh -c '. {_REMOTE_ENV_PATH} && {batch_cmd}; echo $? > {_REMOTE_EXIT_MARKER}' "
         f"> {_REMOTE_LOG_PATH} 2>&1 & disown; echo LAUNCHED"
     )
     result = _run_ssh(ssh_direct, ssh_key, remote_command)
@@ -247,6 +278,9 @@ def run_gpu(
         _wait_for_ssh_connectable(ssh_direct, ssh_key)
         _cuda_preflight(ssh_direct, ssh_key)
 
+        # PUBLIC_KEY is only relevant to the pod's own sshd startup, not to `jlt batch` -- excluded
+        # here so the remote secrets file holds only what the batch process actually consumes.
+        _write_remote_env(ssh_direct, ssh_key, {k: v for k, v in extra_env.items() if k != "PUBLIC_KEY"})
         _launch_batch_detached(
             ssh_direct,
             ssh_key,

@@ -11,3 +11,4 @@ venv/
 data/
 .env
 .jlt_gpu_state.json
+.scratch/
