@@ -8,15 +8,16 @@
     (pipeline_core.run_call's enable_llm_baseline defaults to False and the webapp never opts in),
     so it has no use for that key.
 
-    Requires the Strongbox PowerShell module and the railway CLI, both already linked to this
-    project (`railway link`) before running.
+    Requires the Strongbox PowerShell module and the railway CLI. Run `railway link --project
+    94d4b2ae-f830-4250-b596-1569c141df54` first (project "jev-live-transcription-webapp") if this
+    shell isn't already linked to it.
 
 .PARAMETER ServiceName
-    The Railway service name to set the variable on. Defaults to "jev-live-transcription-webapp"
-    -- adjust if the actual service was created under a different name.
+    The Railway service name to set the variable on. Defaults to "webapp", matching the service
+    created in the jev-live-transcription-webapp project.
 #>
 param(
-    [string]$ServiceName = "jev-live-transcription-webapp"
+    [string]$ServiceName = "webapp"
 )
 
 $ErrorActionPreference = "Stop"
