@@ -1,0 +1,5 @@
+.venv/
+.git/
+.claude/
+data/
+output/tui_captures/
