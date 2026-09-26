@@ -7,8 +7,8 @@ Three hand-crafted cases:
   (a) a single-candidate case that should resolve via Noul.
   (b) a multi-candidate phone-number self-correction, modeled on the real transcript in
       `output/transcript_short/metadata/001_noise_neighbor_complaint.json` (the caller says
-      "555...wait, it's 555-3212...uh, 555-4321") -- confirms the Choice call favors the
-      corrected final value, 555-4321.
+      "555...wait, it's 555-3212...uh, 555-4321") -- confirms the Choice call, once the
+      corrected candidate set settles, favors the corrected final value, 555-4321.
   (c) a forced failure (invalid API key), confirming the error-as-data path raises rather than
       swallowing the failure.
 
@@ -20,7 +20,7 @@ import asyncio
 
 from typesafe_sdk import AsyncTypeSafeClient, RetryPolicy
 
-from jev_live_transcription import secrets
+from jev_live_transcription import config, secrets
 from jev_live_transcription.jev_pipeline import JevFieldResolver, JevResolutionError
 
 CALL_SINGLE = "smoke-single-candidate"
@@ -57,7 +57,7 @@ async def case_self_correction(resolver: JevFieldResolver) -> None:
     print(f"after first mention: {first}")
     assert first is not None and first.question_type == "noul"
 
-    second = await resolver.resolve_field(
+    correction_kwargs = dict(
         call_id=CALL_CORRECTION,
         field_name="phone_number",
         candidates=["555-3212", "555-4321"],
@@ -66,6 +66,12 @@ async def case_self_correction(resolver: JevFieldResolver) -> None:
             "Sorry, let me say that again, it's 555-4321."
         ),
     )
+    # The corrected candidate set must persist for config.JEV_RECONFIRM_SETTLE_TICKS consecutive
+    # observations (the SettleGate's settle window) before jev is actually re-called about it.
+    for _ in range(config.JEV_RECONFIRM_SETTLE_TICKS - 1):
+        pending = await resolver.resolve_field(**correction_kwargs)
+        assert pending is None, f"expected no resolution yet (still settling), got {pending!r}"
+    second = await resolver.resolve_field(**correction_kwargs)
     assert second is not None, "expected a Choice resolution, got None"
     assert second.question_type == "choice", f"expected choice, got {second.question_type}"
     assert set(second.distinct_candidates) == {"555-3212", "555-4321"}

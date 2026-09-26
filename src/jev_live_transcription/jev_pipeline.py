@@ -181,8 +181,10 @@ class JevFieldResolver:
     ) -> JevResolution | None:
         """Fold this tick's `candidates` into the field's dedup set and resolve if warranted.
 
-        Returns `None` when no jev call is warranted this tick (no candidates seen yet, or a
-        single already-committed candidate with nothing new to resolve).
+        Returns `None` when no jev call is warranted this tick: no candidates seen yet, a single
+        already-committed candidate with nothing new to resolve, or -- for 2+ distinct candidates
+        -- the set hasn't yet settled per `SettleGate` (it will resolve within
+        `config.JEV_RECONFIRM_SETTLE_TICKS` further ticks of the set persisting unchanged).
         """
         key = (call_id, field_name)
         lock = self._locks.setdefault(key, asyncio.Lock())
@@ -211,7 +213,13 @@ class JevFieldResolver:
                 if not self._settle_gate.observe(key, candidate_set):
                     return None
                 result = await self._resolve_choice(call_id, field_name, distinct, context_window)
-                self._settle_gate.record_resolved(key, candidate_set)
+                if result.is_committed:
+                    # Only a confident answer counts as "resolved" for gating purposes -- an
+                    # uncommitted (low-confidence) Choice call must keep being retried every tick
+                    # this same set is observed, matching the Noul path's below-threshold retry
+                    # behavior, rather than getting silently stuck unresolved until a genuinely
+                    # new candidate appears.
+                    self._settle_gate.record_resolved(key, candidate_set)
 
             self._committed[key] = result.is_committed
             return result

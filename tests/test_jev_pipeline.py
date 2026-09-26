@@ -234,6 +234,28 @@ async def test_choice_settle_gate_requires_persistence_before_first_real_call():
 
 
 @pytest.mark.asyncio
+async def test_choice_uncommitted_result_is_retried_next_tick_not_stuck():
+    # A low-confidence Choice answer is not treated as "resolved" by the gate -- the set must
+    # keep being retried every tick it's observed until jev returns a confident answer, matching
+    # the Noul path's below-threshold retry behavior rather than getting silently stuck forever.
+    system_one = AsyncMock(return_value=_choice_response("555-4321", 0.2))
+    resolver = _resolver(system_one, settle_ticks=1)
+    key_kwargs = dict(
+        call_id=1,
+        field_name="phone_number",
+        candidates=["555-3212", "555-4321"],
+        context_window="ctx",
+    )
+
+    first = await resolver.resolve_field(**key_kwargs)
+    assert first is not None and first.is_committed is False
+
+    second = await resolver.resolve_field(**key_kwargs)
+    assert second is not None and second.is_committed is False
+    assert system_one.await_count == 2
+
+
+@pytest.mark.asyncio
 async def test_self_correction_resolves_once_new_candidate_settles_bounded_latency():
     # The real self-correction scenario: a phone number is committed via Noul, then the caller
     # restates a different one. The Choice re-resolution should fire promptly once the new
