@@ -265,3 +265,60 @@ def test_reset_call_is_safe_when_pii_model_never_loaded(monkeypatch):
     gliner_pipeline.reset_call("call-6")
 
     assert "call-6" not in gliner_pipeline._pii_sent_length
+
+
+def test_resolve_device_auto_resolves_to_cuda_when_available(monkeypatch):
+    monkeypatch.setattr(config, "GLINER_DEVICE", "auto")
+    monkeypatch.setattr(gliner_pipeline.torch.cuda, "is_available", lambda: True)
+
+    assert gliner_pipeline._resolve_device() == "cuda"
+
+
+def test_resolve_device_auto_resolves_to_cpu_when_unavailable(monkeypatch):
+    monkeypatch.setattr(config, "GLINER_DEVICE", "auto")
+    monkeypatch.setattr(gliner_pipeline.torch.cuda, "is_available", lambda: False)
+
+    assert gliner_pipeline._resolve_device() == "cpu"
+
+
+def test_resolve_device_explicit_override_passes_through_unchanged(monkeypatch):
+    monkeypatch.setattr(config, "GLINER_DEVICE", "cpu")
+    monkeypatch.setattr(gliner_pipeline.torch.cuda, "is_available", lambda: True)
+
+    assert gliner_pipeline._resolve_device() == "cpu"
+
+
+def test_get_pii_model_loads_with_resolved_device(monkeypatch):
+    monkeypatch.setattr(gliner_pipeline, "_pii_model", None)
+    monkeypatch.setattr(gliner_pipeline, "_resolve_device", lambda: "cuda")
+    captured = {}
+
+    def fake_from_pretrained(name, map_location=None):
+        captured["name"] = name
+        captured["map_location"] = map_location
+        return "fake-pii-model"
+
+    monkeypatch.setattr(gliner_pipeline.GLiNER, "from_pretrained", fake_from_pretrained)
+
+    model = gliner_pipeline._get_pii_model()
+
+    assert model == "fake-pii-model"
+    assert captured == {"name": gliner_pipeline.PII_MODEL_NAME, "map_location": "cuda"}
+
+
+def test_get_zero_shot_model_loads_with_resolved_device(monkeypatch):
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", None)
+    monkeypatch.setattr(gliner_pipeline, "_resolve_device", lambda: "cuda")
+    captured = {}
+
+    def fake_from_pretrained(name, map_location=None):
+        captured["name"] = name
+        captured["map_location"] = map_location
+        return "fake-zero-shot-model"
+
+    monkeypatch.setattr(gliner_pipeline.GLiNER, "from_pretrained", fake_from_pretrained)
+
+    model = gliner_pipeline._get_zero_shot_model()
+
+    assert model == "fake-zero-shot-model"
+    assert captured == {"name": gliner_pipeline.ZERO_SHOT_MODEL_NAME, "map_location": "cuda"}

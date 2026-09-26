@@ -1,4 +1,4 @@
-"""Local, CPU-only candidate-extraction stage for the live-transcription benchmark.
+"""Local, device-configurable candidate-extraction stage for the live-transcription benchmark.
 
 Runs two GLiNER models against the transcript-so-far on every tick: a streaming
 PII checkpoint (`knowledgator/gliner-stream-pii-v1.0`) that reuses its decoder
@@ -16,6 +16,7 @@ import asyncio
 import threading
 import time
 
+import torch
 from gliner import GLiNER
 
 from . import config
@@ -79,12 +80,26 @@ _pii_call_locks_guard = threading.Lock()
 _pii_inference_lock = threading.Lock()
 
 
+def _resolve_device() -> str:
+    """Resolve `config.GLINER_DEVICE` to a concrete `"cpu"`/`"cuda"` string.
+
+    GLiNER's own `from_pretrained(map_location=...)` defaults unconditionally to `"cpu"` -- it
+    does no autodetection, and passing `"cuda"` with no CUDA device present raises a
+    `RuntimeError` rather than falling back -- so `"auto"` must be resolved to a concrete value
+    here before ever calling `from_pretrained`. An explicit `"cpu"`/`"cuda"` override passes
+    through unchanged.
+    """
+    if config.GLINER_DEVICE == "auto":
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    return config.GLINER_DEVICE
+
+
 def _get_pii_model() -> GLiNER:
     global _pii_model
     if _pii_model is None:
         with _singleton_load_lock:
             if _pii_model is None:
-                _pii_model = GLiNER.from_pretrained(PII_MODEL_NAME)
+                _pii_model = GLiNER.from_pretrained(PII_MODEL_NAME, map_location=_resolve_device())
     return _pii_model
 
 
@@ -93,7 +108,9 @@ def _get_zero_shot_model() -> GLiNER:
     if _zero_shot_model is None:
         with _singleton_load_lock:
             if _zero_shot_model is None:
-                _zero_shot_model = GLiNER.from_pretrained(ZERO_SHOT_MODEL_NAME)
+                _zero_shot_model = GLiNER.from_pretrained(
+                    ZERO_SHOT_MODEL_NAME, map_location=_resolve_device()
+                )
     return _zero_shot_model
 
 
