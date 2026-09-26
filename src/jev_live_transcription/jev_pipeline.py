@@ -14,7 +14,11 @@ form) accumulate across ticks and never shrink:
 - Exactly 1 distinct candidate, not yet committed: ask a yes/no ("Noul") question.
 - More than 1 distinct candidate ever seen: ask a multiple-choice ("Choice") question over all
   of them plus "none_of_these" -- this is what lets a previously committed value change when the
-  caller self-corrects (a phone number restated, for example).
+  caller self-corrects (a phone number restated, for example). Gated by a `SettleGate` (see
+  `settle_gate.py`) so a Choice call only fires once the distinct-candidate set itself has changed
+  and persisted for `config.JEV_RECONFIRM_SETTLE_TICKS` consecutive observations -- GLiNER
+  re-detects the same entities most ticks, so without this a field with 2+ distinct candidates
+  would re-call jev on essentially every tick even when nothing has changed.
 - Exactly 1 distinct candidate, already committed: nothing new to resolve, so no call is made.
 
 Each distinct candidate's own context snippet is cached the first time it is detected, keyed by
@@ -46,6 +50,7 @@ from typesafe_sdk import (
 )
 
 from jev_live_transcription import config
+from jev_live_transcription.settle_gate import SettleGate
 
 CallId = int | str
 
@@ -151,7 +156,12 @@ class JevFieldResolver:
     documented safe for concurrent requests from multiple coroutines.
     """
 
-    def __init__(self, client: AsyncTypeSafeClient | None = None) -> None:
+    def __init__(
+        self,
+        client: AsyncTypeSafeClient | None = None,
+        *,
+        settle_ticks: int = config.JEV_RECONFIRM_SETTLE_TICKS,
+    ) -> None:
         # Retries are driven explicitly by `_call_with_retry` below (fixed backoff, transient
         # errors only) rather than the SDK's own default policy, so the benchmark has a single,
         # visible retry/timeout budget per call instead of two overlapping ones.
@@ -163,6 +173,10 @@ class JevFieldResolver:
         # whatever the extraction stage reports on later ticks.
         self._contexts: dict[tuple[CallId, str], dict[str, str]] = {}
         self._committed: dict[tuple[CallId, str], bool] = {}
+        # Gates the Choice (multi-candidate) path only -- see `resolve_field` -- against
+        # re-resolving on every tick a field's distinct-candidate set happens to be re-reported
+        # unchanged.
+        self._settle_gate: SettleGate[tuple[CallId, str], frozenset[str]] = SettleGate(settle_ticks)
         # Serializes resolve_field calls per (call_id, field_name): each call reads then awaits a
         # jev round-trip before writing self._committed, so concurrent calls for the same key
         # would otherwise race on which result's commit outcome wins. Different keys stay fully
@@ -191,8 +205,10 @@ class JevFieldResolver:
         cached once it's available, instead of being permanently shadowed by an earlier, less
         precise substitute.
 
-        Returns `None` when no jev call is warranted this tick (no candidates seen yet, or a
-        single already-committed candidate with nothing new to resolve).
+        Returns `None` when no jev call is warranted this tick: no candidates seen yet, a single
+        already-committed candidate with nothing new to resolve, or -- for 2+ distinct candidates
+        -- the set hasn't yet settled per `SettleGate` (it will resolve within
+        `config.JEV_RECONFIRM_SETTLE_TICKS` further ticks of the set persisting unchanged).
         """
         key = (call_id, field_name)
         lock = self._locks.setdefault(key, asyncio.Lock())
@@ -227,10 +243,20 @@ class JevFieldResolver:
                     call_id, field_name, distinct[0], candidate_context
                 )
             else:
+                candidate_set = frozenset(seen.keys())
+                if not self._settle_gate.observe(key, candidate_set):
+                    return None
                 combined_context = self._combined_context(
                     field_name, distinct, contexts, per_candidate, context_window
                 )
                 result = await self._resolve_choice(call_id, field_name, distinct, combined_context)
+                if result.is_committed:
+                    # Only a confident answer counts as "resolved" for gating purposes -- an
+                    # uncommitted (low-confidence) Choice call must keep being retried every tick
+                    # this same set is observed, matching the Noul path's below-threshold retry
+                    # behavior, rather than getting silently stuck unresolved until a genuinely
+                    # new candidate appears.
+                    self._settle_gate.record_resolved(key, candidate_set)
 
             self._committed[key] = result.is_committed
             return result

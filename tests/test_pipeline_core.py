@@ -420,7 +420,10 @@ async def test_run_call_jev_choice_context_covers_candidate_that_stopped_being_r
         ]
     )
     fake_client = SimpleNamespace(system_one=system_one, aclose=AsyncMock())
-    real_resolver = JevFieldResolver(client=fake_client)
+    # settle_ticks=1 so the Choice call fires on the very first tick the 2-candidate set is
+    # observed -- this test is about context caching, not SettleGate's own settling behavior
+    # (covered separately in tests/test_jev_pipeline.py).
+    real_resolver = JevFieldResolver(client=fake_client, settle_ticks=1)
     monkeypatch.setattr(pipeline_core, "JevFieldResolver", lambda: real_resolver)
 
     monkeypatch.setattr(

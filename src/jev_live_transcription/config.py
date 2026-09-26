@@ -12,6 +12,11 @@ LLM_CADENCE_TICKS = 3
 # rather than held for a later tick.
 JEV_COMMIT_THRESHOLD = 0.6
 
+# Consecutive ticks a field's distinct-candidate set must persist unchanged before jev's
+# multi-candidate ("Choice") path re-resolves it -- GLiNER re-detects the same entities most
+# ticks, so gating on a settled set avoids re-confirming jev on every one of them.
+JEV_RECONFIRM_SETTLE_TICKS = 2
+
 # This machine's installed RAM, used to size call-level concurrency: reserve
 # 4GB headroom for the OS/other sessions and budget ~4GB per concurrent call.
 RAM_GB = 16
