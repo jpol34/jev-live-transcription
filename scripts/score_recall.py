@@ -35,6 +35,18 @@ def normalize(value: str) -> str:
     return _WHITESPACE_RE.sub(" ", value.strip().lower())
 
 
+def _disclosed_items(value: object) -> list[str]:
+    """Return the non-empty string items a ground-truth field value actually discloses.
+
+    A field's ground truth is either a single string or a list of strings (e.g.
+    `amenities_requested`, when a call discloses more than one). Corpus generation has no schema
+    enforcement on array element types, so a list can contain `None` or empty-string noise --
+    filtered out here so it's never treated as a disclosed-but-unmatchable value.
+    """
+    items = value if isinstance(value, list) else [value]
+    return [item for item in items if isinstance(item, str) and item.strip()]
+
+
 def is_match(extracted: str, truth: str | list[str]) -> bool:
     """True if `extracted` and `truth` agree closely enough to count as a recall hit.
 
@@ -51,7 +63,7 @@ def is_match(extracted: str, truth: str | list[str]) -> bool:
     against any one disclosed item counts as recall for that call.
     """
     if isinstance(truth, list):
-        return any(is_match(extracted, item) for item in truth)
+        return any(is_match(extracted, item) for item in _disclosed_items(truth))
     norm_extracted, norm_truth = normalize(extracted), normalize(truth)
     if not norm_extracted or not norm_truth:
         return False
@@ -111,9 +123,7 @@ def score_recall(
     stats: dict[str, dict] = {}
     for field_name in fields:
         expected_call_ids = [
-            call_id
-            for call_id, gt in ground_truths.items()
-            if gt.get(field_name) not in (None, "", [])
+            call_id for call_id, gt in ground_truths.items() if _disclosed_items(gt.get(field_name))
         ]
         matched = sum(
             1
