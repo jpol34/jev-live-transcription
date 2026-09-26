@@ -10,6 +10,7 @@ import subprocess
 
 OPENAI_ENV_VAR = "OPENAI_API_KEY"
 TYPESAFE_ENV_VAR = "TYPESAFE_API_KEY"
+RUNPOD_ENV_VAR = "RUNPOD_API_KEY"
 
 
 def load_secret(env_var: str, secret_name: str | None = None) -> None:
@@ -48,6 +49,10 @@ def load_secret(env_var: str, secret_name: str | None = None) -> None:
 
 def load_openai_key() -> None:
     load_secret(OPENAI_ENV_VAR)
+
+
+def load_runpod_key() -> None:
+    load_secret(RUNPOD_ENV_VAR)
 
 
 def load_typesafe_key() -> None:

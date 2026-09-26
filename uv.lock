@@ -205,6 +205,14 @@ wheels = [
 ]
 
 [[package]]
+name = "hangar"
+version = "0.1.0"
+source = { git = "https://github.com/jpol34/hangar#c81c49b3d13bbf5d397ea24d0a6e6452f9e0609a" }
+dependencies = [
+    { name = "httpx" },
+]
+
+[[package]]
 name = "hf-xet"
 version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -383,6 +391,7 @@ source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "gliner" },
+    { name = "hangar" },
     { name = "httpx" },
     { name = "openai" },
     { name = "protobuf" },
@@ -398,6 +407,7 @@ dependencies = [
 requires-dist = [
     { name = "fastapi" },
     { name = "gliner", specifier = ">=0.2.28" },
+    { name = "hangar", git = "https://github.com/jpol34/hangar" },
     { name = "httpx" },
     { name = "openai" },
     { name = "protobuf", specifier = ">=7.36.2" },

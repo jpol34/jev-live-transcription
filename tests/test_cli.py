@@ -98,6 +98,70 @@ def test_batch_reports_failures_via_exit_code(monkeypatch, tmp_path):
     assert exit_code == 1
 
 
+def test_gpu_run_forwards_flags(monkeypatch, tmp_path):
+    # Unlike `tui` (patched via a fake sys.modules entry, since nothing else imports it and it's
+    # heavy to import for real), `gpu_run` is already genuinely imported by test_gpu_run.py at
+    # collection time -- `from . import gpu_run` inside `_run_gpu_run` resolves via the
+    # `jev_live_transcription` package's own cached attribute, not sys.modules, so a sys.modules
+    # fake would silently be ignored and the real hangar/RunPod calls would run instead. Patching
+    # the real module's `run_gpu` attribute directly is what actually intercepts the call.
+    from jev_live_transcription import gpu_run as real_gpu_run
+
+    run_gpu_mock = Mock(return_value=0)
+    monkeypatch.setattr(real_gpu_run, "run_gpu", run_gpu_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    state_path = tmp_path / "state.json"
+    exit_code = cli.main(
+        [
+            "gpu-run",
+            "--subset",
+            "5",
+            "--db-path",
+            str(db_path),
+            "--call-concurrency",
+            "2",
+            "--gliner-concurrency",
+            "3",
+            "--enable-llm-baseline",
+            "--pod-state-path",
+            str(state_path),
+            "--ssh-key",
+            "/home/me/.ssh/id_ed25519",
+            "--keep-pod",
+        ]
+    )
+
+    assert exit_code == 0
+    run_gpu_mock.assert_called_once_with(
+        subset=5,
+        db_path=db_path,
+        call_concurrency=2,
+        gliner_concurrency=3,
+        enable_llm_baseline=True,
+        pod_state_path=state_path,
+        ssh_key="/home/me/.ssh/id_ed25519",
+        keep_pod=True,
+    )
+
+
+def test_gpu_run_defaults(monkeypatch, tmp_path):
+    from jev_live_transcription import gpu_run as real_gpu_run
+
+    run_gpu_mock = Mock(return_value=0)
+    monkeypatch.setattr(real_gpu_run, "run_gpu", run_gpu_mock)
+
+    cli.main(["gpu-run"])
+
+    _, kwargs = run_gpu_mock.call_args
+    assert kwargs["subset"] is None
+    assert kwargs["call_concurrency"] == 1
+    assert kwargs["gliner_concurrency"] == 1
+    assert kwargs["enable_llm_baseline"] is False
+    assert kwargs["ssh_key"] is None
+    assert kwargs["keep_pod"] is False
+
+
 def test_tui_defaults_enable_llm_baseline_to_false(monkeypatch):
     # `_run_tui` imports `tui` lazily inside the function -- patch the module in sys.modules so
     # that import resolves to a fake instead of the real (model-loading) tui module.

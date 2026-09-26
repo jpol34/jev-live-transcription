@@ -62,3 +62,10 @@ PRICING_PER_MILLION_TOKENS = {
 # reconstructed context size, cached or not — `input_tokens_details.cached_tokens`
 # is the subset of those tokens actually billed at this discount.
 PROMPT_CACHE_DISCOUNT = 0.5
+
+# `jlt gpu-run` pod GPU type. RunPod stock fluctuates within minutes (confirmed live during
+# development), so this is a single best-effort choice, not pinned to a data center -- letting
+# RunPod's scheduler place the pod keeps it working as stock shifts between regions. If this type
+# has no stock when you run it, check current availability (hangar.runpod_client / the runpod
+# MCP's get-capacity) and update this constant.
+RUNPOD_GPU_TYPE_ID = "NVIDIA RTX 6000 Ada Generation"
