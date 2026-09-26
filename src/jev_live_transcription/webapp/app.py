@@ -26,7 +26,8 @@ from collections import defaultdict
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .. import batch_runner, corpus, pipeline_core, secrets
@@ -105,6 +106,18 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 if _STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static")
+
+
+@app.get("/")
+def index() -> FileResponse:
+    return FileResponse(_STATIC_DIR / "index.html")
+
+
+@app.get("/call/{call_id}")
+def call_page(call_id: int) -> FileResponse:
+    if call_id not in app.state.calls:
+        raise HTTPException(status_code=404, detail="call_id not found")
+    return FileResponse(_STATIC_DIR / "call.html")
 
 
 def _group_calls(calls: dict[int, dict]) -> dict[str, dict[str, list[dict]]]:
