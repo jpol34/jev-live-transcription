@@ -481,8 +481,8 @@ async def test_run_call_on_tick_callback_fires_every_tick_with_committed_snapsho
         1,
         store,
         calls=_calls_fixture(),
-        on_tick=lambda tick_number, total_ticks, committed: on_tick_calls.append(
-            (tick_number, total_ticks, dict(committed))
+        on_tick=lambda tick_number, total_ticks, snapshot, committed: on_tick_calls.append(
+            (tick_number, total_ticks, snapshot, dict(committed))
         ),
     )
 
@@ -490,12 +490,15 @@ async def test_run_call_on_tick_callback_fires_every_tick_with_committed_snapsho
     assert [call[0] for call in on_tick_calls] == [0, 1]
     # total_ticks (from CallPacer) is the same value on every call.
     assert on_tick_calls[0][1] == on_tick_calls[1][1]
+    # Each call's own transcript snapshot is passed through as-is.
+    assert on_tick_calls[0][2] == ""
+    assert on_tick_calls[1][2] == "a"
     # Tick 0's snapshot has nothing committed yet.
-    assert on_tick_calls[0][2] == {}
+    assert on_tick_calls[0][3] == {}
     # Tick 1's snapshot reflects the freshly committed value...
-    assert on_tick_calls[1][2][("gliner_jev", "phone_number")] == ("555-1111", 0.9)
+    assert on_tick_calls[1][3][("gliner_jev", "phone_number")] == ("555-1111", 0.9)
     # ...and each snapshot is its own copy, unaffected by state mutated on later ticks.
-    assert on_tick_calls[0][2] == {}
+    assert on_tick_calls[0][3] == {}
 
 
 # --- confident-rejection/confident-null carry-forward clearing, at the orchestration level -------

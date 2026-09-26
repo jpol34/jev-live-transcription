@@ -111,7 +111,7 @@ async def _run_async(call_id: int, db_path: Path, enable_llm_baseline: bool) -> 
     console = Console()
     state = _TuiState(call_id=call_id, scenario=call_data["scenario"])
 
-    def on_tick(tick_number: int, total_ticks: int, committed: dict) -> None:
+    def on_tick(tick_number: int, total_ticks: int, snapshot: str, committed: dict) -> None:
         state.update(tick_number, total_ticks, committed)
         live.update(state.render())
 
