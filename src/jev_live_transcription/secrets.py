@@ -51,4 +51,7 @@ def load_openai_key() -> None:
 
 
 def load_typesafe_key() -> None:
-    load_secret(TYPESAFE_ENV_VAR)
+    # typesafe.ai keys are provisioned per-project on their side, so this pulls the
+    # project-scoped Strongbox entry rather than a generic one (same convention as trellis's and
+    # laya-bench's scripts/configure-typesafe-secret.ps1).
+    load_secret(TYPESAFE_ENV_VAR, secret_name="TYPESAFE_API_KEY::jpol34/jev-live-transcription")

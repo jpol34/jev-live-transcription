@@ -10,6 +10,7 @@ dependencies = [
     "rich",
     "pytest",
     "protobuf>=7.36.2",
+    "pytest-asyncio",
 ]
 
 [build-system]
@@ -18,3 +19,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jev_live_transcription"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
