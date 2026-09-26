@@ -107,7 +107,6 @@ def _candidate_context_windows(
     snapshot: str,
     candidate_spans: list[dict],
     *,
-    fallback: str,
     spans: list[tuple[int, int]] | None = None,
 ) -> dict[str, str]:
     """Map each candidate span's own text to its own individually-sliced context window.
@@ -116,19 +115,20 @@ def _candidate_context_windows(
     candidate here keeps its own justifying sentence(s) distinct from any other candidate's --
     this is what `JevFieldResolver.resolve_field` caches per candidate the first time it is
     detected, so a later Choice call still has it even once a candidate's span stops being
-    reported on later ticks. A span missing `start`/`end` falls back to `fallback` (the same
-    merged window `_field_context_window` itself falls back to when offsets are missing).
+    reported on later ticks. A span missing `start`/`end` is left out entirely rather than mapped
+    to a merged fallback: caching an imprecise substitute (potentially the whole snapshot, per
+    `_field_context_window`'s own fallback) would lock it in forever for that candidate even once
+    a later tick supplies a real, tightly-scoped span for it. Dropping the entry here instead lets
+    `resolve_field` fall back to its own `context_window` argument for just this call, and keep
+    trying to cache a precise window on a later tick.
     """
     windows: dict[str, str] = {}
     for candidate in candidate_spans:
         text = candidate.get("text")
-        if not text or text in windows:
-            continue
         start, end = candidate.get("start"), candidate.get("end")
-        if start is None or end is None:
-            windows[text] = fallback
-        else:
-            windows[text] = context_window(snapshot, start, end, spans=spans)
+        if not text or text in windows or start is None or end is None:
+            continue
+        windows[text] = context_window(snapshot, start, end, spans=spans)
     return windows
 
 
@@ -345,9 +345,7 @@ async def _run_gliner_jev_step(
         if not values:
             continue
         context = _field_context_window(snapshot, field_spans, spans=sentence_spans)
-        candidate_contexts = _candidate_context_windows(
-            snapshot, field_spans, fallback=context, spans=sentence_spans
-        )
+        candidate_contexts = _candidate_context_windows(snapshot, field_spans, spans=sentence_spans)
         resolve_tasks.append(
             _timed_resolve_field(
                 resolver.resolve_field(

@@ -182,10 +182,14 @@ class JevFieldResolver:
 
         `candidate_context_windows`, when given, maps each raw string in `candidates` to its own
         individually-sliced context snippet (the text surrounding just that candidate's span,
-        distinct from any other candidate's). The first time a candidate is seen, its snippet --
-        from `candidate_context_windows`, or `context_window` when the map omits it or is not
-        given at all -- is cached under its normalized value and reused for every later call
-        involving that candidate, regardless of what either argument holds on a later tick.
+        distinct from any other candidate's). The first time a candidate's own snippet is
+        available this way, it is cached under the candidate's normalized value and reused for
+        every later call involving that candidate, regardless of what either argument holds on a
+        later tick. A candidate missing from `candidate_context_windows` (or seen before this
+        argument existed) falls back to `context_window` for that call only -- this fallback is
+        never itself cached, so a later tick supplying the candidate's own snippet still gets
+        cached once it's available, instead of being permanently shadowed by an earlier, less
+        precise substitute.
 
         Returns `None` when no jev call is warranted this tick (no candidates seen yet, or a
         single already-committed candidate with nothing new to resolve).
@@ -205,8 +209,8 @@ class JevFieldResolver:
                     continue
                 if normalized not in seen:
                     seen[normalized] = value
-                if normalized not in contexts:
-                    contexts[normalized] = per_candidate.get(raw, context_window)
+                if normalized not in contexts and raw in per_candidate:
+                    contexts[normalized] = per_candidate[raw]
 
             distinct = list(seen.values())
             if not distinct:
@@ -215,14 +219,17 @@ class JevFieldResolver:
             if len(distinct) == 1:
                 if self._committed.get(key, False):
                     return None
-                candidate_context = contexts.get(
-                    normalize_candidate(field_name, distinct[0]), context_window
+                normalized = normalize_candidate(field_name, distinct[0])
+                candidate_context = contexts.get(normalized) or per_candidate.get(
+                    distinct[0], context_window
                 )
                 result = await self._resolve_noul(
                     call_id, field_name, distinct[0], candidate_context
                 )
             else:
-                combined_context = self._combined_context(field_name, distinct, contexts, context_window)
+                combined_context = self._combined_context(
+                    field_name, distinct, contexts, per_candidate, context_window
+                )
                 result = await self._resolve_choice(call_id, field_name, distinct, combined_context)
 
             self._committed[key] = result.is_committed
@@ -230,18 +237,26 @@ class JevFieldResolver:
 
     @staticmethod
     def _combined_context(
-        field_name: str, distinct: list[str], contexts: dict[str, str], fallback: str
+        field_name: str,
+        distinct: list[str],
+        contexts: dict[str, str],
+        per_candidate: dict[str, str],
+        fallback: str,
     ) -> str:
-        """Join every distinct candidate's own cached context snippet into one Choice-call context.
+        """Join every distinct candidate's own context snippet into one Choice-call context.
 
-        Snippets are kept in first-seen order and deduplicated by exact text, so two candidates
-        whose spans landed in the same sentence (sharing an identical cached snippet) don't repeat
-        it, while a genuinely older candidate's snippet still appears alongside a newer one's even
-        when they were detected many ticks apart.
+        Prefers each candidate's cached snippet; falls back to its snippet from this tick's own
+        `per_candidate` map (uncached, e.g. offsets were missing on every sighting so far) and
+        finally to the field-level `fallback` when neither is available (e.g. the candidate isn't
+        present at all this tick). Snippets are kept in first-seen order and deduplicated by exact
+        text, so two candidates whose spans landed in the same sentence don't repeat it, while a
+        genuinely older candidate's snippet still appears alongside a newer one's even when they
+        were detected many ticks apart.
         """
         ordered: list[str] = []
         for value in distinct:
-            snippet = contexts.get(normalize_candidate(field_name, value), fallback)
+            normalized = normalize_candidate(field_name, value)
+            snippet = contexts.get(normalized) or per_candidate.get(value, fallback)
             if snippet not in ordered:
                 ordered.append(snippet)
         return "\n\n".join(ordered)

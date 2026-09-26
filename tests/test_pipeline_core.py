@@ -163,9 +163,7 @@ def test_candidate_context_windows_slices_each_candidate_individually():
     ]
     fallback = pipeline_core._field_context_window(snapshot, candidate_spans, spans=spans)
 
-    windows = pipeline_core._candidate_context_windows(
-        snapshot, candidate_spans, fallback=fallback, spans=spans
-    )
+    windows = pipeline_core._candidate_context_windows(snapshot, candidate_spans, spans=spans)
 
     # Each candidate's own window covers only its own justifying text, not the other candidate's --
     # unlike `fallback`, which spans both since it's merged across every span found this tick.
@@ -176,15 +174,16 @@ def test_candidate_context_windows_slices_each_candidate_individually():
     assert "555-1111" in fallback and "555-2222" in fallback
 
 
-def test_candidate_context_windows_falls_back_when_offsets_missing():
+def test_candidate_context_windows_omits_spans_missing_offsets():
+    # A span missing start/end is left out entirely rather than mapped to a merged fallback -- a
+    # caller (JevFieldResolver) that caches this per candidate must never lock in an imprecise
+    # substitute for a candidate whose offsets simply weren't available yet.
     snapshot = "Agent: hi. Caller: my number is 555-1111."
     candidate_spans = [{"text": "555-1111", "start": None, "end": None}]
 
-    windows = pipeline_core._candidate_context_windows(
-        snapshot, candidate_spans, fallback="the merged fallback"
-    )
+    windows = pipeline_core._candidate_context_windows(snapshot, candidate_spans)
 
-    assert windows["555-1111"] == "the merged fallback"
+    assert windows == {}
 
 
 def test_candidate_context_windows_dedupes_repeated_span_text():
@@ -195,9 +194,23 @@ def test_candidate_context_windows_dedupes_repeated_span_text():
             {"text": "555-1111", "start": 19, "end": 27},
             {"text": "555-1111", "start": 38, "end": 46},
         ],
-        fallback=snapshot,
     )
     assert len(windows) == 1
+
+
+def test_candidate_context_windows_keeps_valid_span_after_offsetless_duplicate():
+    # A duplicate-text span with missing offsets encountered before one with valid offsets must
+    # not shadow the valid one -- the valid span's precise window should still be used.
+    snapshot = "Agent: hi. Caller: my number is 555-1111 okay."
+    start = snapshot.index("555-1111")
+    windows = pipeline_core._candidate_context_windows(
+        snapshot,
+        [
+            {"text": "555-1111", "start": None, "end": None},
+            {"text": "555-1111", "start": start, "end": start + 8},
+        ],
+    )
+    assert windows["555-1111"] == pipeline_core.context_window(snapshot, start, start + 8)
 
 
 # --- run_call tick loop: growth gating, LLM cadence gating, carry-forward -----------------------

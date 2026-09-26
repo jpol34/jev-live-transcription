@@ -301,6 +301,27 @@ async def test_candidate_context_cached_on_first_sighting_is_not_overwritten_lat
 
 
 @pytest.mark.asyncio
+async def test_fallback_context_is_never_permanently_cached_over_a_later_precise_one():
+    # A candidate's first sighting has no per-candidate snippet (e.g. its span was missing
+    # start/end that tick), so it must fall back to the field-level context_window for that call
+    # only -- not lock that fallback in forever. Once a later tick supplies the candidate's own
+    # precise snippet, that should get cached and used instead.
+    system_one = AsyncMock(side_effect=[_noul_response(0.3), _noul_response(0.9)])
+    resolver = _resolver(system_one)
+    key_kwargs = dict(call_id=1, field_name="caller_name", candidates=["Someone"])
+
+    await resolver.resolve_field(context_window="whole transcript fallback", **key_kwargs)
+    await resolver.resolve_field(
+        context_window="whole transcript fallback",
+        candidate_context_windows={"Someone": "Caller: my name is Someone."},
+        **key_kwargs,
+    )
+
+    _, kwargs = system_one.call_args
+    assert kwargs["state"]["context_window"] == "Caller: my name is Someone."
+
+
+@pytest.mark.asyncio
 async def test_missing_candidate_context_map_falls_back_to_field_context_window():
     system_one = AsyncMock(return_value=_noul_response(0.9))
     resolver = _resolver(system_one)
