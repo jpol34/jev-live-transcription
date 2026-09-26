@@ -276,6 +276,56 @@ async def test_run_call_gating_and_carry_forward(monkeypatch):
     assert store.closed is False  # an externally-provided store is never closed by run_call
 
 
+# --- on_tick callback ------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_run_call_on_tick_callback_fires_every_tick_with_committed_snapshot(monkeypatch):
+    ticks_script = [
+        (0, "", 0),  # no growth -> on_tick still fires, snapshot is empty
+        (1, "a", 1),  # growth -> gliner+jev commits phone_number
+    ]
+    monkeypatch.setattr(pipeline_core, "iter_batch_ticks", lambda call_pacer: iter(ticks_script))
+
+    extract_candidates_mock = AsyncMock(
+        return_value={"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]}
+    )
+    monkeypatch.setattr(pipeline_core.gliner_pipeline, "extract_candidates", extract_candidates_mock)
+    monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
+    monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", Mock())
+
+    resolve_field_mock = AsyncMock(
+        return_value=JevResolution(
+            call_id="1", field_name="phone_number", question_type="noul", candidate="555-1111",
+            confidence=0.9, is_committed=True, is_none_of_these=False,
+            distinct_candidates=("555-1111",), input_tokens=10, output_tokens=2,
+        )
+    )
+    monkeypatch.setattr(pipeline_core, "JevFieldResolver", lambda: FakeResolver(resolve_field_mock))
+
+    store = FakeStore()
+    on_tick_calls = []
+    await pipeline_core.run_call(
+        1,
+        store,
+        calls=_calls_fixture(),
+        on_tick=lambda tick_number, total_ticks, committed: on_tick_calls.append(
+            (tick_number, total_ticks, dict(committed))
+        ),
+    )
+
+    # Fires once per tick, including the non-growth first tick.
+    assert [call[0] for call in on_tick_calls] == [0, 1]
+    # total_ticks (from CallPacer) is the same value on every call.
+    assert on_tick_calls[0][1] == on_tick_calls[1][1]
+    # Tick 0's snapshot has nothing committed yet.
+    assert on_tick_calls[0][2] == {}
+    # Tick 1's snapshot reflects the freshly committed value...
+    assert on_tick_calls[1][2][("gliner_jev", "phone_number")] == ("555-1111", 0.9)
+    # ...and each snapshot is its own copy, unaffected by state mutated on later ticks.
+    assert on_tick_calls[0][2] == {}
+
+
 @pytest.mark.asyncio
 async def test_run_call_does_not_close_externally_provided_store(monkeypatch):
     monkeypatch.setattr(pipeline_core, "iter_batch_ticks", lambda call_pacer: iter([(0, "", 0)]))
