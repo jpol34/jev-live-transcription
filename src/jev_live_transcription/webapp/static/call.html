@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jev-live-transcription -- live call</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="top">
+    <h1><a href="/" style="color:inherit;text-decoration:none;">jev-live-transcription</a></h1>
+    <span class="subtitle" id="call-label">Loading&hellip;</span>
+  </header>
+  <main>
+    <div class="status-bar">
+      <span>Tick <span id="tick-number">0</span> / <span id="total-ticks">0</span></span>
+      <span>Elapsed: <span id="elapsed">0s</span></span>
+      <span class="pill pending" id="caller-type-pill">pending</span>
+    </div>
+    <div class="live-layout">
+      <div class="panel">
+        <h2>Transcript</h2>
+        <div id="transcript"></div>
+      </div>
+      <div class="panel">
+        <div id="form"></div>
+      </div>
+    </div>
+    <div id="banner"></div>
+  </main>
+  <script src="/static/live.js"></script>
+</body>
+</html>

@@ -91,6 +91,28 @@ def test_list_calls_endpoint(client):
     assert set(body) == {"prospect", "resident"}
 
 
+def test_index_serves_selector_page(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    assert "selector.js" in response.text
+
+
+def test_call_page_serves_live_view(client):
+    response = client.get("/call/1")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    assert "live.js" in response.text
+
+
+def test_static_assets_are_served(client):
+    for path in ("/static/style.css", "/static/selector.js", "/static/live.js"):
+        response = client.get(path)
+        assert response.status_code == 200, path
+
+
 def test_websocket_replay_streams_ticks_and_done(client, monkeypatch):
     async def fake_run_call(call_id, db_path, *, pacer_mode, calls, on_tick):
         on_tick(1, 3, "Agent: hi", {("gliner_jev", "caller_name"): ("Tim Barker", 0.9)})
