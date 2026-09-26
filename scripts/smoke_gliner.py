@@ -26,10 +26,6 @@ def _select_demo_calls(calls: dict[int, dict], count: int = 2) -> list[int]:
     return [call_id for call_id, _ in ranked[:count]]
 
 
-def _render_turns(turns: list[dict]) -> str:
-    return "\n".join(f"{turn['speaker']}: {turn['text']}" for turn in turns)
-
-
 async def _run_call(call_id: int, call: dict) -> None:
     turns = call["transcript_turns"]
     ground_truth = call["ground_truth"]
@@ -58,7 +54,7 @@ async def _run_call(call_id: int, call: dict) -> None:
     try:
         tick_ends = range(TICK_TURN_STRIDE, len(turns) + TICK_TURN_STRIDE, TICK_TURN_STRIDE)
         for tick, end in enumerate(tick_ends, start=1):
-            snapshot = _render_turns(turns[:end])
+            snapshot = corpus.render_turns(turns[:end])
             candidates = await gliner_pipeline.extract_candidates(snapshot, call_id=session_id)
             shown_turns = min(end, len(turns))
             print(
