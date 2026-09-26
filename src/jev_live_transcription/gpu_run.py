@@ -170,7 +170,11 @@ def run_gpu(
         name=_POD_NAME,
         image=_IMAGE,
         gpu_type_id=config.RUNPOD_GPU_TYPE_ID,
-        disk_gb=30,
+        # The image itself is ~38GB (RunPod's base CUDA/torch layers plus two baked-in GLiNER
+        # checkpoints) -- disk_gb is the pod's container disk, which must hold the pulled+
+        # extracted image with room to spare, not just the app's own runtime footprint. 30GB was
+        # too small and left the pod stuck mid-pull with uptime never leaving 0 (confirmed live).
+        disk_gb=60,
         ports=["22/tcp"],
         device_env_key="GLINER_DEVICE",
         device_env_value="cuda",
