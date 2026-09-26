@@ -125,6 +125,14 @@ async def run_batch(
     `pipeline_core.run_call` -- see its docstring for why the GPT-5.1 comparison arm is opt-in
     rather than routine.
     """
+    # asyncio.Semaphore(0) is legal but can never be acquired -- every _run_one would block
+    # forever waiting to acquire it, hanging the whole batch with no error or log line explaining
+    # why. Reject non-positive concurrency up front instead.
+    if call_concurrency < 1:
+        raise ValueError(f"call_concurrency must be >= 1, got {call_concurrency!r}")
+    if gliner_concurrency < 1:
+        raise ValueError(f"gliner_concurrency must be >= 1, got {gliner_concurrency!r}")
+
     calls = calls if calls is not None else corpus.load_all()
     if call_ids is None:
         call_ids = sorted(calls)
@@ -155,6 +163,15 @@ async def run_batch(
             )
         )
     finally:
-        await resolver.aclose()
-        store.close()
+        # Isolated like pipeline_core.run_call's own cleanup: resolver.aclose() raising must not
+        # skip store.close(), or the CaptureStore's background writer thread and live sqlite
+        # connection leak instead of shutting down cleanly.
+        try:
+            await resolver.aclose()
+        except Exception:
+            _LOGGER.exception("resolver.aclose failed")
+        try:
+            store.close()
+        except Exception:
+            _LOGGER.exception("store.close failed")
     return result

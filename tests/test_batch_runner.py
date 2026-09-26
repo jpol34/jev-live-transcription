@@ -12,6 +12,21 @@ import pytest
 from jev_live_transcription import batch_runner
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("kwarg", ["call_concurrency", "gliner_concurrency"])
+@pytest.mark.parametrize("bad_value", [0, -1])
+async def test_run_batch_rejects_non_positive_concurrency(monkeypatch, kwarg, bad_value):
+    # asyncio.Semaphore(0) is legal but can never be acquired -- every call would block forever
+    # instead of raising, silently wedging the whole batch. Reject it up front instead.
+    _patch_store_and_resolver(monkeypatch)
+    monkeypatch.setattr(batch_runner.pipeline_core, "run_call", AsyncMock())
+
+    with pytest.raises(ValueError):
+        await batch_runner.run_batch(
+            [1], db_path="ignored.sqlite3", calls={1: {}}, warm_up=False, **{kwarg: bad_value}
+        )
+
+
 class FakeStore:
     def __init__(self, db_path):
         self.db_path = db_path
@@ -205,6 +220,26 @@ async def test_run_batch_cleans_up_store_and_resolver_even_on_failures(monkeypat
     assert len(result.failed) == 2
     assert store_instances[0].closed is True
     resolver_instances[0].aclose.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_run_batch_closes_store_even_when_resolver_aclose_raises(monkeypatch):
+    # resolver.aclose() raising must not skip store.close() -- otherwise the CaptureStore's
+    # background writer thread and live sqlite connection leak instead of shutting down cleanly.
+    store_instances, _ = _patch_store_and_resolver(monkeypatch)
+
+    failing_resolver = FakeResolver()
+    failing_resolver.aclose.side_effect = RuntimeError("teardown boom")
+    monkeypatch.setattr(batch_runner, "JevFieldResolver", lambda: failing_resolver)
+    monkeypatch.setattr(batch_runner.pipeline_core, "run_call", AsyncMock())
+
+    calls = {1: {}}
+    result = await batch_runner.run_batch(
+        list(calls), db_path="ignored.sqlite3", calls=calls, warm_up=False
+    )
+
+    assert store_instances[0].closed is True
+    assert set(result.succeeded) == {1}
 
 
 @pytest.mark.asyncio

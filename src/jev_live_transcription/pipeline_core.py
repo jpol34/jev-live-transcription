@@ -21,6 +21,7 @@ themselves.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import re
@@ -239,14 +240,15 @@ async def _run_gliner_jev_step(
     committed: _CommittedState,
     gliner_semaphore: asyncio.Semaphore | None = None,
 ) -> None:
-    start = time.monotonic()
+    # `start` is taken *inside* the semaphore, matching where extract_candidates_timed's own
+    # internal per-model timers start -- taking it before acquiring the semaphore would fold
+    # queueing wait (real under gliner_concurrency > 1) into the error path's latency_ms while the
+    # success path's pii_latency_ms/zero_shot_latency_ms never include it, making the two
+    # incomparable for the same stage.
+    semaphore_ctx = gliner_semaphore if gliner_semaphore is not None else contextlib.nullcontext()
     try:
-        if gliner_semaphore is not None:
-            async with gliner_semaphore:
-                candidates, pii_latency_ms, zero_shot_latency_ms = await gliner_pipeline.extract_candidates_timed(
-                    snapshot, pipeline_call_id
-                )
-        else:
+        async with semaphore_ctx:
+            start = time.monotonic()
             candidates, pii_latency_ms, zero_shot_latency_ms = await gliner_pipeline.extract_candidates_timed(
                 snapshot, pipeline_call_id
             )

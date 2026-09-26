@@ -66,6 +66,15 @@ _pii_sent_length: dict[str, int] = {}
 _pii_call_locks: dict[str, threading.Lock] = {}
 _pii_call_locks_guard = threading.Lock()
 
+# The streaming PII checkpoint keeps its own per-session KV-cache/decoder state inside the model
+# object, keyed by session_id -- unlike a stateless forward pass, there is no upstream guarantee
+# that calling `model.inference(...)` concurrently from multiple threads with *different*
+# session_ids is safe against that shared internal state. The per-call_id lock above only
+# serializes ticks for the *same* call; this lock serializes the actual inference call itself
+# across every call_id, so batch_runner's call_concurrency/gliner_concurrency > 1 can never send
+# two calls' inferences into the model at once.
+_pii_inference_lock = threading.Lock()
+
 
 def _get_pii_model() -> GLiNER:
     global _pii_model
@@ -125,12 +134,13 @@ def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict
             # chunk per call, so there's nothing to feed the session; report
             # no candidates rather than re-querying stale state.
             return {field: [] for field in PII_FIELD_LABELS}
-        entities = model.inference(
-            [delta],
-            list(PII_FIELD_LABELS.values()),
-            session_id=[call_id],
-            threshold=0.5,
-        )[0]
+        with _pii_inference_lock:
+            entities = model.inference(
+                [delta],
+                list(PII_FIELD_LABELS.values()),
+                session_id=[call_id],
+                threshold=0.5,
+            )[0]
         _pii_sent_length[call_id] = len(transcript_snapshot)
     return _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
 

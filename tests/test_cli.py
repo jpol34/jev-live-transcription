@@ -96,3 +96,33 @@ def test_batch_reports_failures_via_exit_code(monkeypatch, tmp_path):
     exit_code = cli.main(["batch", "--db-path", str(db_path)])
 
     assert exit_code == 1
+
+
+def test_tui_defaults_enable_llm_baseline_to_false(monkeypatch):
+    # `_run_tui` imports `tui` lazily inside the function -- patch the module in sys.modules so
+    # that import resolves to a fake instead of the real (model-loading) tui module.
+    import sys
+    from types import ModuleType
+
+    tui_run_mock = Mock()
+    fake_tui = ModuleType("jev_live_transcription.tui")
+    fake_tui.run = tui_run_mock
+    monkeypatch.setitem(sys.modules, "jev_live_transcription.tui", fake_tui)
+
+    cli.main(["tui", "42"])
+
+    tui_run_mock.assert_called_once_with(42, db_path=None, enable_llm_baseline=False)
+
+
+def test_tui_forwards_enable_llm_baseline_when_passed(monkeypatch):
+    import sys
+    from types import ModuleType
+
+    tui_run_mock = Mock()
+    fake_tui = ModuleType("jev_live_transcription.tui")
+    fake_tui.run = tui_run_mock
+    monkeypatch.setitem(sys.modules, "jev_live_transcription.tui", fake_tui)
+
+    cli.main(["tui", "42", "--enable-llm-baseline"])
+
+    tui_run_mock.assert_called_once_with(42, db_path=None, enable_llm_baseline=True)

@@ -35,6 +35,16 @@ def _build_parser() -> argparse.ArgumentParser:
             "output/tui_captures/call_<id>.db)"
         ),
     )
+    tui_parser.add_argument(
+        "--enable-llm-baseline",
+        action="store_true",
+        default=False,
+        help=(
+            "Also show the GPT-5.1 comparison column (default: off). This calls the real OpenAI "
+            "API on every config.LLM_CADENCE_TICKS-th grown tick and costs real money -- only "
+            "pass this with explicit approval, never by default."
+        ),
+    )
 
     batch_parser = subparsers.add_parser(
         "batch", help="Drive the call corpus through the pipeline in batch (non-realtime) mode."
@@ -126,7 +136,7 @@ def _run_batch(args: argparse.Namespace) -> int:
 def _run_tui(args: argparse.Namespace) -> int:
     from . import tui
 
-    tui.run(args.call_id, db_path=args.db_path)
+    tui.run(args.call_id, db_path=args.db_path, enable_llm_baseline=args.enable_llm_baseline)
     return 0
 
 
