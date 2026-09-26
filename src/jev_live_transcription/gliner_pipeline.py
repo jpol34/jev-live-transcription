@@ -150,11 +150,22 @@ def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict
 
 def _zero_shot_window(transcript_snapshot: str) -> tuple[str, int]:
     """Return the trailing slice of `transcript_snapshot` fed to the standard zero-shot model this
-    tick -- its last `config.GLINER_ZERO_SHOT_WINDOW_CHARS` characters -- along with that slice's
+    tick -- up to `config.GLINER_ZERO_SHOT_WINDOW_CHARS` characters -- along with that slice's
     start offset within the full snapshot, so callers can translate entity spans the model reports
     (relative to the slice) back into full-snapshot character offsets.
+
+    The raw character cut is advanced to the next word boundary rather than used as-is, so the
+    window never starts mid-word -- a hard cut could otherwise split the very entity the window
+    exists to still capture (e.g. turning "apartment 204" into "...rtment 204", which GLiNER may
+    fail to recognize as a unit number). This can only shrink the window below the configured
+    size, never grow it past it.
     """
-    window_start = max(0, len(transcript_snapshot) - config.GLINER_ZERO_SHOT_WINDOW_CHARS)
+    raw_start = max(0, len(transcript_snapshot) - config.GLINER_ZERO_SHOT_WINDOW_CHARS)
+    window_start = raw_start
+    if raw_start > 0:
+        boundary = transcript_snapshot.find(" ", raw_start)
+        if boundary != -1:
+            window_start = boundary + 1
     return transcript_snapshot[window_start:], window_start
 
 

@@ -38,8 +38,9 @@ async def _run_call(call_id: int, call: dict) -> None:
             continue
         print(f"  {field}: {value!r}")
 
-    # Wrap the zero-shot tick to capture its per-tick latency, since it's the
-    # one expected to grow with transcript length (full re-encode every tick).
+    # Wrap the zero-shot tick to capture its per-tick latency for display below -- it re-encodes
+    # only a bounded trailing window of the transcript (config.GLINER_ZERO_SHOT_WINDOW_CHARS), so
+    # this is the number to watch for confirming that latency stays flat as the call gets longer.
     original_zero_shot_tick = gliner_pipeline._run_zero_shot_tick
     zero_shot_latency_s = 0.0
 
