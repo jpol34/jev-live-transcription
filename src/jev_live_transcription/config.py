@@ -35,3 +35,9 @@ PRICING_PER_MILLION_TOKENS = {
         "output": 0.0,  # typesafe.ai advertises output tokens as free
     },
 }
+
+# Discount applied to prompt-cache-hit input tokens relative to the standard
+# input rate above. OpenAI's `usage.input_tokens` always reports the full
+# reconstructed context size, cached or not — `input_tokens_details.cached_tokens`
+# is the subset of those tokens actually billed at this discount.
+PROMPT_CACHE_DISCOUNT = 0.5
