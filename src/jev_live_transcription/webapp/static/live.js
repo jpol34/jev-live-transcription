@@ -144,15 +144,21 @@ function showBanner(className, text) {
 function connect() {
   const protocol = window.location.protocol === "https:" ? "wss" : "ws";
   const ws = new WebSocket(`${protocol}://${window.location.host}/ws/${callId}`);
+  // Tracks whether the connection ever reached a terminal state on its own (a "busy"/"done"
+  // message, or an onerror) -- onclose fires for *every* disconnect, including those, so it must
+  // not show a redundant/contradictory "connection lost" banner over an already-shown one.
+  let settled = false;
 
   ws.onmessage = (event) => {
     const msg = JSON.parse(event.data);
 
     if (msg.type === "busy") {
+      settled = true;
       showBanner("busy-banner", msg.message || "Busy -- try again shortly.");
       return;
     }
     if (msg.type === "done") {
+      settled = true;
       showBanner("done-banner", "Call finished.");
       return;
     }
@@ -169,7 +175,17 @@ function connect() {
   };
 
   ws.onerror = () => {
+    settled = true;
     showBanner("busy-banner", "Connection error -- try refreshing the page.");
+  };
+
+  ws.onclose = () => {
+    // A clean server-side close with no preceding message (e.g. an unknown call_id, or an
+    // internal error before any tick was sent) fires only this handler, not onmessage/onerror --
+    // without it, the page would otherwise sit on "Loading..."/tick 0 forever with no feedback.
+    if (!settled) {
+      showBanner("busy-banner", "Connection closed -- try refreshing the page.");
+    }
   };
 }
 

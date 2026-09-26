@@ -26,7 +26,7 @@ from collections import defaultdict
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -115,6 +115,8 @@ def index() -> FileResponse:
 
 @app.get("/call/{call_id}")
 def call_page(call_id: int) -> FileResponse:
+    if call_id not in app.state.calls:
+        raise HTTPException(status_code=404, detail="call_id not found")
     return FileResponse(_STATIC_DIR / "call.html")
 
 

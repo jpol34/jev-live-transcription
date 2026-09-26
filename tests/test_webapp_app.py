@@ -107,6 +107,12 @@ def test_call_page_serves_live_view(client):
     assert "live.js" in response.text
 
 
+def test_call_page_404s_for_unknown_call_id(client):
+    response = client.get("/call/9999")
+
+    assert response.status_code == 404
+
+
 def test_static_assets_are_served(client):
     for path in ("/static/style.css", "/static/selector.js", "/static/live.js"):
         response = client.get(path)
