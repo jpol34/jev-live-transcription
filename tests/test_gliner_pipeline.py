@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 from jev_live_transcription import gliner_pipeline
 
@@ -70,6 +71,33 @@ def test_extract_candidates_merges_pii_and_zero_shot_candidates(monkeypatch):
     assert result["phone_number"] == []
     assert pii_model.calls[0]["session_id"] == ["call-1"]
     assert zero_shot_model.calls[0]["multi_label"] is True
+
+
+def test_extract_candidates_timed_times_each_model_independently(monkeypatch):
+    # _run_pii_tick/_run_zero_shot_tick are patched directly (below extract_candidates_timed's
+    # own asyncio.to_thread calls) rather than the model objects, so each fake sleeps for a known,
+    # different duration -- proving the two returned latencies reflect each call's own wall time
+    # instead of one shared measurement of the outer gather.
+    def slow_pii(transcript_snapshot, call_id):
+        time.sleep(0.05)
+        return {field: [] for field in gliner_pipeline.PII_FIELD_LABELS}
+
+    def slow_zero_shot(transcript_snapshot):
+        time.sleep(0.2)
+        return {field: [] for field in gliner_pipeline.ZERO_SHOT_FIELD_LABELS}
+
+    monkeypatch.setattr(gliner_pipeline, "_run_pii_tick", slow_pii)
+    monkeypatch.setattr(gliner_pipeline, "_run_zero_shot_tick", slow_zero_shot)
+
+    candidates, pii_latency_ms, zero_shot_latency_ms = asyncio.run(
+        gliner_pipeline.extract_candidates_timed("some text", "call-timed")
+    )
+
+    expected_fields = set(gliner_pipeline.PII_FIELD_LABELS) | set(gliner_pipeline.ZERO_SHOT_FIELD_LABELS)
+    assert set(candidates.keys()) == expected_fields
+    assert 40 <= pii_latency_ms < 150
+    assert 150 <= zero_shot_latency_ms < 400
+    assert pii_latency_ms != zero_shot_latency_ms
 
 
 def test_pii_model_receives_only_the_new_transcript_suffix(monkeypatch):
