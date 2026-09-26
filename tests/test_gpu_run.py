@@ -54,6 +54,8 @@ def _patch_ssh_flow(monkeypatch, *, exit_code=0):
             return Mock(returncode=0, stdout="", stderr="")
         if "nvidia-smi" in joined:
             return Mock(returncode=0, stdout="NVIDIA L40S, 49140 MiB", stderr="")
+        if gpu_run._REMOTE_ENV_PATH in joined and "chmod" in joined:
+            return Mock(returncode=0, stdout="", stderr="")
         if "nohup" in joined:
             return Mock(returncode=0, stdout="LAUNCHED\n", stderr="")
         if "cat" in joined:
@@ -313,3 +315,34 @@ def test_wait_for_ssh_connectable_raises_on_timeout(monkeypatch):
 
     with pytest.raises(TimeoutError, match="Connection refused"):
         gpu_run._wait_for_ssh_connectable(ssh_direct, None)
+
+
+def test_write_remote_env_sends_secrets_via_stdin_not_argv(monkeypatch):
+    """A secret value must never appear as a subprocess argument (visible in the pod's own `ps`
+    output) -- it has to travel as piped stdin content instead."""
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    captured = {}
+
+    def fake_run(cmd, **kwargs):
+        captured["cmd"] = cmd
+        captured["input"] = kwargs.get("input")
+        return Mock(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(gpu_run.subprocess, "run", Mock(side_effect=fake_run))
+
+    gpu_run._write_remote_env(ssh_direct, None, {"TYPESAFE_API_KEY": "super-secret-value"})
+
+    assert not any("super-secret-value" in part for part in captured["cmd"])
+    assert "export TYPESAFE_API_KEY=super-secret-value" in captured["input"]
+    assert gpu_run._REMOTE_ENV_PATH in " ".join(captured["cmd"])
+    assert "chmod 600" in " ".join(captured["cmd"])
+
+
+def test_write_remote_env_raises_on_failure(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    monkeypatch.setattr(
+        gpu_run.subprocess, "run", Mock(return_value=Mock(returncode=1, stdout="", stderr="disk full"))
+    )
+
+    with pytest.raises(RuntimeError, match="failed to write remote env file"):
+        gpu_run._write_remote_env(ssh_direct, None, {"FOO": "bar"})
