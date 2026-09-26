@@ -1,0 +1,34 @@
+# Call 099 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=5.5  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management! This is Jenny speaking, how can I help you today?
+Caller: Hi, uh, yeah. I wanted to find out about submitting an application for one of your apartments.
+Agent: Great! We’d be happy to help you with that. Have you had a chance to look at any available units on our website or would you need more details first?
+Caller: I saw a couple online but wanted to make sure about the process... and maybe ask about the prices and stuff.
+Agent: Of course. Do you know which specific apartment you’re interested in or should I go over the general options for you?
+Caller: Uh, I think it was a... two-bedroom? Not sure. I looked at it a few days ago.
+Agent: Let me check on that. Okay, we have a couple of two-bedroom options. Do you remember the community name or anything distinctive about it, like a feature or amenity that caught your eye?
+Caller: No, I don't think it was a community name, but it had like a pool... or maybe a gym. Not too sure though.
+Agent: Got it, our Willow Creek Apartment Homes have both. The two-bedroom there is going for $1,650 to $1,700, depending on the view and floor. Does that sound familiar?
+Caller: Uh, yeah, that sounds about right. Do you... um, need a deposit or something to hold it?
+Agent: We do require a security deposit which is generally the equivalent of one month's rent, and you can submit the application online or over the phone. Have you got a specific move-in date in mind?
+Caller: I was thinking sometime in December... around the first week maybe? But it’s not fixed yet.
+Agent: That works for us! December is still available. Let’s get your application started. Can I have your name, please?
+Caller: It's... uh, Mark. Mark D... er, Daniels. D-A-N-I-E-L-S.
+Agent: Thank you, Mark. And just to confirm, would you like us to handle your application over the phone, or would you prefer to do it online independently?
+Caller: I’d rather do it over the phone if that’s okay. It's easier for me.
+Agent: Absolutely, we can do that. I'll just need your contact info first. Could I get your phone number?
+Caller: Yeah, um, it's 555-0123.
+Agent: Thank you. And an email address we can reach you at?
+Caller: Uh, I’d prefer not to give my email right now. Is that fine?
+Agent: That's okay. We can proceed without it for now. Just remember that email can make reaching out for application updates much quicker.
+Caller: Gotcha.
+Agent: Also, are there any pets you'll be moving in with? We have a pet policy, so it's good to note that early on.
+Caller: No pets, so that's not a problem.
+Agent: Perfect. Now, I'll just go over some terms briefly. The standard application fee is $50. Once submitted, we’ll run a credit and background check. Is that all clear for you?
+Caller: Yeah, that’s fine. Uh, what if I have more questions later? Can I call back?
+Agent: Of course, you can always call us or email if you decide to share your email later. Is there anything else you're curious about right now?
+Caller: Not at the moment, but thanks for explaining things.
+Agent: You're welcome, Mark. When you're ready to complete the application, just give us a call, and we'll finalize it. Thanks for reaching out to Willow Creek Property Management!
+Caller: Okay, thanks. Bye!
+Agent: Bye, have a great day!

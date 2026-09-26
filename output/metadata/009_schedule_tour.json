@@ -1,0 +1,32 @@
+{
+  "scenario": {
+    "id": 9,
+    "category": "prospect",
+    "subtype": "schedule_tour",
+    "edge_case": false,
+    "target_minutes": 2.4,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Sarah Miller",
+    "email": "millsarah@gmail.com",
+    "phone_number": "555-128-9876",
+    "move_in_date": null,
+    "outcome": "scheduled a tour",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ],
+    "fields_withheld_or_unknown": [
+      "move_in_date"
+    ],
+    "estimated_call_seconds": 144
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 60,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 3.0,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Angela Thompson",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "3B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "yes",
+    "work_order_issue": "Leaking kitchen sink",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Work order rescheduled with permission to enter",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 180
+  }
+}

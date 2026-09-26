@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 76,
+    "category": "prospect",
+    "subtype": "application_status_check",
+    "edge_case": false,
+    "target_minutes": 3.5,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jessica Rivera",
+    "email": "jessica.rivera89@gmail.com",
+    "phone_number": null,
+    "unit_number": "204",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "November 15th",
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Application under review, move-in date provided",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 220
+  }
+}

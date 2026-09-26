@@ -1,0 +1,46 @@
+{
+  "scenario": {
+    "id": 99,
+    "category": "prospect",
+    "subtype": "submit_application_over_phone",
+    "edge_case": false,
+    "target_minutes": 5.5,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Daniels",
+    "email": null,
+    "phone_number": "555-0123",
+    "unit_number": null,
+    "amenities_requested": [
+      "pool",
+      "gym"
+    ],
+    "pet_info": "No pets",
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "first week of December",
+    "price_quoted": "$1,650 to $1,700",
+    "budget_amount": null,
+    "outcome": "Information provided about application process, prospective future application expected.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 330
+  }
+}

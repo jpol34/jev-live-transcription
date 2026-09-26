@@ -1,0 +1,23 @@
+# Call 029 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.4  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Maria speaking. How can I help you today?
+Caller: Um, hi, Maria. I'm having, like, a bit of an issue with my fridge. It's, um, not cooling properly.
+Agent: I'm sorry to hear that. Could I get your name and unit number to start off?
+Caller: Sure, my name is Jake, Jake Carmichael. I'm in, um, unit 34B.
+Agent: Alright, Jake, let me just pull that up. Unit 34B... okay, I see it here. So the fridge is not cooling, you said?
+Caller: Yeah, exactly. And I, uh, checked the settings, but it’s still warm inside.
+Agent: I understand. We'll definitely need to get someone out there to take a look. Can I have your phone number just in case our technician needs to reach you?
+Caller: Sure, it’s 555-123-9867.
+Agent: Great, I've got that down. Now about access to your apartment—do you give us permission to enter if you’re not home, or should we call you first?
+Caller: Uh, just give me a call first. I should be around, but just in case.
+Agent: Absolutely. So just to clarify, the issue is with the refrigerator not cooling. Is there anything else that you’ve noticed with it?
+Caller: Nope, that's about it. Everything else seems fine.
+Agent: Okay, I’ve noted that down. Do you have any pets that we should be aware of when we enter?
+Caller: Oh! Yeah, sorry, I forgot—uh, I have a cat. His name is Whiskers.
+Agent: Thanks for letting us know, Jake. I’ll add that to the notes. So, anything else I can help you with today?
+Caller: No, that’s all for now. Just need this fridge sorted out.
+Agent: Not a problem. I'll create a work order for our maintenance team, and they'll be in touch with you shortly. And remember, they’ll give you a call before they head over.
+Caller: Great, thanks for your help, Maria.
+Agent: You're welcome, Jake! Have a good day.
+Caller: You too, bye!

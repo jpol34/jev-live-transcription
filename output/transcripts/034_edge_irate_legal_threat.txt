@@ -1,0 +1,25 @@
+# Call 034 — resident / edge_irate_legal_threat
+# edge_case=True  target_minutes=5.7  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Alex, how can I assist you today?
+Caller: Hi, uh, this is Jerry Watson. I'm, I'm actually pretty upset right now because I've reported an issue in my apartment multiple times, and nothing's been done yet.
+Agent: I'm really sorry to hear that, Jerry. Let me see how I can help. Can I start by verifying your unit number, please?
+Caller: Yes, it's 102B. You should have it on file since I've called in like three times already.
+Agent: Thank you for that. And what seems to be the issue you're facing?
+Caller: It's the leaking sink in the kitchen. It's been two weeks now. I can't believe I have to keep explaining this.
+Agent: I apologize for the delay. Let me just pull up your records here... it seems there was a maintenance request logged. Can I place you on a brief hold while I check with our maintenance team for an update?
+Caller: Fine, I guess, just make sure it's quick.
+Agent: Sure thing, one moment please.
+Agent: [background hold music] Thank you for holding, Jerry. It looks like there was an attempt to fix it, but they noted they couldn’t get access to your unit. Did someone not come by?
+Caller: No one called or even knocked on my door! It's like they made it up just to cover their, you know, backsides.
+Agent: I'm truly sorry for this oversight. I'll make sure we get someone out there. Would you like us to call first, or do you give permission for entry in case you're not home?
+Caller: You can have permission to enter. I just want it fixed, and honestly, it's their job to get it sorted without needing me around every time.
+Agent: Understood. I'll escalate this to our facilities manager to ensure it's prioritized. I really appreciate your patience during this.
+Caller: Well, I'm fed up. I'm considering legal action because this is ridiculous. I'm not getting what I'm paying for, and it's caused water damage too.
+Agent: I completely understand your frustration, and we certainly don’t want it to reach that point. Let's ensure maintenance gets out to you immediately. Could I confirm your best contact number, just in case we need to reach out about scheduling?
+Caller: Uh, it should be on file, but I'll give it to you anyway. It's 555-0198. And, seriously, if I don't hear back from you or see some action today, I'm going to see my lawyer.
+Agent: Thank you for confirming that, Jerry. I'll personally follow up on this matter and email or call with the details. Could I have your email, just in case?
+Caller: Sure, it's jwatson@yahoo.com, but, really, just fix the sink. That's what matters now.
+Agent: Absolutely. Again, I'm really sorry for the inconvenience. I'll be on top of this and reach out shortly. If there's anything else you need, feel free to reach out directly. I'm here to help.
+Caller: Okay, thank you. I'll be waiting to hear from you soon.
+Agent: Thank you, Jerry. Take care, and we’ll talk soon.

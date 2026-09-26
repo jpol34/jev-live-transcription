@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 57,
+    "category": "prospect",
+    "subtype": "submit_application_over_phone",
+    "edge_case": false,
+    "target_minutes": 5.7,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Sarah Cooper",
+    "email": "sarah.cooper@yahoo.com",
+    "phone_number": "555-283-9481",
+    "move_in_date": "December 1st",
+    "price_quoted": "$1,200 to $1,300",
+    "pet_info": "Chihuahua, no special registrations",
+    "outcome": "Application instructions emailed",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date",
+      "price_quoted",
+      "pet_info"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 342
+  }
+}

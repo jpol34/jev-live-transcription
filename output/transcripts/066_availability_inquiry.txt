@@ -1,0 +1,24 @@
+# Call 066 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.2  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa. How may I assist you today?
+Caller: Uh, hi. I'm, um, looking for information about, uh, renting an apartment at, uh, Willow Creek Apartments. Do you have, like, um, any availability?
+Agent: Absolutely, I can help with that. May I have your name, please?
+Caller: Oh, yeah, it's, uh, Sam... Samantha. Sorry about that, just a bit flustered.
+Agent: No worries at all, Samantha. Can I also get your phone number in case we get disconnected?
+Caller: Uh, sure, it's 555-0134.
+Agent: Great, thank you. And are there specific dates you're looking to move in?
+Caller: Oh, um, yeah... maybe around the middle of next month? Or, um, the start of the month if possible.
+Agent: Okay. Let me check our availability for you. Please hold on a moment.
+Caller: Sure, take your time. I don't have everything organized yet.
+Agent: Alright, Samantha, I've checked our listings. It looks like we do have some one-bedroom and two-bedroom units available for mid next month. Do you have any preference on the size, or...?
+Caller: Um, I'm not too sure yet. Maybe a one-bedroom, uh, depending on the price, you know?
+Agent: No problem. Our one-bedroom units start around $1,200 a month. Does that fit into your budget?
+Caller: Uh, let me think... yeah, I think that would be fine. I might need to check with my budget again though.
+Agent: That's understandable. Are there any particular amenities you're looking for in the complex?
+Caller: Oh, um, amenities? Do you have, like, um, a gym or a pool?
+Agent: Yes, we do have both a gym and a pool available to residents.
+Caller: Okay, cool. That’s good to know. Hmm, I might need to ask my partner about some of this stuff, you know?
+Agent: Of course, feel free to give us a call back if you have more questions or if you'd like to set up a tour.
+Caller: Thank you. I’ll definitely do that. You've been really helpful!
+Agent: You're welcome, Samantha. Have a great day!

@@ -1,0 +1,24 @@
+# Call 041 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.4  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa. How can I help you today?
+Caller: Hi, um, this is Tom. I live over at Willow Creek Apartment Homes, and I've got a, um, well, a small issue with my... faucet. It's dripping and... you know, it's just getting a bit annoying.
+Agent: Oh no, that sounds frustrating. I can help with that. Can I get your last name, Tom?
+Caller: Sure, it's Johnson. Uh, with a 'J', H-O-H, sorry, J-O-H-N-S-O-N.
+Agent: Thanks for that, Tom. And you're in Building 3, is that right?
+Caller: Actually, uh, no. I'm in Building 5, unit uh, 507.
+Agent: Got it. Building 5, Unit 507. Uh, and just to confirm, your phone number?
+Caller: It's 555-123-7890. I think that's the one you have on file, right?
+Agent: Let me double-check. Yeah, that's what we have. So, the faucet's dripping... is it the bathroom or kitchen faucet?
+Caller: Oh, sorry, it's the kitchen faucet. Every time I turn it off, it's just... drip, drip, drip.
+Agent: Okay, kitchen faucet in Unit 507. No worries, we'll get someone out there. Uh, do you have any pets that maintenance should be aware of?
+Caller: Nope, no pets here.
+Agent: Great, and do we have permission to enter your apartment if you're not home, or should we call you first?
+Caller: Uh, it's okay to enter. I should be around, but just in case, it's fine.
+Agent: Great, thank you. I'll put in that work order for you. It might be tomorrow or the day after when someone can come by. Do you have any specific timings when it would be more convenient?
+Caller: Um, well, I'm usually away in the mornings for work. The afternoons are better if possible.
+Agent: Alright, I'll note that. We try to accommodate whenever we can. Is there anything else you need help with while I have you here?
+Caller: No, that's all for now. Thanks, Lisa.
+Agent: You're welcome, Tom. If anything else comes up or you need to follow up, you're always welcome to give us another call. Have a great day!
+Caller: Thanks, you too! Bye!
+Agent: Goodbye!

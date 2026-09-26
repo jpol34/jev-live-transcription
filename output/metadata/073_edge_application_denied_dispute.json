@@ -1,0 +1,41 @@
+{
+  "scenario": {
+    "id": 73,
+    "category": "prospect",
+    "subtype": "edge_application_denied_dispute",
+    "edge_case": true,
+    "target_minutes": 5.4,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Alex Goodman",
+    "email": "alexg@mail.com",
+    "phone_number": "555-0198",
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": "$1,200",
+    "budget_amount": null,
+    "outcome": "Caller agreed to resend missing documentation for application review.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "budget_amount",
+      "unit_number"
+    ],
+    "estimated_call_seconds": 324
+  }
+}

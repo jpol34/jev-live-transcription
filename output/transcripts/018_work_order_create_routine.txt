@@ -1,0 +1,26 @@
+# Call 018 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.9  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. My name's Anna. How can I help you today?
+Caller: Hi, um, this is Sam... Samantha Robertson. I'm calling from Willow Creek Apartment Homes, uh, about a maintenance issue I have in my unit.
+Agent: Sure thing, Samantha. What seems to be the issue with your unit?
+Caller: Well, um, it's the kitchen sink. It seems to be leaking underneath.
+Agent: Oh, that's no good. We can definitely get that checked out. Can you confirm your unit number for me?
+Caller: Yeah, it's 302. Sorry, I should've mentioned that earlier.
+Agent: No trouble at all, 302. And just to verify, could I get your phone number?
+Caller: Sure, it's 555-0193. Did you get that?
+Agent: Got it, 555-0193. Thanks. And do you happen to have any pets that we should be aware of when entering your apartment?
+Caller: Uh, no, no pets here.
+Agent: Great, thanks for that. Now about when we can come to fix the sink, do we have your permission to enter the unit if you're not home, or would you prefer that we call you first?
+Caller: Hmm, uh, actually can you call me first? I should be around, but just in case, a heads up would be nice.
+Agent: Sure thing, we will call you before. So, just a leak under the sink, correct? Nothing else you've noticed?
+Caller: Oh! You know what? I did forget to mention... there's also a weird noise when I turn the cold water on.
+Agent: Aha, thank you for noting that. We'll make sure the maintenance team checks both issues. I'll jot that down as well. Weird noise with the cold water. Got it.
+Caller: Thanks, Anna. When do you think someone might be able to take a look?
+Agent: Let me just check our maintenance schedule... okay, we could potentially have someone there tomorrow afternoon. Would that work for you?
+Caller: Uh, yeah, I think so. Around what time, though? I might need to step out for a bit but should be back.
+Agent: We should be able to send someone around 2 PM, give or take. If anything changes, we'll be sure to call you at your number.
+Caller: Sounds good. Thanks for the help.
+Agent: You're welcome, Samantha! I'll create a work order right away. If you have any questions, feel free to call us back. Have a great day!
+Caller: Will do, thanks, Anna. Bye.
+Agent: Goodbye!

@@ -1,0 +1,30 @@
+{
+  "scenario": {
+    "id": 5,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 3.0,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark",
+    "unit_number": "505",
+    "work_order_issue": "leaky faucet in kitchen",
+    "permission_to_enter": "yes",
+    "outcome": "Provided update on work order status and scheduled repair",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 180
+  }
+}

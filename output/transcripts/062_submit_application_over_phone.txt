@@ -1,0 +1,29 @@
+# Call 062 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=4.8  disclosure_style=cooperative
+
+Agent: Good afternoon! Thank you for calling Willow Creek Property Management. This is Mark speaking. How can I help you today?
+Caller: Hi Mark, uh, my name is Lisa Tanner, and I'm interested in applying for an apartment at, uh, Willow Creek Apartment Homes.
+Agent: Hi Lisa! That's great. Let me just pull up some information here. Okay, can you tell me a bit about what you're looking for? Like, ah, your preferred move-in date?
+Caller: Sure, um, I'm thinking maybe around January 15th. Does that sound too late or...?
+Agent: January 15th works just fine. Let’s start with some basics. Could you spell your last name for me, just to make sure I have it correct?
+Caller: Uh-huh, it’s T-A-N-N-E-R.
+Agent: Got it, Tanner. And Lisa, do you have an email address where we can send an application link?
+Caller: Yes, it's, um, lisatanner91@gmail.com.
+Agent: Perfect. And a phone number, just in case we need to reach you for any updates or questions?
+Caller: Sure, it's 555-0182. Uh, let me give you the area code too, it's, uh, 310.
+Agent: 310-555-0182, got it. Now, about the apartment, do you have any specific preferences in terms of... number of bedrooms or floor?
+Caller: Oh, well, a one-bedroom would be ideal. I’d like something on the second or third floor, if possible.
+Agent: We can definitely look into availability on those floors. Uh, do you have any pets that might be moving in with you?
+Caller: Uh, no pets at the moment. It's just me.
+Agent: All right. That's good to know. Now, have you had a chance to look over our pricing, or would you like me to go over that with you?
+Caller: I did, uh, glance over it online, but if you could confirm the pricing for a one-bedroom, that'd be great.
+Agent: Of course! Our current one-bedroom units range from $1,200 to $1,350, depending on the floor and view. Does that fit within your budget?
+Caller: Yeah, that's, uh, that sounds about right. I think I can manage that range.
+Agent: Good to know! So, I'll send you that application link to lisatanner91@gmail.com. Just let us know if you have any questions while filling it out.
+Caller: I will, thanks. And, just to check, how long does the application process typically take?
+Agent: Once we have everything submitted, it usually takes between two to three business days. We’ll double-check references and run a quick credit check.
+Caller: Great, I appreciate the information. And, um, what if I have questions while I'm filling it out?
+Agent: Feel free to give us a call anytime, or you can reply to the email I’m sending you. We're here to help!
+Caller: Perfect, will do. Thanks, Mark!
+Agent: Absolutely, Lisa. We're excited to potentially have you at Willow Creek! Have a great day.
+Caller: You too, bye!

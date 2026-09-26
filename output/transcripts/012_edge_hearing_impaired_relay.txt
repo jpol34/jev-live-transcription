@@ -1,0 +1,29 @@
+# Call 012 — prospect / edge_hearing_impaired_relay
+# edge_case=True  target_minutes=4.5  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management, this is Tracy speaking, how can I assist you today?
+Caller: (via relay service, with background noise of dogs barking) Hi, uh, yeah, I'm, uh, sorry I'm using the relay service today, the, um, thing is, I'm looking to move—move into one of your, uh, communities soon, hopefully.
+Agent: Of course! We can help with that. Can I start by getting your name?
+Caller: Sure, uh, it's Megan. Megan Hines.
+Agent: Thank you, Megan. And just to confirm, you're interested in our apartment homes at Willow Creek?
+Caller: Uh, yes, yes. But, um, I'm needing to move in real soon, like possibly even next month? Do you have anything?
+Agent: Okay, um, let me check our availability for—could you repeat the month? The relay connection cut out slightly there.
+Caller: (background noise lessens) Oh, sorry, yes, uh, next month, November. Like early, er, middle of it?
+Agent: Got it, November. Let me just—um, can you hold for a moment while I check that for you?
+Caller: Mm, sure, um, I'll wait.
+Agent: Thank you. [Hold music briefly plays] Alright, Megan, we do have a couple of units coming available around mid-November. Are you able to visit for a tour or are you looking to get more info over the phone?
+Caller: Uh, no, no, can't visit right now. It's hard with my current work—um, can I get some of the, like, details about units and prices?
+Agent: Absolutely, I can help with that. Is there a particular unit size you're interested in?
+Caller: Oh, just a one-bedroom would be great. Um, not too picky, just, uh, need it to fit my budget—
+Agent: Of course, budgets are important. So our current pricing for one-bedroom apartments is between $1,200 and $1,450, depending on the floor plan. Does that fit within what you're looking for?
+Caller: Uh, yeah, I think that works—oh, wait, I might have to stretch just, uh, just a little bit, are there maybe fees or anything?
+Agent: There are some additional fees, like for amenities, and we also require a security deposit... is there specific info I can email you, perhaps?
+Caller: Yeah, um, email's good, it's, uh—shoot, hang on, [muffled shuffling] okay, it's meghines78@gmail.com.
+Agent: Thanks for that. Just to confirm, that's M-E-G-H-I-N-E-S-7-8-@gmail.com?
+Caller: Yes—oh, no, wait, wait—it's Megan, with an A, not MEG, sorry! M-E-G-A-N.
+Agent: Got it, Megan, thank you for clarifying. I’ll send the detailed info over ASAP. And if you think of any more questions, you can reply directly to that email.
+Caller: Great, thanks. Sorry about the, uh, back and forth here—this is kind of, um, overwhelming to do through relay.
+Agent: No problem at all, I understand. Was there anything else I can assist you with today?
+Caller: Um, no, I think that’s all. I’ve taken enough of your time—thank you again!
+Agent: You’re welcome, Megan. Have a great day, and feel free to reach out if you need further assistance. Goodbye!
+Caller: Bye.

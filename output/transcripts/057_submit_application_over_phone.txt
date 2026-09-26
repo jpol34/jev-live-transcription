@@ -1,0 +1,35 @@
+# Call 057 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=5.7  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Amanda speaking, how can I help you today?
+Caller: Hi Amanda, my name's Sarah Cooper. I'm interested in submitting an application for Willow Creek Apartment Homes. Can you help me with that?
+Agent: Absolutely, Sarah. I'd be happy to assist you with the application process. Could you please spell your last name for me?
+Caller: Sure, it's C-O-O-P-E-R.
+Agent: Great, thank you. And, um, do you mind if I start by getting your email address to send over the application materials?
+Caller: No problem. It's sarah.cooper@yahoo.com.
+Agent: Let me repeat that back to you—sarah.cooper at yahoo.com, correct?
+Caller: That's right.
+Agent: Perfect. And just to ensure I have everything right here, would you mind sharing your phone number?
+Caller: Yeah, it's 555-283-9481.
+Agent: Alright, 555-283-9481. Got it. Now, uh, have you taken a tour of the apartments yet, or is that still on your list?
+Caller: I took a tour last weekend. It was really nice.
+Agent: Wonderful! And are you looking to move in on a specific date, or is that flexible?
+Caller: I'm looking to move in around December 1st.
+Agent: December 1st, okay, we can certainly aim for that. Um, I just want to confirm, during your tour, did you receive any information regarding apartment pricing? Do you have a budget range in mind?
+Caller: I think they mentioned somewhere around $1,200 to $1,300 for a one-bedroom. Is that still accurate?
+Agent: Yes, that's generally the range we're looking at for our one-bedrooms here. Just to clarify—$1,200 to $1,300, right?
+Caller: Yes, that's correct.
+Agent: Excellent. And do you have any pets that you'll be bringing along with you?
+Caller: I do. I have a small dog, a Chihuahua.
+Agent: Oh, that sounds lovely! We are pet-friendly here, just so you know there’s a pet fee and a pet rent. Is your dog under any specific services we need to be aware of? Like certification or support animal registration?
+Caller: No, she's just a regular pet. No special registrations.
+Agent: Perfect, thanks for sharing. And during the application process, we'll also need to run a background check. Does that sound okay to you?
+Caller: Yes, that's fine.
+Agent: Great. Now, are there any particular questions or concerns you have about the lease terms or the application process?
+Caller: I think I'm good on questions, just eager to get started.
+Agent: Sounds good. I'll send over the application to the email address you provided. You should see it within the next 10 minutes.
+Caller: Perfect, I'll keep an eye out for it.
+Agent: And if anything comes up or you remember any other details you want to share, feel free to give us another call.
+Caller: I will, thank you so much for your help, Amanda.
+Agent: You're welcome, Sarah. Have a great day!
+Caller: You too. Bye!

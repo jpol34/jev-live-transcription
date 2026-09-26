@@ -1,0 +1,43 @@
+{
+  "scenario": {
+    "id": 90,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.6,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Dan Ovens",
+    "email": null,
+    "phone_number": "555-0199",
+    "unit_number": null,
+    "amenities_requested": [
+      "in-unit laundry",
+      "pool"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "November 30",
+    "price_quoted": null,
+    "budget_amount": "$1,200-$1,400",
+    "outcome": "information provided",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "move_in_date",
+      "budget_amount",
+      "amenities_requested"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 216
+  }
+}

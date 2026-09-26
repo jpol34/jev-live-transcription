@@ -1,0 +1,27 @@
+# Call 074 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=4.1  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jamie speaking. How can I help you today?
+Caller: Hi Jamie, uh, this is Sarah Benson. I was looking to submit my application for Willow Creek Apartment Homes... uh, but I'm kinda new to this, so I'm not sure what the next steps are.
+Agent: Hi Sarah! No worries at all. I'm here to help. Have you already filled out the application form online, or would you like to do that together over the phone?
+Caller: Oh, great. Yeah, I started it online but, um, got stuck on a few parts. Could we finish it together now?
+Agent: Absolutely. Let me pull up your file... Can you just confirm your email address for me?
+Caller: Sure, it's sbenson... uh, at gmail dot com. Should I spell that for you?
+Agent: Got it, sbenson at gmail dot com. Alright, and I do see your partial application here. Let’s start with, uh, your phone number to make sure we have the correct one.
+Caller: Yes, my number is 555-123-7890.
+Agent: Okay, 555-123-7890, thank you. Now, do you have a particular move-in date you’re aiming for?
+Caller: Um, I was thinking around... maybe December 1st? Does that work?
+Agent: December 1st should be doable. Let me just check availability really quick... Could I put you on a brief hold?
+Caller: Sure, no problem.
+Agent: Thank you. [pause] Alright, thanks for holding, Sarah. December 1st works, so we can proceed with that date. Now, for the, uh, rent payments, were you quoted a price?
+Caller: Yeah, I think it was around $1350 per month?
+Agent: Great, $1350 is the right amount. I’ll confirm that. And do you have any pets that we should be aware of?
+Caller: Yes, I have a cat. Just one, though.
+Agent: Got it, thank you. We do allow cats, so that’s no issue. There might be a small additional monthly fee for the pet.
+Caller: Alright, that’s fine.
+Agent: Perfect! So just to recap for the application, I've got your email as sbenson at gmail dot com, phone number 555-123-7890, aiming for a move-in on December 1st with a rent price at $1350, and a cat. Does that all look correct?
+Caller: Yes, that sounds perfect.
+Agent: Excellent. I’ll finalize your application now, and you'll receive a confirmation email with the next steps shortly after we’re done.
+Caller: Alright, thanks so much for your help, Jamie!
+Agent: You’re very welcome, Sarah. If you have any other questions, feel free to call us back. Have a great day!
+Caller: Thanks, you too!

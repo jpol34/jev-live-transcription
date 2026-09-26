@@ -1,0 +1,35 @@
+{
+  "scenario": {
+    "id": 34,
+    "category": "resident",
+    "subtype": "edge_irate_legal_threat",
+    "edge_case": true,
+    "target_minutes": 5.7,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jerry Watson",
+    "email": "jwatson@yahoo.com",
+    "phone_number": "555-0198",
+    "unit_number": "102B",
+    "work_order_issue": "leaking sink in kitchen",
+    "permission_to_enter": "yes",
+    "outcome": "escalated to facilities manager with promise of follow-up",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number",
+      "permission_to_enter",
+      "email"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 345
+  }
+}

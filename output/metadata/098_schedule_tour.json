@@ -1,0 +1,33 @@
+{
+  "scenario": {
+    "id": 98,
+    "category": "prospect",
+    "subtype": "schedule_tour",
+    "edge_case": false,
+    "target_minutes": 2.3,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Emily Thompson",
+    "email": "emily.thompson22@gmail.com",
+    "phone_number": "555-4312",
+    "move_in_date": "January",
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "tour_scheduled",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 138
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "scenario": {
+    "id": 52,
+    "category": "resident",
+    "subtype": "work_order_create_emergency",
+    "edge_case": true,
+    "target_minutes": 3.6,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Tom Rogers",
+    "phone_number": "555-0198",
+    "unit_number": "10C",
+    "work_order_issue": "Toilet flooding bathroom",
+    "permission_to_enter": "call_first",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 230
+  }
+}

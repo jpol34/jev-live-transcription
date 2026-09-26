@@ -1,0 +1,28 @@
+# Call 032 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=5.8  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, this is Jasmine, how can I assist you today?
+Caller: Uh, hi Jasmine, my name is, uh, Greg... uh, Gregory Sanders, and I'm calling about an issue that hasn't been, you know, resolved yet.
+Agent: Oh, I'm sorry to hear that, Gregory. Can you tell me more about the issue you're experiencing?
+Caller: Yeah, it's about my, uh, the leaky faucet in my unit. It's been over a week since I filed the work order.
+Agent: I see, I'm really sorry for the delay. Can I get your unit number to check the status of the work order please?
+Caller: Sure, it's uh, hmm... 2B, I think, no wait! It's 3B, sorry about that.
+Agent: No worries, Gregory. Let me pull up your information, and we'll see what's happening. Can I just put you on a brief hold?
+Caller: Uh, yeah, that's fine.
+Agent: [Pause, typing noises] Thanks for waiting. So it looks like there's a delay because we're waiting on a part to fix the faucet.
+Caller: Yeah, that's what they said last time too... Is there any way you can, uh, expedite the process? It's really becoming a hassle now.
+Agent: I completely understand, Gregory. Unfortunately, it seems like the supplier had some shipping delays. I'll escalate this issue for you. Can I confirm your phone number to update you?
+Caller: Yeah, it should be 347-555-0136. Oh wait, um, can I change it? The number I've been using is a bit different.
+Agent: Of course, just let me know the correct number.
+Caller: It's 347-555-0101, not the other one.
+Agent: Thank you, I'll make sure we use that number for follow-ups. Would you like us to call first before sending someone?
+Caller: Oh, um, no need to call first. Just come by when you can fix it.
+Agent: Alright, thanks for confirming that. I've marked it down here. Is there anything else troubling you in the unit that we should be aware of?
+Caller: No, um, well actually, now that I think of it, the bathroom light is flickering too. But, uh, if you could just focus on the faucet first, that'd be great.
+Agent: Certainly, I'll prioritize the faucet and note the flickering light so it can be addressed soon after.
+Caller: Yeah, that flickering isn't too urgent. Just maybe check it if someone is already here. Thanks.
+Agent: Understood, I'll make sure this is conveyed clearly to our maintenance team. We'll keep you updated on the faucet situation.
+Caller: Okay, thanks, Jasmine. I really appreciate you helping with this.
+Agent: You're welcome, Gregory. If you have any other concerns, feel free to call us anytime. I hope we can resolve this swiftly for you.
+Caller: Yeah, you too, take care.
+Agent: Goodbye.

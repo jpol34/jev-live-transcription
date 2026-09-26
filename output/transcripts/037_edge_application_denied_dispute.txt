@@ -1,0 +1,31 @@
+# Call 037 — prospect / edge_application_denied_dispute
+# edge_case=True  target_minutes=5.5  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. My name is Lisa. How can I assist you today?
+Caller: Uh, hi, Lisa, I—I'm calling because I just got an email that my application for Willow Creek Apartment Homes was denied, and I'm really confused because I, uh, thought everything was in order, you know?
+Agent: I'm sorry to hear that. I can certainly look into this for you. Could I have your full name, please?
+Caller: Sure, it’s Jake... uh, Jake Sanderson. Sorry, it's a bit noisy, I'm outside right now.
+Agent: No worries, Jake. I can hear you fine. Let’s see, let me pull that up. Can I have the phone number you used for the application?
+Caller: Right, um, I think I used my cell: 718-555-4829.
+Agent: Thank you. Let me just confirm that... Okay, and would you have the email address associated with your application on-hand?
+Caller: Oh, it's... uh, sanderson.jake at, uh, gmail dot com. I think I got that right.
+Agent: Got it. It will take just a moment for me to find your application. Could you hold on for a minute or two?
+Caller: Yeah, uh, that’s fine. I can wait a bit.
+Agent: [Brief hold music] Thank you for holding, Jake. I’ve found your application. It's showing here that it was denied due to some credit history discrepancies. Have you been able to check your credit report recently?
+Caller: What? No, I haven't—I mean, I did last year and there were no issues then. This doesn’t make sense! Can you, uh, double-check if there’s anything specific?
+Agent: I understand how troubling this can be. Let me see if there are any additional notes... Hm, it mentions an inconsistency in the reported credit score. Sometimes there's a delay in report updates. Have you had, by any chance, some changes or recent issues that might not be reflected yet?
+Caller: Not that I know of! I mean, I paid off a card recently, but that should be good news, right?
+Agent: Generally, yes. These things can sometimes take a while to be accurately reflected. Have you recently been quoted a rental price for your application?
+Caller: Uh, yeah, my last interaction mentioned $1,450 or... could it have been $1,475? I'm not totally sure.
+Agent: Noted. Listen, since this might be a temporary mismatch, we can escalate your case for a review. Would you like me to do that?
+Caller: Yes, please. I'd really appreciate any help. I just thought everything was lined up with the job and move and all.
+Agent: Understandably, Jake. We’ll look into this further and see if there’s a way we can expedite a second review. Meanwhile, if you have a recent credit report you can access, it might help to send it over to our email, allowing us to have more current info.
+Caller: Sure, I can do that. Just to verify—what email should I send it to? And how soon do you need it?
+Agent: You can send it to reviews@willowcreekpm.com. Try to send it by end of day, so it’s in the queue for tomorrow morning. That should help speed things up.
+Caller: Alright, I’ll make sure to do that. Thanks, Lisa. Just... overwhelmed with all this, you know?
+Agent: I completely understand, Jake. Moving can be stressful enough without these hiccups. We'll do our best to sort this out for you quickly.
+Caller: Great, thanks again. Do I need to call back for updates or...?
+Agent: You can expect to hear back from us, hopefully, within a day or two. If you haven't heard anything by then, feel free to give us a call. Is there anything else I can assist you with right now?
+Caller: No, that's all. You've been really helpful. Thanks a lot.
+Agent: You’re welcome, Jake. Take care and we'll be in touch soon.
+Caller: Will do. Bye.

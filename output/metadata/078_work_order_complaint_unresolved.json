@@ -1,0 +1,33 @@
+{
+  "scenario": {
+    "id": 78,
+    "category": "resident",
+    "subtype": "work_order_complaint_unresolved",
+    "edge_case": true,
+    "target_minutes": 5.2,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "John Johannsen",
+    "phone_number": "555-1012",
+    "unit_number": "5B",
+    "work_order_issue": "leaking kitchen sink not fixed",
+    "permission_to_enter": "call_first",
+    "outcome": "work order re-escalated with call back requested for entry",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 312
+  }
+}

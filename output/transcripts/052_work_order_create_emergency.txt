@@ -1,0 +1,25 @@
+# Call 052 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=3.6  disclosure_style=guarded
+
+Agent: Willow Creek Property Management, this is Jenna speaking. How can I assist you today?
+Caller: Uh, hi, Jenna? It's, uh, it's Tom... Tom Rogers. I need help with something urgent.
+Agent: Of course, Tom. I'm here to help. What seems to be the problem?
+Caller: It's, uh, flooding in my bathroom. The water's... it's everywhere.
+Agent: Oh no, that sounds terrible. Let me get a few details from you so we can send someone out right away. Could you confirm your unit number, please?
+Caller: It's... uh, just a second. The number's 10A... no, wait, it's 10C. Yeah, 10C.
+Agent: Got it, 10C. And your phone number, just in case we get disconnected?
+Caller: Uh, I don't quite remember... hold on, let me find my phone. It's... it's here somewhere.
+Agent: Take your time, Tom. I'll hold.
+Caller: (muffled) Sorry, it's chaos here. Okay, it's 555-0198.
+Agent: Thanks, Tom. 555-0198, correct?
+Caller: Yeah, that's right. Can you hurry? The water’s creeping under the door.
+Agent: Absolutely, I'll expedite this. Can you tell me exactly what's causing the flooding? Is it a burst pipe?
+Caller: Uh, I think it's the toilet... it just won't stop running.
+Agent: Understood. That sounds like an emergency. I'll get someone there ASAP. Do we have permission to enter your unit if you're not home?
+Caller: Well, I'm here now, but... uh, I might have to step out later. So just fix it.
+Agent: I understand, Tom. We’ll do our best to resolve it quickly. Is there any additional information you can give us?
+Caller: No, just... please hurry. It's getting worse by the second.
+Agent: Okay, we'll dispatch maintenance as quickly as possible. Is there anything else I can assist you with in the meantime?
+Caller: No, just get someone here, please. Thanks, uh, Jenna.
+Agent: Absolutely. Hang tight, Tom. We’ll be there soon. Goodbye!
+Caller: Yeah, bye. Thanks.

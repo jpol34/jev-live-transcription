@@ -1,0 +1,44 @@
+{
+  "scenario": {
+    "id": 47,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.1,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "John Jeffries",
+    "email": null,
+    "phone_number": "555-8789",
+    "unit_number": "23B",
+    "amenities_requested": null,
+    "pet_info": "cat",
+    "permission_to_enter": "call_first",
+    "work_order_issue": "leaking kitchen sink",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "work order created for maintenance issue",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "pet_info",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 186
+  }
+}

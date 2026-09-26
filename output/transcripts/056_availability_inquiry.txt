@@ -1,0 +1,24 @@
+# Call 056 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.1  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sofia. How can I help you today?
+Caller: Uh, hi there! This is Tim. I'm curious about the apartment availabilities at the Willow Creek Apartment Homes.
+Agent: Hi Tim, nice to have you on the line. Sure, I can help with that. Are you looking for availability for a specific move-in date?
+Caller: Yeah, actually, I'm, uh, aiming for around mid-November. Is that possible?
+Agent: Alright, mid-November. Let me just check on that...one second.
+Agent: [typing] We've been a bit busy, so thanks for your patience! Looks like we do have a few options available. Are you looking for any specific amenities?
+Caller: Uh, definitely. I'm hoping for a place with, um, in-unit laundry if that's available. Maybe a gym?
+Agent: In-unit laundry and a gym, got it. We have a couple of units that match that. And are you interested in one or two bedrooms?
+Caller: One bedroom is fine, but, sorry, you don't have any pool access, right?
+Agent: Sure, so you'd prefer one bedroom. And actually, we do have pool access for residents. Would you like that included too?
+Caller: I thought you didn't have one. Alright, yeah, a pool sounds great!
+Agent: Perfect. And do you have a budget you're working with so I can guide you best?
+Caller: Yeah, I'm looking to keep it around, um, maybe $1200 a month if possible?
+Agent: [typing] Okay, $1200, that's helpful that you've given me a range. I see one unit that fits your criteria. Would you like to schedule a tour or speak about leasing?
+Caller: Uh, I'd like more info or a tour possibly. Could I, uh, give you a call back with more details?
+Agent: Certainly! Do you mind if I get your phone number to follow up in case we have updates?
+Caller: Sure, it's 555-8734. Oh, sorry, it's actually 555-7834.
+Agent: Great, 555-7834. Perfect, Tim. Is there anything else you'd like to know right now?
+Caller: No, that should be it for now, but thanks Sofia, really appreciate it.
+Agent: Of course, Tim! Feel free to reach out anytime. Have a wonderful day!
+Caller: Thanks! You too!

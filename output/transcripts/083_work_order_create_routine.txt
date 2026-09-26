@@ -1,0 +1,25 @@
+# Call 083 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.4  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sandra, how can I assist you today?
+Caller: Uh, hi. Yeah, I'm calling about, um, needing some maintenance in my apartment.
+Agent: Of course! Can I start off with your name, please?
+Caller: Oh, it's Mark. Mark Reynolds.
+Agent: Thank you, Mark. And could you give me your unit number so I can pull up your details?
+Caller: Yeah, it's... uh, wait a sec. Oh, right, it's 4B.
+Agent: Perfect, 4B. And what seems to be the issue today?
+Caller: The kitchen... uh, the sink. It's leaking all over the place.
+Agent: Oh no, we’ll definitely get someone on that. Um, could you specify if it's leaking from the faucet or underneath the sink?
+Caller: I think it's underneath... it just started yesterday evening.
+Agent: Alright, got it. And just to confirm, do we have permission to enter your unit if you’re not home when maintenance is available?
+Caller: Uh, sure. Yeah, that's fine.
+Agent: Thank you. Also, just for safety, do you have any pets we should be aware of?
+Caller: Uh, no pets. Not at the moment, no.
+Agent: Great, thanks for that. And can I confirm your phone number, Mark, in case maintenance needs to give you a call?
+Caller: Oh, right. It's, uh, 555-0198. Wait, hold up, it's actually 555-0199.
+Agent: Got it, 555-0199. Anything else you need help with while I've got you?
+Caller: No, I think that's it for now. Just need that sink fixed.
+Agent: Alright then, we'll get someone out there as soon as possible. You can expect a call if they need further assistance.
+Caller: Sounds good. Thanks, Sandra.
+Agent: You're welcome, Mark. Have a great day!
+Caller: You too, bye.

@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 80,
+    "category": "resident",
+    "subtype": "edge_duplicate_work_order",
+    "edge_case": true,
+    "target_minutes": 2.6,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": null,
+    "email": "j.doe12@example.com",
+    "phone_number": null,
+    "unit_number": "21B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": "leaking faucet",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "work order rescheduled",
+    "fields_disclosed": [
+      "unit_number",
+      "email",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [
+      "caller_name",
+      "phone_number",
+      "permission_to_enter"
+    ],
+    "estimated_call_seconds": 156
+  }
+}

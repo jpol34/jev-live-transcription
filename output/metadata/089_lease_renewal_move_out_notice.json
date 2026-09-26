@@ -1,0 +1,43 @@
+{
+  "scenario": {
+    "id": 89,
+    "category": "resident",
+    "subtype": "lease_renewal_move_out_notice",
+    "edge_case": false,
+    "target_minutes": 5.0,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email",
+      "move_in_date",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mike",
+    "email": "mike.taylor23@gmail.com",
+    "phone_number": null,
+    "unit_number": "203B",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "June 2022",
+    "price_quoted": "$1,250",
+    "budget_amount": null,
+    "outcome": "Caller to decide on lease renewal within a week.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number",
+      "move_in_date",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number",
+      "budget_amount"
+    ],
+    "estimated_call_seconds": 312
+  }
+}

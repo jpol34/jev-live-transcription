@@ -1,0 +1,22 @@
+# Call 093 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=3.2  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Uh, hi, this is Ben! Uh, yeah, there’s water everywhere in my kitchen, and I—I'm really not sure what to do!
+Agent: Oh no, I’m sorry to hear that. Ben, can you give me a moment to pull up your information?
+Caller: Yeah, sure, but can we—uh—hurry? It’s spreading all over.
+Agent: Absolutely, I’ll be quick. Can I just get your unit number first?
+Caller: Of course, um, let me see... 204. Yes, that’s it.
+Agent: Got it, Unit 204. So, you mentioned there's water in your kitchen? Is it coming from a specific place, like a pipe or appliance?
+Caller: I think—like, maybe from under the sink? It's hard to tell really, there's just so much water…
+Agent: Alright, I understand. It does sound like an emergency. I’ll need to get someone over there as soon as possible.
+Caller: Okay, that sounds good, but what about all the water? It’s... uh, getting onto the living room carpet now.
+Agent: I’m arranging for a maintenance team to come. Do they have permission to enter if you're not home?
+Caller: Oh! Um, yeah, yeah, just—just get them in here, please.
+Agent: Understood, thank you for that. And just to confirm, since it’s noisy there—I can hear it in the background—did you say your last name was...?
+Caller: Oh, sorry, it’s Hanson. Did—did you get that? Ben Hanson.
+Agent: Yes, Hanson with an H, thank you Ben. And, your phone number, if we need to reach you?
+Caller: Um, 555-1823. But I might not be able to answer if I’m cleaning up this mess.
+Agent: Of course, I have that down. The maintenance team will be on their way shortly. Please just try to stay safe until they arrive.
+Caller: Thanks, Sarah. I really appreciate it. I’ve got to go, but you’ve been a help.
+Agent: No problem at all, Ben. Take care!

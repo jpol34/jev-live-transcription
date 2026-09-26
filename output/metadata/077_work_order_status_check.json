@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 77,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 2.9,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jennifer Lawson",
+    "email": null,
+    "phone_number": null,
+    "unit_number": "308",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "yes",
+    "work_order_issue": "leaky kitchen faucet",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "technician scheduled for work order",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 174
+  }
+}

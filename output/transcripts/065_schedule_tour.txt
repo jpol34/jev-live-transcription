@@ -1,0 +1,23 @@
+# Call 065 — prospect / schedule_tour
+# edge_case=False  target_minutes=2.7  disclosure_style=guarded
+
+Agent: Hello, thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Hi, um, I'm interested in touring the Willow Creek, uh, Apartment Homes. Could I set up a time for that?
+Agent: Of course! We’d love to have you visit. Could I get your name to start with?
+Caller: Oh, sure. It's, uh, Rachel... Morris.
+Agent: Thanks, Rachel. Do you have a specific day or time in mind for the tour?
+Caller: Uh, maybe... sometime next week? I'm not, I'm not exactly sure what my schedule will be yet.
+Agent: No problem! We can pencil you in for a day and adjust if needed. How about next Tuesday?
+Caller: Hmm, Tuesday might be hard. How about Thursday? Afternoon works better for me if that's available.
+Agent: Let me check real quick... okay, we have openings at 2 PM and 4 PM next Thursday. Which works for you?
+Caller: Let's go with 4 PM. Uh, what’s... what's the address again?
+Agent: Sure, it's 1234 Willow Creek Drive. Do you need that in an email?
+Caller: No, I’ll just note it down. Um, is there anything else I need to know before the tour?
+Agent: Just bring a photo ID. If you have any questions about amenities or specific units, feel free to ask then as well. Can I have your phone number in case we need to reach you?
+Caller: Yeah, it's, uh, 555-0199... do I need to give, like, an email, or is that enough?
+Agent: That's enough for now. But if you prefer email updates, you can give it to us.
+Caller: I'll leave it for now, thanks. Uh, just one last thing— what's the rent range like?
+Agent: Our apartments range from $1,200 to $1,800 depending on the unit size and amenities. We can go over everything more thoroughly during your visit.
+Caller: Alright, sounds good. I guess I'll see you next Thursday at 4 PM.
+Agent: Great, looking forward to it, Rachel. Have a good day!
+Caller: Thanks, you too!

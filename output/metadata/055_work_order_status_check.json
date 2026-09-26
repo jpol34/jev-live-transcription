@@ -1,0 +1,30 @@
+{
+  "scenario": {
+    "id": 55,
+    "category": "resident",
+    "subtype": "work_order_status_check",
+    "edge_case": false,
+    "target_minutes": 2.2,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Jensen",
+    "unit_number": "5B",
+    "work_order_issue": "noisy fridge",
+    "permission_to_enter": "call_first",
+    "outcome": "Technician will call before arriving",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 132
+  }
+}

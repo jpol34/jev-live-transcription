@@ -1,0 +1,26 @@
+# Call 087 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=3.9  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. How can I assist you today?
+Caller: Hi, um, I'm calling because I have a question about my rent payment for this month.
+Agent: Sure, I’d be happy to help you with that. Can I have your name and unit number to pull up your account?
+Caller: Yeah, it’s Sarah Collins and I'm in, uh, unit 3B... no, wait, sorry, it’s 4B.
+Agent: Alright, thank you, Sarah. Let me just pull up your information. Please hold for a moment.
+Caller: Sure, take your time.
+Agent: Okay, I've got your account up. What’s your question about the payment?
+Caller: I noticed that the amount for this month is higher than usual. I was expecting the usual $1,200, but it looks like it’s something different.
+Agent: Hmm, let me take a look at this. Give me a moment to check the transaction history.
+Caller: Yeah, no problem.
+Agent: Alright, it looks like there was a recent increase due to a, um, adjustment in your lease, effective this month. Did you receive any notification about this?
+Caller: Oh, I think I might have missed an email. I'm not really good at keeping up with those, to be honest.
+Agent: I understand. Sometimes those can get missed. Would you like me to send you a copy of the email to your registered address?
+Caller: Uh, can you remind me what email you have on file, just to make sure? I... think I might have changed it.
+Agent: Of course, it shows here as sarah123 at gmail dot com. Is that correct?
+Caller: Oh, that's the old one. The current one is sarah.collins89 at yahoo dot com.
+Agent: Thanks for the update. I’ll send the information to the new email address. Do you need help with anything else today?
+Caller: I guess that's everything. So just to clarify, the new rent is how much again?
+Agent: Let me confirm. Your new monthly rent is $1,250 starting this month.
+Caller: Alright. Got it. I’ll make sure to update my autopay settings.
+Agent: That sounds good. If you encounter any further issues, please feel free to get back to us.
+Caller: Will do, thanks for your help! Have a good day.
+Agent: You too, Sarah. Goodbye!

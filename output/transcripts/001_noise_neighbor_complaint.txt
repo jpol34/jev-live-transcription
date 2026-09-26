@@ -1,0 +1,26 @@
+# Call 001 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=3.5  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Hi, um, I'm having an issue with, uh, noise... from my neighbors.
+Agent: Oh, I'm sorry to hear that. Can I get your name, please?
+Caller: Uh, yeah, it's Tim. Uh, Tim Barker.
+Agent: Thank you, Tim. Could you tell me what unit you're in so I can pull up your information?
+Caller: Yeah, sure, hold on... It's um, 203. Yeah, 203.
+Agent: Great, let me just pull that up here. Alright, got it. Can you describe the noise issue a bit more? Like, what kind of noise are you experiencing?
+Caller: Well, it's like, uh, loud music and, um, sometimes shouting. Seems like it's uh, coming from above, maybe.
+Agent: I see. And how long has this been going on?
+Caller: I dunno, uh, maybe a week or so? It seems mostly in the evenings.
+Agent: Evenings, okay. Do you remember if it's every day or just certain days?
+Caller: Um, not every day, I don't think... More like, uh, several times this week. Monday and Wednesday, for sure, I remember.
+Agent: Alright, good to know. We can definitely address that for you. Could you, uh, confirm your phone number, just in case we need to reach you about this?
+Caller: Oh, yeah, it's, uh, 555-0134. H-hope I got that right. Uh, yeah, that's it.
+Agent: And that's 555-0134? Just to make sure I got it right.
+Caller: Yeah, that's correct.
+Agent: Fantastic. I'll file a report right now and one of our team members will follow up with you. We generally reach out to the neighbors to remind them of the community noise policies. Sound good?
+Caller: Yeah, that'd be great. I just need some peace and quiet, y'know?
+Agent: Absolutely, I understand. Is there anything else I can assist you with today or any more details you want to add?
+Caller: I—I think that's it, really. Just hope it gets sorted, uh, soon.
+Agent: We'll try to address it as quickly as possible. Thanks for reaching out, Tim. We appreciate your patience.
+Caller: Okay, thanks, um, appreciate it. Bye for now.
+Agent: Bye, take care!

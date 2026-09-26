@@ -1,0 +1,34 @@
+# Call 058 — resident / edge_maintenance_staff_misconduct
+# edge_case=True  target_minutes=6.7  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa. How can I assist you today?
+Caller: Uh, hi Lisa, this is, um, Mark Thompson, calling from Willow Creek Apartments. I, uh, have a bit of a problem with one of the maintenance staff. It's kind of urgent.
+Agent: Oh, I’m sorry to hear that, Mark. Could you tell me what seems to be the problem?
+Caller: Yeah, so, yesterday—ah—Joe, he’s one of your maintenance guys, he came for a repair in my unit, uh, 238. He was supposed to fix a leaky faucet. But, uh, he made me really uncomfortable.
+Agent: I’m sorry to hear about the discomfort. Can you explain what happened exactly?
+Caller: Well, he... uh, he was making comments that just felt, uh, inappropriate. Like, um, asking why I live alone and stuff. I—I don’t know, it just felt off.
+Agent: I understand, Mark. That's definitely not acceptable. Did anything else in particular occur during the visit?
+Caller: He spent a lot of time in the bathroom, just, you know, tinkering around. It—uh, it didn't seem like such a big repair to take that long. And he left without fixing the faucet completely.
+Agent: Okay, did he inform you he'd return to complete it, or leave any other instructions?
+Caller: No, nothing like that. Just said he'd report back to his manager or something. He didn’t say if he was coming back, so now I’m like, stuck with this uh, this problem still.
+Agent: Alright, I will make sure this is noted. Could you confirm your phone number for future communication?
+Caller: Sure, it's 555-0198.
+Agent: Thank you. And just to confirm, that was Joe from our team, right?
+Caller: Yeah, Joe. Pretty sure that was his name.
+Agent: I appreciate you bringing this to our attention. I’ll escalate this to our senior management immediately so we can address this appropriately. Meanwhile, would you like us to arrange for another maintenance staff to fix your faucet?
+Caller: Uh—yeah—I mean, I need that fixed for sure, but, how—to—uh, how should I? I mean, my schedule's tight, can it be done without me around?
+Agent: We can certainly try to accommodate your schedule. Usually, if you give us permission to enter while you're out, we can handle it.
+Caller: Permission to enter? Hmm, I usually prefer being there, but I guess there's no choice here, right?
+Agent: That’s understandable, but rest assured, we will keep everything professional. It’s your decision, though.
+Caller: Okay, uh, you know what, I guess they can go in while I'm at work. Just, please make sure someone trustworthy handles it.
+Agent: We absolutely will. Can you let us know what your available hours are?
+Caller: I usually leave by, um, 8 in the morning and I'm back around 6-ish.
+Agent: Got it. I’ll pass that on and make sure the repair is prioritized. Could you also share your email for any updates?
+Caller: Sure, it's mark.t@domain.com.
+Agent: Thanks, Mark. We'll email you the confirmation once it's set up. Is there anything else you need help with today?
+Caller: No, I think—um, I think you've covered it. It's just really stressful dealing with this stuff, you know?
+Agent: I can only imagine, and again, I’m sorry for the inconvenience. We’ll ensure this is resolved promptly. Feel free to reach out if anything else comes up.
+Caller: Thank you, Lisa. I appreciate that.
+Agent: You’re welcome, Mark. Take care and have a good day.
+Caller: You too. Bye.
+Agent: Goodbye.

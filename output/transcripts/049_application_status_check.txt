@@ -1,0 +1,16 @@
+# Call 049 — prospect / application_status_check
+# edge_case=False  target_minutes=2.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa, how can I help you today?
+Caller: Hi Lisa, um, this is Sarah Jamison. I applied for a unit at the Willow Creek Apartment Homes a couple of weeks ago and wanted to check the status of my application.
+Agent: Of course, Sarah. Let me just pull up your application. Can you confirm the email you used?
+Caller: Sure, it's sarah.jamison, with an 'S' instead of 'Z', at email.com.
+Agent: Got it, thanks. And just verifying, is your phone number ending in 3247?
+Caller: Oh, actually, that's my work number. My cell ends in 0916.
+Agent: Great, thanks for that. Please hold on a moment while I check our system here.
+Agent: (typing sounds) Alright, I see your application here. Looks like everything is in order. Our leasing team should be reaching out to you within the next couple of days.
+Caller: Oh, okay. I was just a bit worried because I hadn't heard back since applying.
+Agent: No worries, you're still in the process. Just to make sure, are there any specific questions or concerns you have about the unit or the process?
+Caller: Uh, no, not really. Just want to make sure my app didn't fall through the cracks. Thank you for confirming!
+Agent: You're very welcome, Sarah. We’ll get back to you soon. Let us know if there's anything else.
+Caller: Perfect, thanks so much for your help, Lisa. I appreciate it.

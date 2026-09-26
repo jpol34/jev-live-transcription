@@ -1,0 +1,21 @@
+# Call 084 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.8  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa. How can I assist you today?
+Caller: Hi Lisa, um, this is Mark Jacobs. I live in one of the Willow Creek Apartments, and...uh, I'm having an issue with my, um, kitchen faucet.
+Agent: Oh no, I'm sorry to hear that, Mark. What seems to be the problem with it?
+Caller: Yeah, it's been...uh, leaking a lot lately. I think it's...it’s pretty old, and the drip is getting worse. Uh, really need someone to take a look at it.
+Agent: Got it. Leaking faucet. We can definitely help with that. Can I just confirm your unit number, please?
+Caller: Sure, uh, it’s B-203.
+Agent: B-203, perfect. Is it okay if we...uh, if we send someone in while you're not home, or would you prefer to be there?
+Caller: Oh, um, you know what, I'd prefer if you guys...uh, if you could call me first. Just to make sure I'm around.
+Agent: Okay, call first before entering. Got it. Do you have any pets we should be aware of?
+Caller: No pets. Uh, so that shouldn't be an issue.
+Agent: Great, that makes it simpler. Can I get a good phone number to reach you at?
+Caller: Yeah, it's uh, 555-0183. Just give me a shout, and I'll make sure I'm at home.
+Agent: 555-0183, alright. We'll have someone contact you shortly. Is there anything else pressing that I could help you with today?
+Caller: No, that's about it for now. Just...uh, yeah, just the faucet issue.
+Agent: Okay. So, just to recap, I'll put a work order in for a leaking kitchen faucet, we'll call you at 555-0183 before entry. Sound good?
+Caller: Yeah, sounds perfect. Thanks, Lisa.
+Agent: You're welcome, Mark! We'll get that sorted for you. Have a good day!
+Caller: You too! Bye.

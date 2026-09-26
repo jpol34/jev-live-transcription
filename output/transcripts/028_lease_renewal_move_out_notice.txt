@@ -1,0 +1,28 @@
+# Call 028 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=3.9  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, this is Maria speaking. How can I assist you today?
+Caller: Hi, uh, this is Jake Barkley, I'm calling about my lease at Willow Creek Apartment Homes.
+Agent: Sure thing, Jake. Are you calling about renewing your lease or something else?
+Caller: Yeah, actually, I wanted to talk about… um… giving notice to move out.
+Agent: Alright, I can help you with that. Can you confirm your unit number for me?
+Caller: It's uh... 213… No, wait, sorry… 212. I always mix those up.
+Agent: Unit 212, got it. And let me just pull up your file here. Could you also confirm the email we have on file for you?
+Caller: Sure, it should be jake.barkley, uh... spelled B-A-R-K-L-E-Y, at gmail.com.
+Agent: Perfect, thank you for confirming that. Now, are you planning to move out at the end of your current lease term?
+Caller: Yeah. When is that, exactly? I, uh, think I lost the paperwork.
+Agent: No worries, let me find that for you. It looks like your lease ends on November 30th. How does that work for your move out schedule?
+Caller: Oh, wow, that's actually sooner than I thought. Well, uh, I guess it works. But I was hoping for a later move out since... you know... the holiday season and all.
+Agent: I understand, the lease terms can sometimes be a bit tricky. If you need to extend your stay into December, I can check if that's an option.
+Caller: Um, yeah, if that wouldn't be too much trouble. But let’s, uh, assume I stick with the November date for now.
+Agent: Alright. For the move-out notice, you'll need to provide us with written notice at least 30 days before November 30th. So by October 31st.
+Caller: Okay, got it. And, uh, would you send me those details in an email, just to be sure?
+Agent: Certainly, I'll email you all the necessary steps and information right after this call. Is there anything else you're curious about?
+Caller: Hmm, oh, one more thing. What’s the process if I change my mind about moving out?
+Agent: If that happens, you can either renew the lease or work out a month-to-month agreement. But you'll have to let us know before the notice deadline.
+Caller: Alright, I'll keep that in mind. Is there, um, living-cost-related information that can help if I decide to renew?
+Agent: For the renewal, I'd have to connect you with our Leasing Department to discuss new rates. Do you want me to transfer you?
+Caller: Uh, not at the moment. I'll call back once I settle the move decision.
+Agent: Sounds good. Feel free to reach out anytime you need further assistance. Look out for my email soon.
+Caller: Will do. Thanks, Maria. You've been really helpful.
+Agent: It's my pleasure, Jake. Have a great day and good luck with your planning!

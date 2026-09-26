@@ -1,0 +1,27 @@
+# Call 008 — prospect / submit_application_over_phone
+# edge_case=False  target_minutes=5.2  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking. How can I assist you today?
+Caller: Uh, hi. I was, um, looking to... I wanted to, you know, submit an application for, uh, the, um, Willow Creek Apartments?
+Agent: Great! I can definitely help you with that. Have you already toured the property or would you like more details before applying?
+Caller: Uh, yeah, I visited last week. I think it was... Monday? No, wait... Tuesday. Yeah, Tuesday.
+Agent: Perfect! So you've seen the units already. Let me just pull up the application information. Could you please give me your full name so I can note it down?
+Caller: Sure, uh, it's Jaime. That's J-A-I-M-E. Last name is Harris.
+Agent: Thank you, Jaime. And do you have an email address that we can use for the application process?
+Caller: Oh, yes. It's jaime.harris78@gmail.com. And that's Harris with two R's.
+Agent: Got it, jaime.harris78@gmail.com. Now, uh, do you have a preferred move-in date?
+Caller: Uh, well... I was thinking probably... um, sometime around the first of next month. Is that, um, possible?
+Agent: Let me check on availability for you. One moment, please. *Hold music* Alright, thanks for holding. So, we do have units available at the beginning of next month. Have you already received any pricing information?
+Caller: Uh, yeah, um, they mentioned something about... One-bedroom was, uh, around $950? Is that right?
+Agent: Yes, that's correct for a one-bedroom unit. And just to confirm, do you have any pets that you'd be bringing along with you?
+Caller: Uh, no pets. I'm, uh, allergic. So, yeah, no pets.
+Agent: No pets, got it. Almost done here. Do you have a contact phone number you’d like us to have on file?
+Caller: Oh, right. It's 555-0123. Uh, sorry, my mind's all over the place today.
+Agent: No worries at all, Jaime. Let me repeat that, 555-0123. Correct?
+Caller: Yes, that's right. 555-0123.
+Agent: Alright, perfect. So just to recap: Your name is Jaime Harris, the move-in date you're looking at is the first of next month, and the unit price quoted for the one-bedroom is $950. You've got no pets and your contact number is 555-0123. Does that sound correct?
+Caller: Uh, yeah, that's, uh, everything. Thank you.
+Agent: Great! You should receive a confirmation email shortly with all the application details. If you have any other questions or need further assistance, feel free to reach out.
+Caller: Awesome, thank you so much. I, uh, think I'm good for now. Appreciate it.
+Agent: You're welcome, Jaime! Have a great day, and best of luck with your application.
+Caller: Thanks, bye!

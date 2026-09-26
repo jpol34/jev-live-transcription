@@ -1,0 +1,43 @@
+{
+  "scenario": {
+    "id": 85,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mike Roddin",
+    "email": "mike.rod.email@gmail.com",
+    "phone_number": "917-555-0199",
+    "unit_number": null,
+    "amenities_requested": [
+      "fitness center"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "2024-01-01",
+    "price_quoted": "$1,100 to $1,300",
+    "budget_amount": "1200",
+    "outcome": "Availability inquiry with future follow-up scheduled",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "amenities_requested",
+      "move_in_date",
+      "budget_amount"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 192
+  }
+}

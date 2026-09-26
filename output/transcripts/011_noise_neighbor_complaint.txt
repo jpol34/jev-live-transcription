@@ -1,0 +1,25 @@
+# Call 011 — resident / noise_neighbor_complaint
+# edge_case=False  target_minutes=3.2  disclosure_style=cooperative
+
+Agent: Hello, thank you for calling Willow Creek Property Management. This is Allison, how can I assist you today?
+Caller: Hi, um, I'm having a bit of an issue with noise from my neighbors. It's been going on for a while and it's kind of gotten out of hand.
+Agent: I'm sorry to hear that. Can you tell me a bit more about the situation? Like, what kind of noise and when it's happening?
+Caller: Yeah, it's mostly loud music and sometimes shouting. It usually starts around 10 PM and can go on past midnight.
+Agent: Okay, that's definitely something we can look into. Which building and unit are you in?
+Caller: I'm in building 12, unit... uh, 304.
+Agent: Thank you, 304. Can I have your name just to note it here in our system?
+Caller: Sure, it's Ethan Roberts.
+Agent: Thanks, Ethan. And just to confirm, is there a specific unit where the noise is coming from, or is it just in the vicinity?
+Caller: It's the unit right above mine, so I guess that would be, um, 404.
+Agent: Got it. Unit 404. I'll go ahead and document that. Now, let me put you on a quick hold while I check our process here, one moment please.
+Caller: No problem, I'll hold.
+Agent: Thanks for holding, Ethan. So, what we can do is reach out to the tenant upstairs and remind them of our community noise policies. Hopefully, that will help.
+Caller: That would be great. I mean, I understand people like to enjoy their music, but it’s, like, pretty disruptive.
+Agent: Absolutely, you deserve to have peace in your home. Would you like us to follow up with you after we’ve spoken to them, or just leave it as is for now?
+Caller: Maybe just follow up with an email? That way I can keep track too.
+Agent: Sure thing. Can you provide your email address so I can make a note for the follow-up?
+Caller: Oh, sure! It's ethan.roberts... let me spell that... e-t-h-a-n dot r-o-b-e-r-t-s at mail dot com.
+Agent: Perfect, I've got that down. Is there anything else you’d like us to address while we're handling this?
+Caller: No, that’s pretty much it. Thank you for your help.
+Agent: Alright, Ethan. Thank you for calling and we'll get on it right away. Have a peaceful day ahead!
+Caller: Thanks, you too. Bye!

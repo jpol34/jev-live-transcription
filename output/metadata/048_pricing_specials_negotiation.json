@@ -1,0 +1,39 @@
+{
+  "scenario": {
+    "id": 48,
+    "category": "prospect",
+    "subtype": "pricing_specials_negotiation",
+    "edge_case": false,
+    "target_minutes": 4.3,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jake Sanders",
+    "email": "j.sanders@gmail.com",
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "mid-November",
+    "price_quoted": "$1,250 for one-bedroom",
+    "budget_amount": "$1,100",
+    "outcome": "Disclosed price, special offer; added to email list",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "move_in_date",
+      "price_quoted",
+      "budget_amount"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 258
+  }
+}

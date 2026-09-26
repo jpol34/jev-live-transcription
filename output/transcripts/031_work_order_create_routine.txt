@@ -1,0 +1,25 @@
+# Call 031 — resident / work_order_create_routine
+# edge_case=False  target_minutes=3.5  disclosure_style=guarded
+
+Agent: Good afternoon, Willow Creek Property Management, this is Lisa speaking. How can I assist you today?
+Caller: Hi uh, this is... Dina. I think I need to, um, place a work order for my apartment.
+Agent: Sure thing, Dina. Can I have your unit number to get started?
+Caller: Uh, it's um, C-214... I think.
+Agent: Okay, let me just pull that up. C-214? Is that correct?
+Caller: Yeah, that's right.
+Agent: Great, and just to confirm, is there a phone number we can reach you at, in case we need to follow up?
+Caller: Um, yeah, hang on a sec... Okay, it's 555-0199.
+Agent: Alright, 555-0199. And what seems to be the issue today?
+Caller: Yeah, the thing is, um, the sink in the kitchen is leaking. It's been dripping awhile.
+Agent: I see. A leaking kitchen sink, okay. Is that an ongoing issue or has it just started recently?
+Caller: Uh, well, I noticed it about... two days ago? But it's getting worse.
+Agent: Got it, thanks for letting us know. And, do you mind if we have a technician enter your apartment if you're not home, or would you prefer a call first?
+Caller: Um, could you call me first? I have a, uh, dog that gets a bit, uh, anxious with strangers.
+Agent: Of course, we'll call you before we arrive. And speaking of your dog, would you like us to note any specific instructions regarding your pet?
+Caller: No, just, uh, a heads-up call is fine. He's friendly but, you know, cautious.
+Agent: Understood. We’ll make a note of that. Is there anything else you'd need us to check while we’re at your unit?
+Caller: Uh, no. Just the sink for now.
+Agent: Alright, Dina, I've logged your work order for the leaky kitchen sink, and remember, we’ll give you a call at the 555-0199 number before we get there.
+Caller: Okay, yeah, that sounds good. Thanks.
+Agent: You're welcome. Someone should be in touch with you soon. Have a nice day!
+Caller: You too, bye.

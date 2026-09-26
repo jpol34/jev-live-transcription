@@ -1,0 +1,21 @@
+# Call 080 — resident / edge_duplicate_work_order
+# edge_case=True  target_minutes=2.6  disclosure_style=corrects_mistake
+
+Caller: Hi, um, is this Willow Creek Property Management? I think I've called before...
+Agent: Yes, hello! You've reached Willow Creek Property Management. How can I assist you today?
+Caller: Okay, so I, ah, called a couple of weeks ago about, uh, the leaking faucet in my kitchen. It's still not fixed and, uh, I think there might be a duplicate work order.
+Agent: Oh, I’m sorry to hear that. Let me check on that for you. Could you please provide your unit number?
+Caller: Right, um, it's 12B. Wait no, sorry, I mean 21B. Yeah, 21B.
+Agent: Okay, unit 21B. Let me pull up your file here, just a moment.
+Agent: Alright, I see a work order from... October 5th regarding a faucet issue, correct?
+Caller: Yeah, yeah, that’s the one. But someone else was supposed to follow up last week, and no one showed up.
+Agent: I see, I apologize for the inconvenience. It looks like there might have been an oversight. Did you, by any chance, receive a confirmation about a visit?
+Caller: Umm, no, I don't think I did. Or maybe I missed it? My emails are quite cluttered.
+Agent: I understand. Let me verify your email address on file, just to make sure. Is it johndoe@example.com?
+Caller: Oh, that's not right. It's j.doe12@example.com. I should've updated that with you.
+Agent: Thank you for that. I’ll update it right away. Would you prefer us to call or email you once the maintenance is rescheduled?
+Caller: Uh, call me please. It's easier for me that way.
+Agent: Got it. I’ll have that noted. Let me reschedule the maintenance and I'll ensure the team calls ahead. Anything else I can help with?
+Caller: Nope, just the leak. It’s getting a bit annoying, uh, you know, the constant dripping noise.
+Agent: I completely understand. We’ll prioritize your fix. Thank you for your patience, and we’ll get someone out to you soon. Have a great day!
+Caller: Thanks, you too. Bye.

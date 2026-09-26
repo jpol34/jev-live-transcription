@@ -1,0 +1,24 @@
+# Call 040 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.7  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I assist you today?
+Caller: Hi Sarah, this is Emily Parker. I live in one of the Willow Creek Apartment Homes and I was just calling to check on the status of a maintenance request I put in last week.
+Agent: Of course, Emily. Could you please remind me of your unit number?
+Caller: Sure, I'm in unit 303.
+Agent: Alright, let me pull up your work order. Hang on just a second, please.
+Caller: No problem.
+Agent: Okay, Emily. I have your file here. It looks like your work order is for a leaky faucet in the kitchen, right?
+Caller: Yes, that's right.
+Agent: I see here that the maintenance was scheduled for yesterday afternoon. Were they able to gain access to your apartment?
+Caller: Um, I was actually at work and no one called me, so I'm not really sure. Can you check on that?
+Agent: Oh, let me double-check for you. Please hold for just a moment.
+Caller: Okay, thank you.
+Agent: Thanks for holding, Emily. It looks like the maintenance team did attempt to access your unit, but they weren’t able to enter since no permission to enter was explicitly noted.
+Caller: Oh, I see. I thought it was okay for them to enter. Can I just give that permission over the phone now?
+Agent: Yes, you can. Would you like to give them permission to enter tomorrow?
+Caller: Yes, please. I'm usually out during the day, so any time that works for them.
+Agent: Got it. I’ll update your record to note that they have permission to enter without calling first, does that sound good?
+Caller: Yes, perfect. Thank you so much, Sarah.
+Agent: You're welcome, Emily. Is there anything else I can help you with today?
+Caller: Nope, that covers it. Thanks again!
+Agent: No problem, have a great day!

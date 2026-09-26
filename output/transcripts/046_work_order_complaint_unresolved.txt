@@ -1,0 +1,24 @@
+# Call 046 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=4.6  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, this is Jenna, how can I assist you today?
+Caller: Hi, yeah, um, I think I've called like, three times about this. My name's Tom, sorry, Tom Leland. It's about the leaky pipe under the kitchen sink?
+Agent: Alright, Tom, I'm really sorry for the repeated trouble. Could I get your unit number to check on the status of the work order?
+Caller: It's 76B, though I think I might've told you 67B last time by mistake, ugh, my bad.
+Agent: No worries, let me verify that real quick in our system... One moment please.
+Agent: Thanks for holding, so it looks like we do have the work order on file for unit 76B, noted as submitted last week. I see attempts to resolve it were marked on the system, however, it's still ongoing? 
+Caller: Yes, that's right. It was supposed to be fixed when the plumber came Monday, but it started leaking again yesterday. I can't keep putting buckets under it, you know?
+Agent: Absolutely, I totally understand how inconvenient that must be. Let me escalate this issue to our maintenance supervisor. Can I get your phone number to ensure we can reach you directly?
+Caller: Sure, it's 555-2389. No, wait, sorry, 555-3289. I always mix those up.
+Agent: Got it, 555-3289. And I'll make sure they have the correct unit as 76B for this escalation.
+Caller: Thanks, I really appreciate it. I've been worried because it's been dripping onto the floor, and I'm concerned about mold or any additional damage.
+Agent: That's completely understandable. I’ll note those potential issues as well so the maintenance team knows to inspect for additional damage. Is there a specific time when you'd be available for them to come by?
+Caller: Uh, actually, I work weekdays from 9 to 5, so after those times would be best, or if it's any day during the weekend.
+Agent: Alright, after 5 PM or on a weekend. They should be able to accommodate that. I’ll confirm these details with our supervisor. They'll most likely give you a call to confirm a specific time.
+Caller: Alright, as long as it gets done soon. I mean, can they - they can just call first if possible? Rather not wait all day.
+Agent: Sure, we can definitely put in a note for them to call first. They'll try to give you a heads-up before they arrive.
+Caller: That's good. I hope this finally resolves it.
+Agent: Me too, Tom. I'm really sorry for the inconvenience you've faced. Is there anything else I can help with today?
+Caller: No, just the leak. Fingers crossed it's sorted now. Thanks for your help.
+Agent: You're welcome, and again, I apologize for any trouble. We'll be in touch shortly. Have a good day.
+Caller: You too, bye.

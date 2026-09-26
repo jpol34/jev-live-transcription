@@ -1,0 +1,35 @@
+{
+  "scenario": {
+    "id": 68,
+    "category": "resident",
+    "subtype": "lease_renewal_move_out_notice",
+    "edge_case": false,
+    "target_minutes": 4.4,
+    "disclosure_style": "guarded",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email",
+      "move_in_date",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Dave Johnson",
+    "email": "d.johnson433@gmail.com",
+    "unit_number": "21B",
+    "move_in_date": null,
+    "price_quoted": null,
+    "outcome": "Move-out notice confirmed",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "move_in_date",
+      "price_quoted"
+    ],
+    "estimated_call_seconds": 264
+  }
+}

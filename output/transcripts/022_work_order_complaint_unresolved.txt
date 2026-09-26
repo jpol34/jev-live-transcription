@@ -1,0 +1,28 @@
+# Call 022 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=4.2  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Emily speaking. How can I assist you today?
+Caller: Hi, Emily. This is Robert Lewis. I'm calling about an issue I've been having in my unit, um, 302B.
+Agent: Hi, Robert. I'm sorry to hear that. Could you let me know what's going on?
+Caller: Yes, so... uh, my AC has been out for almost a week now, and I already submitted a work order, but no one's come by yet.
+Agent: Oh no, that's definitely concerning. Let me just pull up your record here... Give me one second.
+Caller: Sure, take your time.
+Agent: Alright, I'm seeing a request submitted on, um, October 3rd. It shows here it's still in processing. That's quite unusual. Let me reach out to maintenance to see what's going on.
+Caller: I tried calling before and was told it would be fast-tracked, but nothing's changed. The temperature really went up this week, and it's becoming unbearable.
+Agent: I can imagine. And sorry again for the delay. I'm going to escalate this to make sure someone gets back to you today. Can I confirm your phone number, just in case they need to call you back?
+Caller: Uh, yeah, it's 555-0198.
+Agent: 555-0198. Got it. And Robert, just to double-check, you’re okay with them entering your unit if you're not home?
+Caller: Actually, I'd prefer they call first to see if I'm around. My schedule's a bit all over the place.
+Agent: Perfect, I'll note that. Let me place you on a brief hold while I contact our maintenance team. Hang tight.
+Caller: Okay, thank you.
+Agent: [hold music plays] Thanks for waiting, Robert. I spoke with the team, and they assured me someone will be there by this afternoon.
+Caller: This afternoon? That, at least, is something. Do they have any idea why it's taking this long?
+Agent: It seems it was just an oversight due to high volume and some scheduling miscommunication. Really sorry again for the trouble.
+Caller: Alright, well, thanks for looking into it. I just need it resolved soon. It’s starting to impact my, uh, you know, work-from-home situation.
+Agent: Completely understand. We'll do everything we can to resolve this swiftly. I'll ensure your request is marked as urgent.
+Caller: I appreciate that. What if no one comes today? Should I call again?
+Agent: If by any chance no one has shown up by the end of today, please call us immediately and I'll follow up personally.
+Caller: Got it. I hope it doesn't come to that, but at least I know what to do. Thanks.
+Agent: You're welcome, Robert. We're here to help. Is there anything else we can do for you right now?
+Caller: No, that's it for now. Thanks for your help, Emily.
+Agent: Anytime, take care.

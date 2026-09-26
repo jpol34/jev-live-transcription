@@ -1,0 +1,25 @@
+# Call 089 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=5.0  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management, this is Lisa speaking. How can I assist you today?
+Caller: Hi, uh, this is... uh, Mike. I'm calling about my lease. I... I think it might be time for renewal or maybe to give notice? I'm not entirely sure, just wanted to get some information.
+Agent: Sure, Mike, I can certainly help with that. Could you please confirm your unit number first?
+Caller: Oh, yeah, it's um 203B, I think?
+Agent: Alright, let me just pull up your details... Okay, got it here. It looks like your lease is set to expire at the end of next month. Are you considering renewing or moving out?
+Caller: Honestly, I'm still a bit unsure. Um, hoping to decide soon, but... I need to check a few things out first, you know?
+Agent: I understand, no problem at all. If you do decide to renew, I can help provide information on new lease terms and any changes in rent. Otherwise, we typically require a 30-day notice for moving out. Have you got an idea of when you’d like to make that decision by?
+Caller: Uh, probably within the week? Just need to work out some job stuff first.
+Agent: Alright, just let us know as soon as you make your decision. Can I get your email address so we can send you those lease details right when you need them?
+Caller: Oh, sure, let's see... it's mike.taylor23 at uh, gmail dot com.
+Agent: Got it, let me just confirm that: mike.taylor23@gmail.com?
+Caller: Yeah, that's right.
+Agent: Great. And just so I can keep our records up to date, could you remind me when you moved in?
+Caller: Oh jeez, um, I think... I moved in last June. Yeah, that sounds right.
+Agent: Thanks, that helps a lot. Now, in terms of renewing, the new monthly rent for your unit would be $1,250. Would that fit within your budget?
+Caller: Uh, well that's actually a bit higher than I'm... I was hoping for. Gotta think about it.
+Agent: Of course, I understand the decision. If there's anything else like any issues or specific questions you have, feel free to ask.
+Caller: No, no major issues. Guess I just needed to... more time to sort it out.
+Agent: Absolutely. If you have any more questions or need assistance, don't hesitate to call us back.
+Caller: Thank you, Lisa. Appreciate the help.
+Agent: You're very welcome! Take care and talk soon.
+Caller: You too, see ya.

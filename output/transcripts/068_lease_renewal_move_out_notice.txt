@@ -1,0 +1,28 @@
+# Call 068 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=4.4  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management, this is Sarah speaking. How can I assist you today?
+Caller: Uh, hi, um, my name is, uh, Dave Johnson. I'm calling to talk about, er, lease renewal, but more about giving my move-out notice, actually.
+Agent: Alright, Dave. I can certainly help with that. Can I get your unit number, please?
+Caller: Uh, yeah, it's um, hold on... I think it's 21B, yeah, 21B.
+Agent: Got it, 21B. And when are you planning to move out? We usually require at least a 30-day notice.
+Caller: Yeah, I'm aware. I think we’re looking at the, uh, end of next month, so around the 31st. Uh, do I need to confirm that in writing or...?
+Agent: Yes, typically we do need that in writing. I can send you an email with our move-out checklist as well. Can I confirm your email address for this?
+Caller: Sure, it's, uh, d.johnson433... at um... gmail dot com.
+Agent: Okay, let me repeat that back to you: d dot johnson four three three at gmail.com?
+Caller: Yes, that's correct.
+Agent: Great, I'll send you all the necessary details there. And just to make sure, are you moving out due to any specific reasons? Maybe a change in rental terms or...
+Caller: Uh, it's... it's mainly just, uh, personal reasons. Um, nothing against the community, really.
+Agent: Understood, sometimes life just takes us elsewhere. If there's anything we could have done differently or improved, please let us know.
+Caller: No, no, it’s been fine here, just, uh, moving closer to work.
+Agent: Got it, Dave. Closer commutes really make a big difference. Do you have any other questions or concerns about the move-out process I can assist you with today?
+Caller: Um, no, just... guess I’ll need to sort out cleaners. Anything special I should know?
+Agent: We do have a standard move-out cleaning checklist which will be included in the email, so just ensure all those boxes are checked to avoid any charges.
+Caller: Alright, that sounds good. How about, uh, the security deposit? How does that work?
+Agent: Typically, if everything is in good condition, the security deposit is returned within 30 days of your move-out date, after a final inspection.
+Caller: Okay, that makes sense. Guess that’s it for now.
+Agent: Perfect, Dave. I’ll send out that email shortly. If you remember anything else or have further questions, feel free to call us back.
+Caller: Thanks a lot, appreciate it.
+Agent: You're welcome. Have a great day!
+Caller: You too, bye.
+Agent: Goodbye!

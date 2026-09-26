@@ -1,0 +1,24 @@
+# Call 027 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.2  disclosure_style=cooperative
+
+Agent: Good afternoon, thank you for calling Willow Creek Property Management. This is Lila speaking. How can I assist you today?
+Caller: Hi there! This is Jason, um, calling to... to check about some availabilities at, uh, the Willow Creek Apartment Homes.
+Agent: Of course, Jason. I'd be happy to help with that. Are you looking for a specific unit size or just exploring options?
+Caller: Uh, ideally a two-bedroom. Do you have any of those coming up?
+Agent: Let me take a look here. Could you please hold for a moment while I check our system?
+Caller: Sure, no problem.
+Agent: Thanks for holding, Jason. So it looks like we do have a couple of two-bedroom units becoming available next month. May I ask when you're hoping to move in?
+Caller: Yeah, um, we're looking at... probably, early November? The... the 3rd, maybe.
+Agent: Great, I think the timing could work out well. And Jason, just to get a sense of what you're looking for, do you have a budget range in mind for your new place?
+Caller: Uh, we're aiming around fifteen hundred, give or take. You know how it is with the... prices these days.
+Agent: I understand completely. Our two-bedroom units are typically within that range, so you should be in good shape there. Are there any specific amenities you're particularly interested in?
+Caller: Uh, well, I think having a gym and some, uh, green space would be great. And maybe, hmm, an onsite laundry? That's uh, yes, that's kinda important for us too.
+Agent: Absolutely. Our community does have a fitness center and a park-like area with plenty of greenery. We also offer a communal laundry facility. Does that sound like it meets your needs?
+Caller: Yeah, that sounds perfect. Um, one more thing—how about, uh, parking? We have two cars.
+Agent: Ah, good question! Each unit comes with one assigned parking space, and we do have additional spaces available. There might be a small fee for the extra space, but we can certainly arrange that.
+Caller: Okay, well, that sounds doable. Do you... um, do you need to take any more details from me now, or should I... visit?
+Agent: You're welcome to visit! A tour could really help you decide if the place is right. I can set an appointment if you like.
+Caller: Yeah, let me, uh, talk to my partner first, and I'll give you a call back. What's the best number to reach you, just in case?
+Agent: Sure thing, you can reach us at this number whenever you're ready. We look forward to hearing from you!
+Caller: Great, thanks so much for your help!
+Agent: You're very welcome, Jason. Have a wonderful day!

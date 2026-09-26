@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "id": 51,
+    "category": "prospect",
+    "subtype": "application_status_check",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "email"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jason Henderson",
+    "email": null,
+    "phone_number": "555-0167",
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "Caller was informed application is under review and advised on timeline.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "email"
+    ],
+    "estimated_call_seconds": 192
+  }
+}

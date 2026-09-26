@@ -1,0 +1,20 @@
+# Call 063 — prospect / schedule_tour
+# edge_case=False  target_minutes=2.8  disclosure_style=cooperative
+
+Agent: Good afternoon, thank you for calling Willow Creek Property Management. This is Linda, how can I assist you today?
+Caller: Hi Linda, this is Josh. I'm interested in scheduling a tour of the Willow Creek Apartment Homes.
+Agent: Hi, Josh! Sure thing. I'd be happy to help with that. Do you have a particular day in mind for your visit?
+Caller: Uh, I was thinking maybe this Saturday? Do you have any openings then?
+Agent: Let me just check... One moment please. *pause* Okay, I do see some availability this Saturday. Would you prefer the morning or afternoon?
+Caller: The afternoon would be great. How about around 2 PM?
+Agent: 2 PM works perfectly. I'll go ahead and reserve that for you. Could I get your full name and a contact number in case we need to reach you?
+Caller: Sure, it's Josh Green, and my phone number is 555-0173. Uh, do you need my email too?
+Agent: Yes please, that would be helpful. What's the best email to reach you at?
+Caller: It's j.green@gmail.com.
+Agent: Got it, j-dot-green at gmail.com. And are you looking at a specific move-in date?
+Caller: I'm hoping to move in by December if possible.
+Agent: Alright, December it is. We can discuss availability and leasing terms more during your visit. Anything else you'd like to know beforehand?
+Caller: Hmm, is there parking available, and do the units come with washer and dryers?
+Agent: Great questions! Yes, we do have parking spaces, and most of our units come equipped with a washer and dryer. You'll have the chance to see those when you visit.
+Caller: Perfect, that's everything I needed to know for now. Thanks, Linda!
+Agent: You're very welcome, Josh. Looking forward to seeing you on Saturday at 2 PM. If anything changes or you have more questions, feel free to call us. Have a great day!

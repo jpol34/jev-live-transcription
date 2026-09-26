@@ -1,0 +1,27 @@
+# Call 088 — resident / billing_rent_payment_question
+# edge_case=False  target_minutes=4.0  disclosure_style=rushed
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa, how can I assist you today?
+Caller: Hi, um, I'm trying to, uh, figure out why my rent payment hasn't gone through yet. I think I did it online last week.
+Agent: Okay, I can help with that. May I have your name, please?
+Caller: Oh, sure, it's Dan, Dan Harrison.
+Agent: Thanks, Dan. And could you confirm your unit number for me?
+Caller: Yeah, it's uh, 203. I think... Wait, yeah, 203.
+Agent: Great, thank you. Let me pull up your account here, one moment please.
+Agent: Alright, I'm seeing a payment from last week, but it shows as pending. Did you receive any confirmation email when you made the payment?
+Caller: Uh, not that I remember. Can you resend that? I might have missed it.
+Agent: I sure can. But let me just verify your email address first. Can you tell me what it’s listed under?
+Caller: Yeah, I think it's dan.h1988@gmail.com. Does that sound right?
+Agent: Let me check... Yes, that's what we have on file. I'll resend the confirmation email to you.
+Caller: Awesome, thanks. But, like, should I worry about a late fee or anything? 'Cause the payment was supposed to be through by the first.
+Agent: There shouldn’t be any issue since you attempted the payment before the deadline. It looks like a technical glitch on our end. Let me put you on hold for a moment while I check in with our billing department.
+Caller: Sure, no problem.
+Agent: Thank you for holding, Dan. I spoke with billing, and they've confirmed that no late fee will apply since the issue was on our end.
+Caller: Alright, cool. I was really worried there for a second.
+Agent: Understandable. I'm glad we could clear that up. Would you like me to update you if anything changes with the payment?
+Caller: Yeah, that'd be great. Uh, just email me, I probably won't be around the phone.
+Agent: Sure thing, Dan. We’ll email you any updates. Is there anything else I can help with today?
+Caller: Nah, I think that's it. Thanks for sorting this out, Lisa.
+Agent: You’re welcome! Feel free to reach out anytime. Have a great day!
+Caller: You too, bye!
+Agent: Goodbye!

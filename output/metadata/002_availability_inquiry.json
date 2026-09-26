@@ -1,0 +1,44 @@
+{
+  "scenario": {
+    "id": 2,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.0,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jacob",
+    "email": null,
+    "phone_number": "(555) 239-8420",
+    "unit_number": null,
+    "amenities_requested": [
+      "gym"
+    ],
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": "November 15th",
+    "price_quoted": "$1,200 to $1,400",
+    "budget_amount": null,
+    "outcome": "Caller received availability info and price range",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "amenities_requested",
+      "move_in_date",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [
+      "budget_amount"
+    ],
+    "estimated_call_seconds": 180
+  }
+}

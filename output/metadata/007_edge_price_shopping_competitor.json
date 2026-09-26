@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 7,
+    "category": "prospect",
+    "subtype": "edge_price_shopping_competitor",
+    "edge_case": true,
+    "target_minutes": 3.8,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Dave Jenkins",
+    "email": "dave.jenkins23@mail.com",
+    "phone_number": null,
+    "unit_number": null,
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": null,
+    "work_order_issue": null,
+    "move_in_date": null,
+    "price_quoted": "$1,800 a month",
+    "budget_amount": "$1,900",
+    "outcome": "Potential tour to be scheduled; more info to be emailed.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "price_quoted",
+      "budget_amount"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number",
+      "move_in_date"
+    ],
+    "estimated_call_seconds": 228
+  }
+}

@@ -1,0 +1,29 @@
+# Call 003 — resident / lease_renewal_move_out_notice
+# edge_case=False  target_minutes=3.9  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management. This is Lisa speaking. How can I help you today?
+Caller: Hi, um, I think I need to, uh, talk about, uh, moving out? Or maybe renewing my lease? Not quite sure what's next, actually.
+Agent: Sure, I can help with that. Can you start by giving me your name, please?
+Caller: Oh, right, sorry! It’s Jason Bell.
+Agent: Thank you, Jason. And, uh, what's your unit number?
+Caller: Uh, it’s 304B, I think? Yes, 304B.
+Agent: Alright, let me pull up your info here... okay, so I see your lease is actually set to end July 15th. Were you thinking of moving out then, or are you considering renewing?
+Caller: Uh, I’m not sure yet. I might have, uh, a new job soon, so it depends on that.
+Agent: Got it, makes sense. Um, do you know when you'll have that decision made by?
+Caller: Well, they said, like, two weeks? But you know, with these things, who can really say?
+Agent: Understandable. Would you like to maybe proceed with renewal details just in case, to prepare for either scenario?
+Caller: Uh, yeah, yeah, let's do that. I think I should know the options, right?
+Agent: Certainly. Let’s see, the current rate for your unit, if you renew, will be $1,500 per month. How does that sound?
+Caller: Hmm, wasn't it $1,450 when I first moved in?
+Agent: Yes, that’s correct. Rates have gone up slightly this year. I can double-check if any promotions are available, though.
+Caller: Oh, um, sure, that'd be great.
+Agent: Alright, Jason, let me just put you on hold for a moment to check that, okay?
+Caller: Yeah, that's fine.
+Agent: [Hold Music] Alright, thanks for waiting. I double-checked, and unfortunately, there aren’t any, uh, current promotions that would apply.
+Caller: Ah, figures. Alright, well, at least I know.
+Agent: Yes, and just to confirm, if you decide to move out, we’ll need at least a 30-day notice.
+Caller: Right... and I should email that to you guys?
+Agent: Exactly, yes. And if you choose to renew, you can just let us know, and we’ll send over the agreements to sign.
+Caller: Got it. You've been really helpful, thanks.
+Agent: No problem at all! If you think of any other questions, feel free to reach out. Have a great day!
+Caller: You too, thanks. Bye!

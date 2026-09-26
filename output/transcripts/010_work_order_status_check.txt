@@ -1,0 +1,19 @@
+# Call 010 — resident / work_order_status_check
+# edge_case=False  target_minutes=2.9  disclosure_style=cooperative
+
+Agent: Good afternoon, Willow Creek Property Management, this is Lisa speaking. How can I help you today?
+Caller: Hi, um, my name is Mark Johnson. I just wanted to check on the status of a work order I put in a couple of days ago.
+Agent: Sure thing, Mark, let me pull up your information. Could you remind me of your unit number, please?
+Caller: Yeah, it's 204B.
+Agent: Great, got it. And just to confirm, you said Mark Johnson, right?
+Caller: That's correct, yes.
+Agent: Perfect, let me just take a look here... Alright, I see the work order. You said this was submitted a couple of days ago, right? Could you tell me what the issue was again?
+Caller: Uh, it was actually for a leaking faucet in the kitchen. It's been, uh, dripping quite a lot, so I just wanted to see if it's been scheduled yet.
+Agent: Got it, leaking faucet in the kitchen, let me check on that... Okay, it looks like this is set for repairs tomorrow morning. We have an appointment scheduled for between 9 AM and 11 AM. Does that work for you?
+Caller: Uh, yeah, that should be fine. Do I need to be there, or will they just, uh, come in and do it?
+Agent: For a leaking faucet, if you're unable to be there, we can have them enter with a key. Do you give permission to enter, or would you prefer to be called first?
+Caller: You can go ahead and enter, that's not a problem.
+Agent: Alright, I'll note that you gave permission to enter. Is there anything else I can assist you with today?
+Caller: No, I think that covers it. Thanks for your help.
+Agent: You're welcome, Mark. Have a great day!
+Caller: You too, bye!

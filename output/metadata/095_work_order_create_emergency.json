@@ -1,0 +1,40 @@
+{
+  "scenario": {
+    "id": 95,
+    "category": "resident",
+    "subtype": "work_order_create_emergency",
+    "edge_case": true,
+    "target_minutes": 2.8,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jamie",
+    "email": null,
+    "phone_number": "555-8765",
+    "unit_number": "2A",
+    "amenities_requested": null,
+    "pet_info": null,
+    "permission_to_enter": "yes",
+    "work_order_issue": "water leak from the ceiling",
+    "move_in_date": null,
+    "price_quoted": null,
+    "budget_amount": null,
+    "outcome": "maintenance dispatched for emergency water leak",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 168
+  }
+}

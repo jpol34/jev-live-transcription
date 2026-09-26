@@ -1,0 +1,23 @@
+# Call 019 — resident / edge_non_english_speaker
+# edge_case=True  target_minutes=5.0  disclosure_style=cooperative
+
+Agent: Hello and thank you for calling Willow Creek Property Management. This is Lisa speaking, how can I assist you today?
+Caller: Ah, hello, yes, uh, good morning. My name is Emiliano, I live in apartment, uhm, eh, uno-dos-seis, I think. Sorry for my English, not so good.
+Agent: No problem at all, Emiliano. You're at apartment one-twenty-six, correct?
+Caller: Yes, si, eso es. It, uhm, yes, one-two-six. I have problem, the, ah, el calentador de agua, how to say... water hot.
+Agent: Oh, the water heater? It's not working properly, is that correct?
+Caller: Yes, yes, no working. Cold water only, no hot. Mucho frio, understand?
+Agent: Got it, the water is too cold. Let me just jot this down—apartment 126, and you're experiencing no hot water. When did this start happening?
+Caller: Eh, como se dice, three days ago. We think it come back. Still same now.
+Agent: You’ve been without hot water for three days? I'm sorry to hear that, Emiliano. Let’s get this sorted as quickly as possible. Can I ask if you've tried adjusting the thermostat on the heater, if it's accessible?
+Caller: Eh, you know, my roommate tried, but, uh, no change. It's, uh, I don't know what, broken I think.
+Agent: Understood. I’ll create a work order for our maintenance team to come and take a look at it. Would you like for us to enter your unit directly if you're not home, or should we call you first?
+Caller: Uhm, call, yes. Mejor that you call first. Sometimes I work from home, sometimes not.
+Agent: Sure thing, we'll call before arriving. Can I double-check the number we have on file for you, just to ensure it's up-to-date?
+Caller: Yes, eh, it is, uh, 555-9801.
+Agent: Thank you. I've got 555-9801 noted here. We’ll be in touch shortly. Are there any other issues or questions you have, Emiliano?
+Caller: Uh, well, um, I think eso es todo, oh wait! Garbage collection, esta semana, when?
+Agent: This week's schedule? Let me check... It looks like collection is on Thursday this week. Is there anything else I can help with?
+Caller: Ah, Thursday. No, that is all. You are very helpful, gracias.
+Agent: You're very welcome, Emiliano. We'll get that maintenance team out as soon as possible and we'll call before we arrive. Have a great day!
+Caller: Thank you, good day to you too!

@@ -1,0 +1,20 @@
+# Call 100 — resident / work_order_create_emergency
+# edge_case=True  target_minutes=2.3  disclosure_style=cooperative
+
+Caller: Uh, hi, is this Willow Creek Property Management?
+Agent: Yes, it is. How can I help you today?
+Caller: Uh, my name is Linda Tyson, and I... I live at Willow Creek Apartment Homes. There's, um, a serious issue in my unit.
+Agent: Oh, I'm sorry to hear that. What seems to be the problem?
+Caller: It's the water heater. It's... um, leaking really badly and I think it's about to burst. I've tried turning off the water, but it's not... it's not helping.
+Agent: That's definitely an emergency. Can you give me your unit number, Linda?
+Caller: Oh, yes, it's Unit 304. Sorry, I should've mentioned that earlier.
+Agent: No worries. And just to confirm, your phone number?
+Caller: Yeah, uh, it's 555-123-4567.
+Agent: Thank you. I’m going to send maintenance over right away. Do they have permission to enter if you're not at home?
+Caller: Um, I’d prefer a call first if that’s okay. I might need to come back... to make sure someone is here.
+Agent: Absolutely, we can arrange for them to give you a call first. Just to clarify, the water has not completely shut off, correct?
+Caller: That's right, it’s still leaking quite a bit. I’ve put some towels around, but it’s not enough.
+Agent: Okay, we’ll treat this as a priority and get someone there as soon as possible. Is there anything else I can assist you with right now?
+Caller: No, I think that's it. Just please hurry, it's really getting worse.
+Agent: We will. Thank you for letting us know, Linda, and hang tight, someone will be in touch shortly.
+Caller: Thank you so much. I really appreciate it.

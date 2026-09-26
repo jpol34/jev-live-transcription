@@ -1,0 +1,36 @@
+{
+  "scenario": {
+    "id": 83,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.4,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Reynolds",
+    "phone_number": "555-0199",
+    "unit_number": "4B",
+    "pet_info": "no pets",
+    "permission_to_enter": "yes",
+    "work_order_issue": "leaking sink",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "pet_info",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 204
+  }
+}

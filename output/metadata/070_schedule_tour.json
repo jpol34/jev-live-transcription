@@ -1,0 +1,31 @@
+{
+  "scenario": {
+    "id": 70,
+    "category": "prospect",
+    "subtype": "schedule_tour",
+    "edge_case": false,
+    "target_minutes": 2.6,
+    "disclosure_style": "rushed",
+    "relevant_fields": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jenna Thompson",
+    "email": "jennathompson89@gmail.com",
+    "phone_number": "415-555-2323",
+    "move_in_date": "beginning of December",
+    "outcome": "Tour scheduled for Tuesday at 3 PM",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "move_in_date"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 156
+  }
+}

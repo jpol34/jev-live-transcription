@@ -1,0 +1,34 @@
+{
+  "scenario": {
+    "id": 58,
+    "category": "resident",
+    "subtype": "edge_maintenance_staff_misconduct",
+    "edge_case": true,
+    "target_minutes": 6.7,
+    "disclosure_style": "cooperative",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Mark Thompson",
+    "email": "mark.t@domain.com",
+    "phone_number": "555-0198",
+    "unit_number": "238",
+    "permission_to_enter": "yes",
+    "work_order_issue": "Incomplete faucet repair; maintenance staff misconduct",
+    "outcome": "Issue escalated to management; new repair scheduled",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "phone_number",
+      "unit_number",
+      "permission_to_enter",
+      "work_order_issue"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 402
+  }
+}

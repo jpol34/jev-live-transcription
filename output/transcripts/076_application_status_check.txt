@@ -1,0 +1,23 @@
+# Call 076 — prospect / application_status_check
+# edge_case=False  target_minutes=3.5  disclosure_style=cooperative
+
+Agent: Good afternoon, thanks for calling Willow Creek Property Management. This is Jamie speaking. How may I assist you today?
+Caller: Hi Jamie, it's uh, Jessica Rivera here. I submitted an application for the Willow Creek Apartment Homes last week, and I was just wondering if there's any update on that?
+Agent: Oh, sure, Jessica. Let me... just give me a second to look that up for you. Can I have your email address or phone number to pull up your details, please?
+Caller: Yeah, sure! My email is jessica.rivera89@gmail.com.
+Agent: Alright, thanks for that. Jessica... Rivera... alright, so I'm just pulling this up now. A moment while I check that for you.
+Caller: Great, thanks.
+Agent: Alright, Jessica, I have your application open here. I see you applied for a two-bedroom unit, correct?
+Caller: Yes, that's right. I think it was unit number 204?
+Agent: That's it, yes. So, let me see... (pause) Okay, it looks like your application is still under review. Our leasing team typically takes about a week to process everything. So you're almost there!
+Caller: Oh, alright. I just wanted to double-check. Um, is there anything else you need from me at this point?
+Agent: Let me double-check... no, it seems like we have all the documents we need from you already. Just waiting on the final assessment.
+Caller: Okay, awesome. And, um, do you know if you have the... uh, the move-in availability for that unit yet?
+Agent: Good question. I see that if everything goes smoothly with your application, the anticipated move-in date for unit 204 would be November 15th. Does that work for you?
+Caller: Uh, yeah, that should be fine. I can start preparing for that date, then.
+Agent: Perfect. And just so you know, if you have any more questions or need anything changed, you can always reach out. I'll be here to help.
+Caller: Thank you, Jamie. Oh, and um, is it okay if I call back in a couple of days if I don't hear anything?
+Agent: Absolutely, feel free to give us a call anytime. We're here to assist you with anything you need.
+Caller: Great, thanks so much for your help. I really appreciate it.
+Agent: You're welcome, Jessica. Have a wonderful day!
+Caller: You too, bye!

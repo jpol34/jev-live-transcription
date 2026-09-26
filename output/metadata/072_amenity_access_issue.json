@@ -1,0 +1,30 @@
+{
+  "scenario": {
+    "id": 72,
+    "category": "resident",
+    "subtype": "amenity_access_issue",
+    "edge_case": false,
+    "target_minutes": 2.0,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Sarah Linton",
+    "unit_number": "204",
+    "phone_number": null,
+    "work_order_issue": "Key fob not granting gym access",
+    "outcome": "Caller advised to visit office to resync fob",
+    "fields_disclosed": [
+      "caller_name",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "phone_number"
+    ],
+    "estimated_call_seconds": 142
+  }
+}

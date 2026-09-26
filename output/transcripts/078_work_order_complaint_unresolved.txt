@@ -1,0 +1,28 @@
+# Call 078 — resident / work_order_complaint_unresolved
+# edge_case=True  target_minutes=5.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management, this is Jessica. How can I help you today?
+Caller: Uh, hi, Jessica. This is, uh, John… uh, Johannsen. I live in, I believe it's unit 5B?
+Agent: Hi John, got it—unit 5B. How can I assist you today?
+Caller: Yeah, so I, um, put in a work order like, uh, last month for my leaking sink, and... uh, it's still leaking?
+Agent: Oh, I'm sorry to hear that. You're saying it was for a leaking sink, correct? Let me pull up your work order record here.
+Caller: Yeah, it was the, um, the kitchen sink actually, it's, uh, it's dripping quite a lot now.
+Agent: Thanks for clarifying. Okay, I see the work order here was entered on the 10th. It says here that it was marked complete. You're saying they didn't fix it?
+Caller: Yeah, no, um, they came, but I guess... something didn't stick? It's still, uh, it's still leaking a lot.
+Agent: I'm so sorry about the continued inconvenience. Let me just make a note here... could I confirm your phone number, just in case we need to follow up?
+Caller: Uh, sure, it's 555-0112... uh, wait, sorry, it's 555-1012. Got mixed up.
+Agent: Thank you for that. So you mentioned a leaking sink, have you noticed anything else going wrong or, um, any changes since they last visited?
+Caller: Not really, it's just the same issue, but, um, worse over time, I guess? It floods the countertop sometimes.
+Agent: Alright, so it's urgent. Let me escalate this, and we can have someone come back as soon as possible. Is there a time that works best for you?
+Caller: Uh, soon, I guess? But I'm generally around in the afternoons. Maybe tomorrow?
+Agent: Afternoons, got it. I can place a reminder for them to reach you before they arrive. Do you need a call first, or is it okay for them to just come in?
+Caller: I'd prefer if, uh, if they called first, you know, just to make sure?
+Agent: Sure, we can call you before they come. Anything else regarding the sink that I should note?
+Caller: No, um, wait, actually, there's sometimes this weird noise... like a gurgling? When it, uh, when it starts leaking more.
+Agent: Alright, I'll include that noise note. It helps the maintenance team understand what's happening. Now, I'll tag this as urgent and escalate. You said an afternoon visit works, right?
+Caller: Yeah, afternoons, please.
+Agent: Perfect, they'll call you first on your number ends with 1012. Expect a call tomorrow then. Is there anything else you want us to address?
+Caller: No, just the sink... and, uh, please make sure it gets fixed this time.
+Agent: Absolutely, John. We're sorry for the trouble and we'll ensure it's properly resolved. Thank you for your patience.
+Caller: Alright, thanks, Jessica... appreciate it.
+Agent: You're welcome! Have a good day.

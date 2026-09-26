@@ -1,0 +1,18 @@
+# Call 013 — resident / amenity_access_issue
+# edge_case=False  target_minutes=2.2  disclosure_style=corrects_mistake
+
+Agent: Thank you for calling Willow Creek Property Management. This is Sarah, how can I help you today?
+Caller: Hi, uh, this is Mark. I'm having some trouble with my, um, access to the gym. The, uh, keycard doesn't seem to work.
+Agent: Oh, I'm sorry to hear that, Mark. Let's see what we can do. Could you please provide your unit number?
+Caller: Yeah, it's, uh, 207. Wait, no, sorry, I meant 307.
+Agent: Got it, unit 307. And just to confirm, did you have any issues accessing other amenities, or is it just the gym?
+Caller: No, just the gym. Everything else seems fine.
+Agent: Alright, uh, let me put you on a quick hold while I check the system here to make sure your keycard is activated correctly, okay?
+Caller: Sure, that's fine.
+Agent: Thanks, just a moment.
+Agent: (brief hold music) Thanks for holding, Mark. So, it looks like your keycard should be active. Can you confirm the phone number we have on file? Sometimes there’s a glitch and I'll need to re-enter it.
+Caller: Uh, yeah, it's 555-0123. Oh wait, did I say 555-0123? I meant 555-0132, sorry.
+Agent: No worries, 555-0132. I'll update that. Let's try reactivating your card. Can you give it another try later today? It should work after that.
+Caller: Sure, I'll do that. Is there anything else I should, uh, know or check if it doesn't work?
+Agent: If you still face issues after today, give us another call and we can issue a new card. Could you let me know if it works or not?
+Caller: Okay, definitely. Thanks for your help!

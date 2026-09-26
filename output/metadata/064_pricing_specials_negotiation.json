@@ -1,0 +1,31 @@
+{
+  "scenario": {
+    "id": 64,
+    "category": "prospect",
+    "subtype": "pricing_specials_negotiation",
+    "edge_case": false,
+    "target_minutes": 4.4,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "budget_amount",
+      "price_quoted",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Morgan Kandles",
+    "phone_number": "323-555-0187",
+    "budget_amount": "$1,200",
+    "price_quoted": "$1,000 for a one-bedroom with $200 off first month if moved in before the end of next month",
+    "outcome": "Tour scheduled",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "price_quoted"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 270
+  }
+}

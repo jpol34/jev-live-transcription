@@ -1,0 +1,38 @@
+{
+  "scenario": {
+    "id": 56,
+    "category": "prospect",
+    "subtype": "availability_inquiry",
+    "edge_case": false,
+    "target_minutes": 3.1,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "phone_number",
+      "budget_amount",
+      "amenities_requested",
+      "move_in_date"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Tim",
+    "phone_number": "555-7834",
+    "move_in_date": "mid-November",
+    "budget_amount": "$1200",
+    "amenities_requested": [
+      "in-unit laundry",
+      "gym",
+      "pool"
+    ],
+    "outcome": "Caller needs more information and may call back to schedule a tour.",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "move_in_date",
+      "budget_amount",
+      "amenities_requested"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 190
+  }
+}

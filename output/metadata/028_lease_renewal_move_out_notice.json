@@ -1,0 +1,35 @@
+{
+  "scenario": {
+    "id": 28,
+    "category": "resident",
+    "subtype": "lease_renewal_move_out_notice",
+    "edge_case": false,
+    "target_minutes": 3.9,
+    "disclosure_style": "corrects_mistake",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "email",
+      "move_in_date",
+      "price_quoted"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Jake Barkley",
+    "email": "jake.barkley@gmail.com",
+    "unit_number": "212",
+    "move_in_date": null,
+    "price_quoted": null,
+    "outcome": "Pending move-out notice discussion; email follow-up planned.",
+    "fields_disclosed": [
+      "caller_name",
+      "email",
+      "unit_number"
+    ],
+    "fields_withheld_or_unknown": [
+      "move_in_date",
+      "price_quoted"
+    ],
+    "estimated_call_seconds": 240
+  }
+}

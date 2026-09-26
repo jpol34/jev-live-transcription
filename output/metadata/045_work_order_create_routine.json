@@ -1,0 +1,36 @@
+{
+  "scenario": {
+    "id": 45,
+    "category": "resident",
+    "subtype": "work_order_create_routine",
+    "edge_case": false,
+    "target_minutes": 3.2,
+    "disclosure_style": "confused",
+    "relevant_fields": [
+      "caller_name",
+      "unit_number",
+      "phone_number",
+      "work_order_issue",
+      "permission_to_enter",
+      "pet_info"
+    ]
+  },
+  "metadata": {
+    "caller_name": "Carla Jones",
+    "phone_number": "555-0214",
+    "unit_number": "18C",
+    "work_order_issue": "leaking kitchen faucet",
+    "pet_info": "small dog",
+    "permission_to_enter": "call_first",
+    "fields_disclosed": [
+      "caller_name",
+      "phone_number",
+      "unit_number",
+      "work_order_issue",
+      "pet_info",
+      "permission_to_enter"
+    ],
+    "fields_withheld_or_unknown": [],
+    "estimated_call_seconds": 220
+  }
+}

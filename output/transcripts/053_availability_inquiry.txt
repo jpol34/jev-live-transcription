@@ -1,0 +1,24 @@
+# Call 053 — prospect / availability_inquiry
+# edge_case=False  target_minutes=3.0  disclosure_style=cooperative
+
+Agent: Thank you for calling Willow Creek Property Management. This is Jasmine speaking. How can I assist you today?
+Caller: Hi Jasmine, this is Alex Brown. I'm looking at potentially moving into the Willow Creek Apartment Homes, and I wanted to ask about availability.
+Agent: Sure thing, Alex. I'd be happy to help you with that. Could you tell me what kind of unit you're interested in?
+Caller: Um, I'm looking for a two-bedroom, preferably something with a nice view.
+Agent: Okay, two-bedroom units. Let me check what we have available. Could you hold for just a moment?
+Caller: Yeah, no problem.
+Agent: Thanks for holding. So, we do have a couple of two-bedroom units available. Do you have a particular move-in date in mind?
+Caller: Uh, I'm hoping to move in around mid-November. Would that be possible?
+Agent: Mid-November should work fine. We have a unit available from the 15th. Does that align with your plans?
+Caller: Yeah, that sounds perfect. What about amenities? Does it come with the usual, like a gym or a pool?
+Agent: Yes, we have a gym and a pool on site. Is there any specific amenity you're particularly interested in?
+Caller: A gym would definitely be great. Are there any additional costs for using it?
+Agent: No extra costs for residents. Everything is included in the rent. Speaking of which, do you have a budget in mind?
+Caller: I'm hoping to keep it under $1,800 per month. Is that doable?
+Agent: Let me double-check. Ah yes, we do have a unit that fits that budget. It's listed at $1,750 per month.
+Caller: That’s within my range. Excellent. And uh, is there a deposit required?
+Agent: Yes, there's a standard security deposit, which is one month's rent. Can I take your phone number to keep in touch as we move forward?
+Caller: Sure, it’s 555-0192.
+Agent: Great, I've got that down. Is there anything else you’d like to know?
+Caller: No, I think that covers it. Thanks for the help, Jasmine!
+Agent: You're very welcome, Alex! Feel free to call us back if you have any more questions. Have a great day!

@@ -1,0 +1,26 @@
+# Call 072 — resident / amenity_access_issue
+# edge_case=False  target_minutes=2.0  disclosure_style=confused
+
+Agent: Thank you for calling Willow Creek Property Management, how can I help you today?
+Caller: Uh, hi, yeah, uh, I'm having a bit of an issue getting into the gym here at, um, Willow Creek.
+Agent: Oh, I'm sorry to hear that. Could I get your name, please?
+Caller: Sure, it's, uh, Sarah... Sarah Linton.
+Agent: Alright, Sarah. Could you spell your last name for me?
+Caller: Yeah, it's L-I-N-T-O-N.
+Agent: Thank you. And could I have your unit number, please?
+Caller: Oh, um, it's 204. Yeah, 204.
+Agent: Perfect, thanks for that. So, you're trying to access the gym facility?
+Caller: Right, I tried my key fob but, uh, it just doesn't work.
+Agent: Got it. Could there be any chance your fob needs to be updated or... when was the last time it worked?
+Caller: Uh, I think it was fine last week? I'm not sure what's changed, though.
+Agent: Alright, let me quickly check if there are any known issues or if your fob needs re-programming. Do you mind holding for just a moment?
+Caller: Yeah, that's okay, I'll wait.
+Agent: (hold music) Okay, thanks for holding, Sarah. I just checked, and it looks like there might have been a system update recently.
+Caller: Oh, okay... so what does that mean?
+Agent: It means your fob might need to be re-synced with the main system. I recommend stopping by the office so we can take a look and fix it for you.
+Caller: Alright, I'll do that. Uh, is there a specific time I should come by, or can I just drop in?
+Agent: You're welcome to drop in anytime during office hours, which are 9 AM to 5 PM, Monday to Friday. Will that work for you?
+Caller: Yeah, I think that'll work. I'll come by tomorrow.
+Agent: Great. Anything else I can help you with?
+Caller: No, that's it. Thanks for your help!
+Agent: You're welcome, Sarah! Have a good day.

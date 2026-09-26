@@ -1,0 +1,32 @@
+# Call 097 — resident / edge_pest_infestation
+# edge_case=True  target_minutes=4.1  disclosure_style=guarded
+
+Agent: Thank you for calling Willow Creek Property Management. My name is Amy. How can I help you today?
+Caller: Hi, uh, this is... um, uh, Mike. I, I'm having a bit of a situation.
+Agent: I'm sorry to hear that, Mike. Could you let me know what's going on?
+Caller: Yeah, uh, it’s... I've been seeing these, uh... creatures, I guess? In my apartment. It's kind of freaking me out.
+Agent: Oh, I understand that can be concerning. Could you specify what kind of creatures they are? Like insects or rodents?
+Caller: They're like bugs, mostly in the kitchen. I think they're... cockroaches?
+Agent: Got it. Cockroaches in the kitchen. Have you noticed them anywhere else in your unit?
+Caller: I, uh, well mostly in the kitchen. Maybe the bathroom. I’m not really sure.
+Agent: Alright. We'll definitely need to take care of that for you. Can I have your unit number, please?
+Caller: Uh, hold on, let me check... Um, it's... I don't have it off the top of my head. Can you look it up by my name?
+Agent: Sure thing, but just to confirm, could you spell your last name for me?
+Caller: It's Wilson, uh, W-I-L-S-O-N.
+Agent: Thank you, Mike. Let me just pull that up for you...
+Agent: Alright, I see you're in unit 4B. Is that correct?
+Caller: Yes, that's right. 4B.
+Agent: Perfect. Now, just to proceed with the work order, do you have any pets?
+Caller: Uh, no pets. But, um, I really don’t want them, uh, spraying anything toxic. I’m worried about, you know, health stuff.
+Agent: I completely understand your concern, Mike. We can request a more eco-friendly pest control option. Would that be acceptable for your situation?
+Caller: I guess that would be better. Could, could someone call me before they come by?
+Agent: Of course, we can arrange for them to call you first. What’s the best number to reach you at?
+Caller: It's, um, 847-555-7239.
+Agent: 847-555-7239, got it. One last thing, is there a specific time that works best for you?
+Caller: Uh, afternoons. Maybe after 3 PM? But, only on weekdays.
+Agent: Noted. Afternoons after 3 PM, weekdays only. We'll make sure to accommodate that.
+Agent: Is there anything else I can assist you with today?
+Caller: No, I just really want these things gone. It’s kinda stressful.
+Agent: I understand entirely, Mike. We’ll handle this as soon as possible. Thanks for reaching out.
+Caller: Alright, thanks, Amy. Bye.
+Agent: You're welcome, take care. Goodbye.
