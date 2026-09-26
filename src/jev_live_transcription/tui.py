@@ -1,7 +1,8 @@
 """Terminal UI for watching one call replay live, tick by tick.
 
-Shows both pipelines' (`gliner_jev` and `llm`) current committed value and confidence for all 11
-fields, side by side, refreshing every tick. Built entirely on
+Shows the `gliner_jev` pipeline's current committed value and confidence for all 11 fields, and
+the `llm` (GPT-5.1) pipeline's alongside it when `--enable-llm-baseline` is passed, refreshing
+every tick. Built entirely on
 `pipeline_core.run_call(pacer_mode="realtime")` via its `on_tick` callback -- this module does not
 reimplement any tick-pacing or transcript-replay logic itself.
 """
@@ -93,14 +94,15 @@ class _TuiState:
         return layout
 
 
-async def _run_async(call_id: int, db_path: Path) -> None:
+async def _run_async(call_id: int, db_path: Path, enable_llm_baseline: bool) -> None:
     calls = corpus.load_all()
     if call_id not in calls:
         raise SystemExit(
             f"call_id {call_id} not found in corpus (see output/metadata/ for available ids)"
         )
 
-    secrets.load_openai_key()
+    if enable_llm_baseline:
+        secrets.load_openai_key()
     secrets.load_typesafe_key()
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -120,6 +122,7 @@ async def _run_async(call_id: int, db_path: Path) -> None:
             pacer_mode="realtime",
             calls=calls,
             on_tick=on_tick,
+            enable_llm_baseline=enable_llm_baseline,
         )
         state.done = True
         live.update(state.render())
@@ -127,7 +130,11 @@ async def _run_async(call_id: int, db_path: Path) -> None:
     console.print(f"\nCall {call_id} finished. Capture DB written to {db_path}")
 
 
-def run(call_id: int, db_path: Path | str | None = None) -> None:
-    """Entry point for `jlt tui <call_id>`: replay `call_id` live and render both pipelines."""
+def run(call_id: int, db_path: Path | str | None = None, enable_llm_baseline: bool = False) -> None:
+    """Entry point for `jlt tui <call_id>`: replay `call_id` live and render both pipelines.
+
+    `enable_llm_baseline` defaults to `False` -- the GPT-5.1 comparison column stays empty unless
+    explicitly requested, since enabling it calls the real OpenAI API and costs real money.
+    """
     resolved_db_path = Path(db_path) if db_path is not None else DEFAULT_CAPTURE_DIR / f"call_{call_id}.db"
-    asyncio.run(_run_async(call_id, resolved_db_path))
+    asyncio.run(_run_async(call_id, resolved_db_path, enable_llm_baseline))

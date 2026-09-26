@@ -1,7 +1,7 @@
 """Orchestrates one call end to end: replays its transcript via the pacer and, on every tick the
-transcript grows, runs the GLiNER+jev pipeline; the GPT-5.1 baseline runs concurrently alongside
-it on every `config.LLM_CADENCE_TICKS`-th such tick. Every tick's activity is captured to the
-capture DB.
+transcript grows, runs the GLiNER+jev pipeline; the GPT-5.1 baseline, when `run_call`'s
+`enable_llm_baseline` is opted in, runs concurrently alongside it on every
+`config.LLM_CADENCE_TICKS`-th such tick. Every tick's activity is captured to the capture DB.
 
 Two logical pipelines are recorded, named by the `pipeline` column on `pipeline_runs` and
 `field_extractions`:
@@ -21,6 +21,7 @@ themselves.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import re
@@ -211,6 +212,22 @@ async def _enqueue_pipeline_run(
     return await asyncio.wrap_future(future)
 
 
+async def _timed_resolve_field(coro):
+    """Await one `resolver.resolve_field` call and return `(result_or_exception, latency_ms)`.
+
+    Timed individually per field rather than around a caller's outer `asyncio.gather` of several
+    such calls, so concurrently-resolved fields never share one wall-clock number. Never raises --
+    an exception is captured and returned alongside its own latency instead, so a caller can
+    `asyncio.gather` every field's call without `return_exceptions=True` losing per-field timing.
+    """
+    start = time.monotonic()
+    try:
+        result = await coro
+    except Exception as exc:  # noqa: BLE001 -- surfaced to the caller as data, not raised here
+        return exc, (time.monotonic() - start) * 1000
+    return result, (time.monotonic() - start) * 1000
+
+
 async def _run_gliner_jev_step(
     store,
     *,
@@ -221,10 +238,20 @@ async def _run_gliner_jev_step(
     snapshot: str,
     resolver: JevFieldResolver,
     committed: _CommittedState,
+    gliner_semaphore: asyncio.Semaphore | None = None,
 ) -> None:
-    start = time.monotonic()
+    # `start` is taken *inside* the semaphore, matching where extract_candidates_timed's own
+    # internal per-model timers start -- taking it before acquiring the semaphore would fold
+    # queueing wait (real under gliner_concurrency > 1) into the error path's latency_ms while the
+    # success path's pii_latency_ms/zero_shot_latency_ms never include it, making the two
+    # incomparable for the same stage.
+    semaphore_ctx = gliner_semaphore if gliner_semaphore is not None else contextlib.nullcontext()
     try:
-        candidates = await gliner_pipeline.extract_candidates(snapshot, pipeline_call_id)
+        async with semaphore_ctx:
+            start = time.monotonic()
+            candidates, pii_latency_ms, zero_shot_latency_ms = await gliner_pipeline.extract_candidates_timed(
+                snapshot, pipeline_call_id
+            )
     except Exception as exc:  # noqa: BLE001 -- GLiNER failures are captured as data, not raised
         # extract_candidates runs both underlying models concurrently and surfaces whichever one
         # raised first -- there is no way to tell from here whether the PII or zero-shot model (or
@@ -252,7 +279,6 @@ async def _run_gliner_jev_step(
             ),
         )
         return
-    latency_ms = (time.monotonic() - start) * 1000
 
     pii_candidates = {field: candidates.get(field, []) for field in gliner_pipeline.PII_FIELD_LABELS}
     zero_shot_candidates = {
@@ -265,7 +291,7 @@ async def _run_gliner_jev_step(
             call_id=call_id,
             pipeline=GLINER_JEV_PIPELINE,
             stage="gliner_stream_pii",
-            latency_ms=latency_ms,
+            latency_ms=pii_latency_ms,
             raw_output_json=json.dumps(pii_candidates),
         ),
         _enqueue_pipeline_run(
@@ -274,7 +300,7 @@ async def _run_gliner_jev_step(
             call_id=call_id,
             pipeline=GLINER_JEV_PIPELINE,
             stage="gliner_standard",
-            latency_ms=latency_ms,
+            latency_ms=zero_shot_latency_ms,
             raw_output_json=json.dumps(zero_shot_candidates),
         ),
     )
@@ -291,15 +317,15 @@ async def _run_gliner_jev_step(
             continue
         context = _field_context_window(snapshot, field_spans, spans=sentence_spans)
         resolve_tasks.append(
-            resolver.resolve_field(pipeline_call_id, field_name, values, context)
+            _timed_resolve_field(resolver.resolve_field(pipeline_call_id, field_name, values, context))
         )
         resolve_field_names.append(field_name)
     if not resolve_tasks:
         return
 
-    results = await asyncio.gather(*resolve_tasks, return_exceptions=True)
+    results_with_latency = await asyncio.gather(*resolve_tasks)
     persist_tasks = []
-    for field_name, result in zip(resolve_field_names, results):
+    for field_name, (result, jev_latency_ms) in zip(resolve_field_names, results_with_latency):
         if isinstance(result, Exception):
             await _enqueue_pipeline_run(
                 store,
@@ -307,6 +333,7 @@ async def _run_gliner_jev_step(
                 call_id=call_id,
                 pipeline=GLINER_JEV_PIPELINE,
                 stage="jev",
+                latency_ms=jev_latency_ms,
                 error=str(result),
             )
             continue
@@ -323,6 +350,7 @@ async def _run_gliner_jev_step(
             call_id=call_id,
             pipeline=GLINER_JEV_PIPELINE,
             stage="jev",
+            latency_ms=jev_latency_ms,
             input_tokens=result.input_tokens,
             output_tokens=result.output_tokens,
             estimated_cost_usd=_estimate_jev_cost_usd(result.input_tokens, result.output_tokens),
@@ -429,6 +457,8 @@ async def run_call(
     calls: dict[int, dict] | None = None,
     resolver: JevFieldResolver | None = None,
     on_tick: Callable[[int, int, _CommittedState], None] | None = None,
+    gliner_semaphore: asyncio.Semaphore | None = None,
+    enable_llm_baseline: bool = False,
 ) -> None:
     """Replay `call_id`'s transcript and capture both pipelines' activity to the capture DB.
 
@@ -439,7 +469,16 @@ async def run_call(
     avoid re-reading every transcript/metadata file per call. `resolver` follows the same
     reuse-or-own pattern as `db_path`: pass an already-constructed `JevFieldResolver` to share its
     underlying HTTP connection pool across concurrently orchestrated calls, or omit it to have
-    `run_call` create and close its own for just this call.
+    `run_call` create and close its own for just this call. `gliner_semaphore`, when given, is
+    acquired around every GLiNER inference this call makes -- shared across concurrently
+    orchestrated calls to bound total GLiNER concurrency independently of how many calls are
+    running at once.
+
+    `enable_llm_baseline` defaults to `False`: the GPT-5.1 comparison arm costs real OpenAI API
+    usage on every `config.LLM_CADENCE_TICKS`-th grown tick, so it never runs unless a caller opts
+    in explicitly -- it is a deliberate, approved "final benchmark" comparison run, not routine
+    GLiNER+jev data collection. When disabled, no `llm_baseline.extract` call is made and no `llm`
+    pipeline rows are written for any tick.
 
     `pacer_mode` is `"batch"` (replay every tick back-to-back, no sleeping) or `"realtime"`
     (replay paced to wall-clock time).
@@ -528,9 +567,10 @@ async def run_call(
                             snapshot=snapshot,
                             resolver=resolver,
                             committed=committed,
+                            gliner_semaphore=gliner_semaphore,
                         )
                     ]
-                    if tick_number % config.LLM_CADENCE_TICKS == 0:
+                    if enable_llm_baseline and tick_number % config.LLM_CADENCE_TICKS == 0:
                         steps.append(
                             _run_llm_step(
                                 store,

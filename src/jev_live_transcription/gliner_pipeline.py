@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import threading
+import time
 
 from gliner import GLiNER
 
@@ -64,6 +65,15 @@ _pii_sent_length: dict[str, int] = {}
 # `_pii_sent_length` or send overlapping chunks into the streaming session.
 _pii_call_locks: dict[str, threading.Lock] = {}
 _pii_call_locks_guard = threading.Lock()
+
+# The streaming PII checkpoint keeps its own per-session KV-cache/decoder state inside the model
+# object, keyed by session_id -- unlike a stateless forward pass, there is no upstream guarantee
+# that calling `model.inference(...)` concurrently from multiple threads with *different*
+# session_ids is safe against that shared internal state. The per-call_id lock above only
+# serializes ticks for the *same* call; this lock serializes the actual inference call itself
+# across every call_id, so batch_runner's call_concurrency/gliner_concurrency > 1 can never send
+# two calls' inferences into the model at once.
+_pii_inference_lock = threading.Lock()
 
 
 def _get_pii_model() -> GLiNER:
@@ -124,12 +134,13 @@ def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict
             # chunk per call, so there's nothing to feed the session; report
             # no candidates rather than re-querying stale state.
             return {field: [] for field in PII_FIELD_LABELS}
-        entities = model.inference(
-            [delta],
-            list(PII_FIELD_LABELS.values()),
-            session_id=[call_id],
-            threshold=0.5,
-        )[0]
+        with _pii_inference_lock:
+            entities = model.inference(
+                [delta],
+                list(PII_FIELD_LABELS.values()),
+                session_id=[call_id],
+                threshold=0.5,
+            )[0]
         _pii_sent_length[call_id] = len(transcript_snapshot)
     return _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
 
@@ -145,6 +156,34 @@ def _run_zero_shot_tick(transcript_snapshot: str) -> dict[str, list[dict]]:
     return _entities_to_candidates(entities, _ZERO_SHOT_LABEL_TO_FIELD)
 
 
+async def _timed_to_thread(func, *args):
+    """Run `func` in a worker thread and return `(result, latency_ms)` for that call alone.
+
+    Timed around the individual `asyncio.to_thread` call rather than around a caller's outer
+    `asyncio.gather` of several such calls, so each call's own latency is never conflated with a
+    concurrently-running sibling's.
+    """
+    start = time.monotonic()
+    result = await asyncio.to_thread(func, *args)
+    return result, (time.monotonic() - start) * 1000
+
+
+async def extract_candidates_timed(
+    transcript_snapshot: str, call_id: str
+) -> tuple[dict[str, list[dict]], float, float]:
+    """Same as `extract_candidates`, but also returns each model's own latency in milliseconds as
+    `(candidates, pii_latency_ms, zero_shot_latency_ms)` -- timed independently per model (see
+    `_timed_to_thread`) so a caller recording per-stage latency (e.g. `pipeline_core`) never
+    attributes one model's wall-clock time to the other.
+    """
+    pii_task = _timed_to_thread(_run_pii_tick, transcript_snapshot, call_id)
+    zero_shot_task = _timed_to_thread(_run_zero_shot_tick, transcript_snapshot)
+    (pii_candidates, pii_latency_ms), (zero_shot_candidates, zero_shot_latency_ms) = await asyncio.gather(
+        pii_task, zero_shot_task
+    )
+    return {**pii_candidates, **zero_shot_candidates}, pii_latency_ms, zero_shot_latency_ms
+
+
 async def extract_candidates(transcript_snapshot: str, call_id: str) -> dict[str, list[dict]]:
     """Return per-field candidate spans for one call's transcript-so-far.
 
@@ -155,11 +194,14 @@ async def extract_candidates(transcript_snapshot: str, call_id: str) -> dict[str
     than their sum. The result covers all 11 fields; each maps to a list of
     candidate spans shaped `{"text", "score", "start", "end"}`, empty when no
     candidate was found this tick.
+
+    A thin wrapper over `extract_candidates_timed` for callers that only need the merged
+    candidates, not each model's individual latency.
     """
-    pii_task = asyncio.to_thread(_run_pii_tick, transcript_snapshot, call_id)
-    zero_shot_task = asyncio.to_thread(_run_zero_shot_tick, transcript_snapshot)
-    pii_candidates, zero_shot_candidates = await asyncio.gather(pii_task, zero_shot_task)
-    return {**pii_candidates, **zero_shot_candidates}
+    candidates, _pii_latency_ms, _zero_shot_latency_ms = await extract_candidates_timed(
+        transcript_snapshot, call_id
+    )
+    return candidates
 
 
 def reset_call(call_id: str) -> None:
