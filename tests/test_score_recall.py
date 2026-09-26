@@ -22,6 +22,17 @@ def test_is_match_false_for_unrelated_values():
     assert not score_recall.is_match("Tim Barker", "555-0134")
 
 
+def test_is_match_false_for_numeric_substring_that_is_not_a_whole_token():
+    # "12" is a plain substring of "212", but they're different unit numbers/prices -- a match
+    # here would be a false positive recall hit for a wrong extraction.
+    assert not score_recall.is_match("212", "12")
+    assert not score_recall.is_match("103", "3")
+
+
+def test_is_match_true_for_whole_numeric_token_within_longer_text():
+    assert score_recall.is_match("apartment 204", "204")
+
+
 def test_is_match_false_for_empty_values():
     assert not score_recall.is_match("", "Tim Barker")
     assert not score_recall.is_match("Tim Barker", "")

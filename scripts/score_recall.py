@@ -37,13 +37,20 @@ def is_match(extracted: str, truth: str) -> bool:
     """True if `extracted` and `truth` agree closely enough to count as a recall hit.
 
     Extracted values are free text produced by a model, not guaranteed to match the ground-truth
-    string exactly (e.g. "the caller, Tim Barker" vs "Tim Barker") -- normalized equality or
-    substring containment either way covers that without requiring an exact match.
+    string exactly (e.g. "the caller, Tim Barker" vs "Tim Barker") -- normalized equality, or the
+    shorter value appearing as a whole word (or run of words) inside the longer one, covers that
+    without requiring an exact match. Plain substring containment (with no word-boundary check)
+    would count "212" as a match for ground truth "12", or "103" for "3" -- a real risk for the
+    short numeric/ID-like fields (unit_number, phone digits, prices), where every digit string is
+    a substring of many other digit strings that share no actual value.
     """
     norm_extracted, norm_truth = normalize(extracted), normalize(truth)
     if not norm_extracted or not norm_truth:
         return False
-    return norm_extracted == norm_truth or norm_truth in norm_extracted or norm_extracted in norm_truth
+    if norm_extracted == norm_truth:
+        return True
+    shorter, longer = sorted((norm_extracted, norm_truth), key=len)
+    return re.search(rf"\b{re.escape(shorter)}\b", longer) is not None
 
 
 def load_ground_truths(conn: sqlite3.Connection) -> dict[int, dict]:
@@ -121,11 +128,8 @@ def print_table(stats: dict[str, dict]) -> None:
     for field_name, field_stats in stats.items():
         recall = field_stats["recall"]
         recall_str = f"{recall:.2%}" if recall is not None else "n/a"
-        print(
-            f"{field_name:<22} "
-            f"{field_stats['n_matched']}/{field_stats['n_expected']:<15} "
-            f"{recall_str:<8}"
-        )
+        ratio_str = f"{field_stats['n_matched']}/{field_stats['n_expected']}"
+        print(f"{field_name:<22} {ratio_str:<18} {recall_str:<8}")
 
 
 def diff_against_baseline(stats: dict[str, dict], baseline: dict[str, dict], tolerance: float) -> list[str]:
@@ -181,7 +185,12 @@ def main() -> int:
         print(f"\nSaved recall snapshot -> {args.save}")
 
     if args.baseline is not None:
-        baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
+        if not args.baseline.exists():
+            parser.error(f"baseline snapshot not found: {args.baseline}")
+        try:
+            baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            parser.error(f"baseline snapshot at {args.baseline} is not valid JSON: {exc}")
         regressions = diff_against_baseline(stats, baseline, args.tolerance)
         if regressions:
             print(f"\nRecall regressed past tolerance ({args.tolerance:.2%}) vs. {args.baseline}:")
