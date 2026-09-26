@@ -103,6 +103,35 @@ def _field_context_window(
     )
 
 
+def _candidate_context_windows(
+    snapshot: str,
+    candidate_spans: list[dict],
+    *,
+    spans: list[tuple[int, int]] | None = None,
+) -> dict[str, str]:
+    """Map each candidate span's own text to its own individually-sliced context window.
+
+    Unlike `_field_context_window`'s single window merged across every span found this tick, each
+    candidate here keeps its own justifying sentence(s) distinct from any other candidate's --
+    this is what `JevFieldResolver.resolve_field` caches per candidate the first time it is
+    detected, so a later Choice call still has it even once a candidate's span stops being
+    reported on later ticks. A span missing `start`/`end` is left out entirely rather than mapped
+    to a merged fallback: caching an imprecise substitute (potentially the whole snapshot, per
+    `_field_context_window`'s own fallback) would lock it in forever for that candidate even once
+    a later tick supplies a real, tightly-scoped span for it. Dropping the entry here instead lets
+    `resolve_field` fall back to its own `context_window` argument for just this call, and keep
+    trying to cache a precise window on a later tick.
+    """
+    windows: dict[str, str] = {}
+    for candidate in candidate_spans:
+        text = candidate.get("text")
+        start, end = candidate.get("start"), candidate.get("end")
+        if not text or text in windows or start is None or end is None:
+            continue
+        windows[text] = context_window(snapshot, start, end, spans=spans)
+    return windows
+
+
 def _apply_carry_forward(
     committed: _CommittedState,
     pipeline: str,
@@ -316,8 +345,17 @@ async def _run_gliner_jev_step(
         if not values:
             continue
         context = _field_context_window(snapshot, field_spans, spans=sentence_spans)
+        candidate_contexts = _candidate_context_windows(snapshot, field_spans, spans=sentence_spans)
         resolve_tasks.append(
-            _timed_resolve_field(resolver.resolve_field(pipeline_call_id, field_name, values, context))
+            _timed_resolve_field(
+                resolver.resolve_field(
+                    pipeline_call_id,
+                    field_name,
+                    values,
+                    context,
+                    candidate_context_windows=candidate_contexts,
+                )
+            )
         )
         resolve_field_names.append(field_name)
     if not resolve_tasks:

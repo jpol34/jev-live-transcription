@@ -1,12 +1,13 @@
 """Mocked tests for pipeline_core -- no real GLiNER/jev/OpenAI calls (kept fast/offline)."""
 
 import concurrent.futures
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
 import pytest
 
 from jev_live_transcription import pipeline_core
-from jev_live_transcription.jev_pipeline import JevResolution
+from jev_live_transcription.jev_pipeline import JevFieldResolver, JevResolution
 
 
 def _resolved_future(value):
@@ -140,6 +141,76 @@ def test_context_window_includes_neighbor_sentences():
 def test_context_window_falls_back_to_full_text_without_matching_span():
     text = "One sentence only"
     assert pipeline_core.context_window(text, 0, len(text)) == text
+
+
+def test_candidate_context_windows_slices_each_candidate_individually():
+    snapshot = (
+        "Agent: hi. Caller: my number is 555-1111. Some unrelated note here. "
+        "Caller: actually it's 555-2222. Thanks for calling."
+    )
+    spans = pipeline_core._sentence_spans(snapshot)
+    candidate_spans = [
+        {
+            "text": "555-1111",
+            "start": snapshot.index("555-1111"),
+            "end": snapshot.index("555-1111") + len("555-1111"),
+        },
+        {
+            "text": "555-2222",
+            "start": snapshot.index("555-2222"),
+            "end": snapshot.index("555-2222") + len("555-2222"),
+        },
+    ]
+    fallback = pipeline_core._field_context_window(snapshot, candidate_spans, spans=spans)
+
+    windows = pipeline_core._candidate_context_windows(snapshot, candidate_spans, spans=spans)
+
+    # Each candidate's own window covers only its own justifying text, not the other candidate's --
+    # unlike `fallback`, which spans both since it's merged across every span found this tick.
+    assert "555-1111" in windows["555-1111"]
+    assert "555-2222" not in windows["555-1111"]
+    assert "555-2222" in windows["555-2222"]
+    assert "555-1111" not in windows["555-2222"]
+    assert "555-1111" in fallback and "555-2222" in fallback
+
+
+def test_candidate_context_windows_omits_spans_missing_offsets():
+    # A span missing start/end is left out entirely rather than mapped to a merged fallback -- a
+    # caller (JevFieldResolver) that caches this per candidate must never lock in an imprecise
+    # substitute for a candidate whose offsets simply weren't available yet.
+    snapshot = "Agent: hi. Caller: my number is 555-1111."
+    candidate_spans = [{"text": "555-1111", "start": None, "end": None}]
+
+    windows = pipeline_core._candidate_context_windows(snapshot, candidate_spans)
+
+    assert windows == {}
+
+
+def test_candidate_context_windows_dedupes_repeated_span_text():
+    snapshot = "Agent: hi. Caller: 555-1111, that's 555-1111 again."
+    windows = pipeline_core._candidate_context_windows(
+        snapshot,
+        [
+            {"text": "555-1111", "start": 19, "end": 27},
+            {"text": "555-1111", "start": 38, "end": 46},
+        ],
+    )
+    assert len(windows) == 1
+
+
+def test_candidate_context_windows_keeps_valid_span_after_offsetless_duplicate():
+    # A duplicate-text span with missing offsets encountered before one with valid offsets must
+    # not shadow the valid one -- the valid span's precise window should still be used.
+    snapshot = "Agent: hi. Caller: my number is 555-1111 okay."
+    start = snapshot.index("555-1111")
+    windows = pipeline_core._candidate_context_windows(
+        snapshot,
+        [
+            {"text": "555-1111", "start": None, "end": None},
+            {"text": "555-1111", "start": start, "end": start + 8},
+        ],
+    )
+    assert windows["555-1111"] == pipeline_core.context_window(snapshot, start, start + 8)
 
 
 # --- run_call tick loop: growth gating, LLM cadence gating, carry-forward -----------------------
@@ -294,6 +365,81 @@ async def test_run_call_gating_and_carry_forward(monkeypatch):
     gliner_reset_mock.assert_called_once_with("1")
     llm_reset_mock.assert_called_once_with("1")
     assert store.closed is False  # an externally-provided store is never closed by run_call
+
+
+# --- jev context caching survives a candidate aging out of GLiNER's per-tick report -------------
+
+
+@pytest.mark.asyncio
+async def test_run_call_jev_choice_context_covers_candidate_that_stopped_being_reported(monkeypatch):
+    # Simulates ticket #19's GLiNER windowing: tick 1 reports "555-3212" (with its own span) and
+    # never again -- by tick 6, only the genuinely new "555-4321" is reported that tick, as if
+    # "555-3212"'s original mention has aged out of GLiNER's bounded input. The real
+    # JevFieldResolver (only its HTTP client is faked) must still send jev a Choice-call context
+    # covering both candidates' own justifying text, from what pipeline_core cached the first time
+    # "555-3212" was detected.
+    snapshot_tick_1 = "Caller: my number is 555-3212 okay."
+    snapshot_tick_6 = "Caller: actually it's 555-4321 now."
+    start_1 = snapshot_tick_1.index("555-3212")
+    start_6 = snapshot_tick_6.index("555-4321")
+    gliner_side_effects = [
+        (
+            {"phone_number": [{"text": "555-3212", "score": 0.9, "start": start_1, "end": start_1 + 8}]},
+            10.0,
+            20.0,
+        ),
+        (
+            # "555-3212" is no longer reported at all this tick -- only the new candidate is.
+            {"phone_number": [{"text": "555-4321", "score": 0.9, "start": start_6, "end": start_6 + 8}]},
+            11.0,
+            21.0,
+        ),
+    ]
+
+    async def fake_extract_candidates_timed(snapshot, call_id):
+        return gliner_side_effects.pop(0)
+
+    monkeypatch.setattr(
+        pipeline_core.gliner_pipeline, "extract_candidates_timed", fake_extract_candidates_timed
+    )
+    monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
+    monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", Mock())
+
+    # Hand run_call a real JevFieldResolver so its own dedup/context caching runs for real --
+    # only the underlying typesafe.ai HTTP client is faked.
+    system_one = AsyncMock(
+        side_effect=[
+            SimpleNamespace(
+                nouls={"field": SimpleNamespace(noul=0.9)},
+                usage=SimpleNamespace(input_tokens=10, output_tokens=2),
+            ),
+            SimpleNamespace(
+                choices={"field": SimpleNamespace(choice="555-4321", confidence=0.85)},
+                usage=SimpleNamespace(input_tokens=15, output_tokens=3),
+            ),
+        ]
+    )
+    fake_client = SimpleNamespace(system_one=system_one, aclose=AsyncMock())
+    # settle_ticks=1 so the Choice call fires on the very first tick the 2-candidate set is
+    # observed -- this test is about context caching, not SettleGate's own settling behavior
+    # (covered separately in tests/test_jev_pipeline.py).
+    real_resolver = JevFieldResolver(client=fake_client, settle_ticks=1)
+    monkeypatch.setattr(pipeline_core, "JevFieldResolver", lambda: real_resolver)
+
+    monkeypatch.setattr(
+        pipeline_core,
+        "iter_batch_ticks",
+        lambda call_pacer: iter([(0, "", 0), (1, snapshot_tick_1, 1), (6, snapshot_tick_6, 2)]),
+    )
+
+    store = FakeStore()
+    await pipeline_core.run_call(1, store, calls=_calls_fixture())
+
+    assert system_one.await_count == 2
+    _, choice_kwargs = system_one.call_args
+    combined_context = choice_kwargs["state"]["context_window"]
+    assert "555-3212" in combined_context
+    assert "555-4321" in combined_context
 
 
 # --- on_tick callback ------------------------------------------------------------------
