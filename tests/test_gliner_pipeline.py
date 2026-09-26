@@ -278,6 +278,25 @@ def test_zero_shot_inference_lock_is_held_during_the_model_call(monkeypatch):
     assert lock_states == [True]
 
 
+def test_pii_inference_lock_is_held_during_the_model_call(monkeypatch):
+    lock_states = []
+
+    class LockCheckingPIIModel(FakePIIModel):
+        def inference(self, texts, labels, *, session_id, threshold=0.5):
+            lock_states.append(gliner_pipeline._pii_inference_lock.locked())
+            return super().inference(texts, labels, session_id=session_id, threshold=threshold)
+
+    monkeypatch.setattr(gliner_pipeline, "_pii_sent_length", {})
+    pii_model = LockCheckingPIIModel([[]])
+    zero_shot_model = FakeZeroShotModel([[]])
+    monkeypatch.setattr(gliner_pipeline, "_pii_model", pii_model)
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", zero_shot_model)
+
+    asyncio.run(gliner_pipeline.extract_candidates("some text", "call-pii-lock"))
+
+    assert lock_states == [True]
+
+
 def test_reset_call_clears_tracked_length_and_model_session(monkeypatch):
     monkeypatch.setattr(gliner_pipeline, "_pii_sent_length", {"call-5": 42})
     pii_model = FakePIIModel([])

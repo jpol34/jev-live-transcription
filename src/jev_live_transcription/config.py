@@ -39,7 +39,7 @@ GLINER_ZERO_SHOT_WINDOW_CHARS = 200
 # surfaces at all is unrecoverable, while a low-confidence false positive is just one more
 # candidate for jev to weigh and reject. 0.30 is the same value Microsoft's own Presidio project
 # uses in its official GLiNER-based PII recognizer, which has the same no-verification-step shape
-# as this pipeline, rather than an untested guess.
+# as this pipeline.
 GLINER_ZERO_SHOT_THRESHOLD = 0.30
 
 # This machine's installed RAM, used to size call-level concurrency: reserve

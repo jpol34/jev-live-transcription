@@ -49,6 +49,11 @@ ZERO_SHOT_FIELD_LABELS: dict[str, str] = {
 }
 
 _PII_LABEL_TO_FIELD = {label: field for field, label in PII_FIELD_LABELS.items()}
+# Identity mapping: `ZERO_SHOT_FIELD_LABELS` is passed to GLiNER as a label-description dict (see
+# `_run_zero_shot_tick`), so `entity["label"]` already comes back as the field name itself. Kept as
+# an explicit dict, rather than skipping the lookup entirely, so `_entities_to_candidates` can share
+# the same signature across both the PII and zero-shot call sites.
+_ZERO_SHOT_LABEL_TO_FIELD = {field: field for field in ZERO_SHOT_FIELD_LABELS}
 
 # Module-level singletons, lazily loaded on first use and reused for the rest
 # of the process's lifetime. Lazy (rather than eager at import time) so that
@@ -72,10 +77,13 @@ _pii_sent_length: dict[str, int] = {}
 _pii_call_locks: dict[str, threading.Lock] = {}
 _pii_call_locks_guard = threading.Lock()
 
-# No project-level lock guards the streaming PII model's `inference()` call itself (only the
-# per-call_id lock above, serializing ticks for the *same* call): GLiNER's own streaming execution
-# path already holds an internal lock around each call's cache read, forward pass, and cache
-# write-back, fully serializing calls across every session_id/call_id at the library level.
+# Guards `model.inference(...)` for the streaming PII model below, serializing every call across
+# every session_id/call_id (the per-call_id lock above only serializes ticks for the *same* call).
+# This project owns that serialization itself rather than relying on the installed `gliner`
+# library's own internal locking around that call: that locking is a private implementation detail
+# with no documented API contract, and `pyproject.toml` places no upper bound on the installed
+# version, so a future upgrade could narrow or remove it without this project ever noticing.
+_pii_inference_lock = threading.Lock()
 
 # Guards `model.predict_entities(...)` for the zero-shot model below. Unlike the streaming PII
 # path, GLiNER's stateless inference has no internal lock of its own -- only `torch.no_grad()`, no
@@ -161,12 +169,13 @@ def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict
             # chunk per call, so there's nothing to feed the session; report
             # no candidates rather than re-querying stale state.
             return {field: [] for field in PII_FIELD_LABELS}
-        entities = model.inference(
-            [delta],
-            list(PII_FIELD_LABELS.values()),
-            session_id=[call_id],
-            threshold=0.5,
-        )[0]
+        with _pii_inference_lock:
+            entities = model.inference(
+                [delta],
+                list(PII_FIELD_LABELS.values()),
+                session_id=[call_id],
+                threshold=0.5,
+            )[0]
         _pii_sent_length[call_id] = len(transcript_snapshot)
     return _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
 
@@ -201,7 +210,9 @@ def _run_zero_shot_tick(transcript_snapshot: str) -> dict[str, list[dict]]:
 
     `ZERO_SHOT_FIELD_LABELS` is passed directly as a label-description mapping: GLiNER prompts the
     model with each value (the descriptive text) but reports the corresponding key (this project's
-    field name) back in each entity's `label`, so no separate label-to-field lookup is needed here.
+    field name) back in each entity's `label`, so the lookup passed to `_entities_to_candidates`
+    below (`_ZERO_SHOT_LABEL_TO_FIELD`) is a trivial identity mapping, kept only so both call sites
+    share the same helper signature.
     """
     model = _get_zero_shot_model()
     window_text, window_start = _zero_shot_window(transcript_snapshot)
@@ -212,7 +223,7 @@ def _run_zero_shot_tick(transcript_snapshot: str) -> dict[str, list[dict]]:
             multi_label=True,
             threshold=config.GLINER_ZERO_SHOT_THRESHOLD,
         )
-    candidates = _entities_to_candidates(entities, {field: field for field in ZERO_SHOT_FIELD_LABELS})
+    candidates = _entities_to_candidates(entities, _ZERO_SHOT_LABEL_TO_FIELD)
     if window_start:
         for spans in candidates.values():
             for span in spans:
