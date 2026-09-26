@@ -1,6 +1,7 @@
-"""Orchestrates one call end to end: replays its transcript via the pacer and, at every tick,
-runs the GLiNER+jev pipeline and the GPT-5.1 baseline concurrently, capturing every tick's
-activity to the capture DB.
+"""Orchestrates one call end to end: replays its transcript via the pacer and, on every tick the
+transcript grows, runs the GLiNER+jev pipeline; the GPT-5.1 baseline runs concurrently alongside
+it on every `config.LLM_CADENCE_TICKS`-th such tick. Every tick's activity is captured to the
+capture DB.
 
 Two logical pipelines are recorded, named by the `pipeline` column on `pipeline_runs` and
 `field_extractions`:
@@ -21,6 +22,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import re
 import time
 from pathlib import Path
@@ -29,6 +31,8 @@ from . import config, corpus, gliner_pipeline, llm_baseline
 from .jev_pipeline import JevFieldResolver
 from .pacer import CallPacer, iter_batch_ticks, iter_realtime_ticks
 from . import db as db_module
+
+_LOGGER = logging.getLogger(__name__)
 
 GLINER_JEV_PIPELINE = "gliner_jev"
 LLM_PIPELINE = "llm"
@@ -57,13 +61,17 @@ def _sentence_spans(text: str) -> list[tuple[int, int]]:
     return spans
 
 
-def context_window(snapshot: str, start: int, end: int) -> str:
+def context_window(
+    snapshot: str, start: int, end: int, *, spans: list[tuple[int, int]] | None = None
+) -> str:
     """Slice `snapshot` to the sentence(s) spanning `[start, end)` plus one sentence on each side.
 
     Falls back to the full snapshot when `start`/`end` don't land inside any sentence span (e.g.
-    missing offsets from an upstream candidate).
+    missing offsets from an upstream candidate). `spans` lets a caller that already computed
+    `_sentence_spans(snapshot)` for this tick (e.g. once, shared across every field's candidates)
+    pass it in instead of paying to re-tokenize the same snapshot again per field.
     """
-    spans = _sentence_spans(snapshot)
+    spans = _sentence_spans(snapshot) if spans is None else spans
     if not spans:
         return snapshot
     covering = [i for i, (s, e) in enumerate(spans) if e > start and s < end]
@@ -76,13 +84,21 @@ def context_window(snapshot: str, start: int, end: int) -> str:
     return snapshot[window_start:window_end].strip()
 
 
-def _field_context_window(snapshot: str, candidate_spans: list[dict]) -> str:
-    """Context window covering every candidate span found for one field on one tick."""
-    starts = [c["start"] for c in candidate_spans if c.get("start") is not None]
-    ends = [c["end"] for c in candidate_spans if c.get("end") is not None]
-    if not starts or not ends:
+def _field_context_window(
+    snapshot: str, candidate_spans: list[dict], *, spans: list[tuple[int, int]] | None = None
+) -> str:
+    """Context window covering every candidate span found for one field on one tick.
+
+    Only spans with both a `start` and an `end` contribute to the window -- a span missing just
+    one of the pair is dropped instead of letting its lone coordinate pair up with another span's,
+    which would stitch together a window spanning two unrelated candidates.
+    """
+    bounded = [c for c in candidate_spans if c.get("start") is not None and c.get("end") is not None]
+    if not bounded:
         return snapshot
-    return context_window(snapshot, min(starts), max(ends))
+    return context_window(
+        snapshot, min(c["start"] for c in bounded), max(c["end"] for c in bounded), spans=spans
+    )
 
 
 def _apply_carry_forward(
@@ -109,6 +125,43 @@ def _apply_carry_forward(
         held_value, held_confidence = held
         return held_value, held_confidence, True
     return candidate_value, confidence, False
+
+
+async def _persist_field(
+    store,
+    committed: _CommittedState,
+    *,
+    pipeline: str,
+    call_id: int,
+    tick_number: int,
+    run_id: int,
+    field_name: str,
+    candidate_value: str | None,
+    confidence: float,
+    is_committed_now: bool,
+) -> None:
+    """Fold one field's raw resolution through `_apply_carry_forward` and persist the row.
+
+    Shared by both pipelines' per-field loops below. Awaits the enqueued write's future (unlike a
+    fire-and-forget put) so a caller who awaits the enclosing step -- and, transitively, `run_call`
+    -- knows every `field_extractions` row for this tick has actually committed, not just been
+    queued; this matters when `run_call` is given an externally-owned store it never closes (and
+    so never blocks on draining) to wait for.
+    """
+    persisted_value, persisted_confidence, persisted_committed = _apply_carry_forward(
+        committed, pipeline, field_name, candidate_value, confidence, is_committed_now
+    )
+    future = store.enqueue_field_extraction(
+        run_id=run_id,
+        call_id=call_id,
+        tick_number=tick_number,
+        pipeline=pipeline,
+        field_name=field_name,
+        candidate_value=persisted_value,
+        confidence=persisted_confidence,
+        is_committed=int(persisted_committed),
+    )
+    await asyncio.wrap_future(future)
 
 
 def _estimate_jev_cost_usd(input_tokens: int | None, output_tokens: int | None) -> float | None:
@@ -172,15 +225,30 @@ async def _run_gliner_jev_step(
     try:
         candidates = await gliner_pipeline.extract_candidates(snapshot, pipeline_call_id)
     except Exception as exc:  # noqa: BLE001 -- GLiNER failures are captured as data, not raised
+        # extract_candidates runs both underlying models concurrently and surfaces whichever one
+        # raised first -- there is no way to tell from here whether the PII or zero-shot model (or
+        # both) actually failed, so both stages get an error row rather than misattributing the
+        # failure to just one.
         latency_ms = (time.monotonic() - start) * 1000
-        await _enqueue_pipeline_run(
-            store,
-            tick_id=tick_id,
-            call_id=call_id,
-            pipeline=GLINER_JEV_PIPELINE,
-            stage="gliner_standard",
-            latency_ms=latency_ms,
-            error=str(exc),
+        await asyncio.gather(
+            _enqueue_pipeline_run(
+                store,
+                tick_id=tick_id,
+                call_id=call_id,
+                pipeline=GLINER_JEV_PIPELINE,
+                stage="gliner_stream_pii",
+                latency_ms=latency_ms,
+                error=str(exc),
+            ),
+            _enqueue_pipeline_run(
+                store,
+                tick_id=tick_id,
+                call_id=call_id,
+                pipeline=GLINER_JEV_PIPELINE,
+                stage="gliner_standard",
+                latency_ms=latency_ms,
+                error=str(exc),
+            ),
         )
         return
     latency_ms = (time.monotonic() - start) * 1000
@@ -210,13 +278,17 @@ async def _run_gliner_jev_step(
         ),
     )
 
+    # Computed once per tick and shared across every field's context window below, instead of
+    # every field re-tokenizing the same (potentially long, ever-growing) snapshot from scratch.
+    sentence_spans = _sentence_spans(snapshot)
+
     resolve_tasks = []
     resolve_field_names = []
-    for field_name, spans in candidates.items():
-        values = [span["text"] for span in spans if span.get("text")]
+    for field_name, field_spans in candidates.items():
+        values = [span["text"] for span in field_spans if span.get("text")]
         if not values:
             continue
-        context = _field_context_window(snapshot, spans)
+        context = _field_context_window(snapshot, field_spans, spans=sentence_spans)
         resolve_tasks.append(
             resolver.resolve_field(pipeline_call_id, field_name, values, context)
         )
@@ -225,6 +297,7 @@ async def _run_gliner_jev_step(
         return
 
     results = await asyncio.gather(*resolve_tasks, return_exceptions=True)
+    persist_tasks = []
     for field_name, result in zip(resolve_field_names, results):
         if isinstance(result, Exception):
             await _enqueue_pipeline_run(
@@ -238,14 +311,11 @@ async def _run_gliner_jev_step(
             continue
         if result is None:
             continue
-        persisted_value, persisted_confidence, persisted_committed = _apply_carry_forward(
-            committed,
-            GLINER_JEV_PIPELINE,
-            field_name,
-            result.candidate if not result.is_none_of_these else None,
-            result.confidence,
-            result.is_committed and not result.is_none_of_these,
-        )
+        if result.is_none_of_these and result.is_committed:
+            # A confident "none of these" is jev actively rejecting every candidate seen so far
+            # for this field, not merely "nothing new this tick" -- clear whatever was
+            # previously held so the rejection isn't masked by carrying the stale value forward.
+            committed.pop((GLINER_JEV_PIPELINE, field_name), None)
         run_id = await _enqueue_pipeline_run(
             store,
             tick_id=tick_id,
@@ -265,16 +335,22 @@ async def _run_gliner_jev_step(
                 }
             ),
         )
-        store.enqueue_field_extraction(
-            run_id=run_id,
-            call_id=call_id,
-            tick_number=tick_number,
-            pipeline=GLINER_JEV_PIPELINE,
-            field_name=field_name,
-            candidate_value=persisted_value,
-            confidence=persisted_confidence,
-            is_committed=int(persisted_committed),
+        persist_tasks.append(
+            _persist_field(
+                store,
+                committed,
+                pipeline=GLINER_JEV_PIPELINE,
+                call_id=call_id,
+                tick_number=tick_number,
+                run_id=run_id,
+                field_name=field_name,
+                candidate_value=result.candidate if not result.is_none_of_these else None,
+                confidence=result.confidence,
+                is_committed_now=result.is_committed and not result.is_none_of_these,
+            )
         )
+    if persist_tasks:
+        await asyncio.gather(*persist_tasks)
 
 
 async def _run_llm_step(
@@ -287,15 +363,18 @@ async def _run_llm_step(
     snapshot: str,
     committed: _CommittedState,
 ) -> None:
+    start = time.monotonic()
     try:
         result = await llm_baseline.extract(pipeline_call_id, snapshot)
     except Exception as exc:  # noqa: BLE001 -- LLM failures are captured as data, not raised
+        latency_ms = (time.monotonic() - start) * 1000
         await _enqueue_pipeline_run(
             store,
             tick_id=tick_id,
             call_id=call_id,
             pipeline=LLM_PIPELINE,
             stage="llm",
+            latency_ms=latency_ms,
             error=str(exc),
         )
         return
@@ -314,23 +393,31 @@ async def _run_llm_step(
         raw_output_json=json.dumps(result["fields"]),
     )
 
+    persist_tasks = []
     for field_name in llm_baseline.FIELDS:
         value = result["fields"][field_name]
-        confidence = result["confidences"][field_name]
         is_committed_now = result["is_committed"][field_name]
-        persisted_value, persisted_confidence, persisted_committed = _apply_carry_forward(
-            committed, LLM_PIPELINE, field_name, value, confidence, is_committed_now
+        if value is None and is_committed_now:
+            # A confident null is the LLM actively reporting "no value" (its confidence reflects
+            # certainty in *that* answer, not in a candidate value that doesn't exist) -- clear any
+            # previously held commit instead of letting it fall through to _apply_carry_forward's
+            # "nothing new, hold steady" branch and silently re-persist a stale value as current.
+            committed.pop((LLM_PIPELINE, field_name), None)
+        persist_tasks.append(
+            _persist_field(
+                store,
+                committed,
+                pipeline=LLM_PIPELINE,
+                call_id=call_id,
+                tick_number=tick_number,
+                run_id=run_id,
+                field_name=field_name,
+                candidate_value=value,
+                confidence=result["confidences"][field_name],
+                is_committed_now=is_committed_now,
+            )
         )
-        store.enqueue_field_extraction(
-            run_id=run_id,
-            call_id=call_id,
-            tick_number=tick_number,
-            pipeline=LLM_PIPELINE,
-            field_name=field_name,
-            candidate_value=persisted_value,
-            confidence=persisted_confidence,
-            is_committed=int(persisted_committed),
-        )
+    await asyncio.gather(*persist_tasks)
 
 
 async def run_call(
@@ -339,6 +426,7 @@ async def run_call(
     *,
     pacer_mode: str = "batch",
     calls: dict[int, dict] | None = None,
+    resolver: JevFieldResolver | None = None,
 ) -> None:
     """Replay `call_id`'s transcript and capture both pipelines' activity to the capture DB.
 
@@ -346,7 +434,10 @@ async def run_call(
     call) or an already-constructed `CaptureStore`-like object (reused as-is, e.g. shared across
     concurrently orchestrated calls against the same database). `calls` defaults to
     `corpus.load_all()`; callers running many calls can load the corpus once and pass it in to
-    avoid re-reading every transcript/metadata file per call.
+    avoid re-reading every transcript/metadata file per call. `resolver` follows the same
+    reuse-or-own pattern as `db_path`: pass an already-constructed `JevFieldResolver` to share its
+    underlying HTTP connection pool across concurrently orchestrated calls, or omit it to have
+    `run_call` create and close its own for just this call.
 
     `pacer_mode` is `"batch"` (replay every tick back-to-back, no sleeping) or `"realtime"`
     (replay paced to wall-clock time).
@@ -374,73 +465,95 @@ async def run_call(
         store = db_path
         owns_store = False
 
-    resolver = JevFieldResolver()
-    committed: _CommittedState = {}
-
+    # `store` is already a live resource (a background writer thread plus an open sqlite
+    # connection) by this point when `owns_store` is True, so its cleanup lives in its own
+    # `finally` wrapping everything below -- including constructing `resolver`, which itself
+    # opens an HTTP connection pool and could fail before the inner `try` even starts. Without
+    # this outer layer, a `JevFieldResolver()` construction failure would leak `store`'s writer
+    # thread and connection instead of closing it.
     try:
-        store.insert_call(
-            call_id=call_id,
-            scenario_json=json.dumps(scenario),
-            category=scenario["category"],
-            subtype=scenario["subtype"],
-            edge_case=int(bool(scenario["edge_case"])),
-            ground_truth_json=json.dumps(ground_truth),
-            target_seconds=call_pacer.total_seconds,
-            full_transcript_word_count=len(call_pacer.events),
-        )
+        owns_resolver = resolver is None
+        resolver = resolver or JevFieldResolver()
+        committed: _CommittedState = {}
 
-        if pacer_mode == "batch":
-            tick_source = iter_batch_ticks(call_pacer)
-        elif pacer_mode == "realtime":
-            tick_source = iter_realtime_ticks(call_pacer)
-        else:
-            raise ValueError(f"unknown pacer_mode: {pacer_mode!r}")
-
-        previous_offset = 0
-        async for tick_number, snapshot, offset in _as_async_iter(tick_source):
-            tick_future = store.enqueue_tick(
+        try:
+            store.insert_call(
                 call_id=call_id,
-                tick_number=tick_number,
-                wall_clock_ts=time.time(),
-                transcript_char_offset=offset,
-                transcript_snapshot=snapshot,
+                scenario_json=json.dumps(scenario),
+                category=scenario["category"],
+                subtype=scenario["subtype"],
+                edge_case=int(bool(scenario["edge_case"])),
+                ground_truth_json=json.dumps(ground_truth),
+                target_seconds=call_pacer.total_seconds,
+                full_transcript_word_count=len(call_pacer.events),
             )
-            tick_id = await asyncio.wrap_future(tick_future)
 
-            grew = offset > previous_offset
-            previous_offset = offset
-            if not grew:
-                continue
+            if pacer_mode == "batch":
+                tick_source = iter_batch_ticks(call_pacer)
+            elif pacer_mode == "realtime":
+                tick_source = iter_realtime_ticks(call_pacer)
+            else:
+                raise ValueError(f"unknown pacer_mode: {pacer_mode!r}")
 
-            steps = [
-                _run_gliner_jev_step(
-                    store,
+            previous_offset = 0
+            async for tick_number, snapshot, offset in _as_async_iter(tick_source):
+                tick_future = store.enqueue_tick(
                     call_id=call_id,
-                    pipeline_call_id=pipeline_call_id,
-                    tick_id=tick_id,
                     tick_number=tick_number,
-                    snapshot=snapshot,
-                    resolver=resolver,
-                    committed=committed,
+                    wall_clock_ts=time.time(),
+                    transcript_char_offset=offset,
+                    transcript_snapshot=snapshot,
                 )
-            ]
-            if tick_number % config.LLM_CADENCE_TICKS == 0:
-                steps.append(
-                    _run_llm_step(
+                tick_id = await asyncio.wrap_future(tick_future)
+
+                grew = offset > previous_offset
+                previous_offset = offset
+                if not grew:
+                    continue
+
+                steps = [
+                    _run_gliner_jev_step(
                         store,
                         call_id=call_id,
                         pipeline_call_id=pipeline_call_id,
                         tick_id=tick_id,
                         tick_number=tick_number,
                         snapshot=snapshot,
+                        resolver=resolver,
                         committed=committed,
                     )
-                )
-            await asyncio.gather(*steps)
+                ]
+                if tick_number % config.LLM_CADENCE_TICKS == 0:
+                    steps.append(
+                        _run_llm_step(
+                            store,
+                            call_id=call_id,
+                            pipeline_call_id=pipeline_call_id,
+                            tick_id=tick_id,
+                            tick_number=tick_number,
+                            snapshot=snapshot,
+                            committed=committed,
+                        )
+                    )
+                await asyncio.gather(*steps)
+        finally:
+            # Each cleanup step is isolated so one raising (e.g. a GLiNER session that was never
+            # created because every tick had grew=False) doesn't skip the rest -- in particular,
+            # `resolver.aclose()` must still run to avoid leaking its HTTP connection pool.
+            try:
+                gliner_pipeline.reset_call(pipeline_call_id)
+            except Exception:
+                _LOGGER.exception("gliner_pipeline.reset_call failed for call_id=%r", call_id)
+            try:
+                llm_baseline.reset_call(pipeline_call_id)
+            except Exception:
+                _LOGGER.exception("llm_baseline.reset_call failed for call_id=%r", call_id)
+            if owns_resolver:
+                try:
+                    await resolver.aclose()
+                except Exception:
+                    _LOGGER.exception("resolver.aclose failed for call_id=%r", call_id)
     finally:
-        gliner_pipeline.reset_call(pipeline_call_id)
-        llm_baseline.reset_call(pipeline_call_id)
-        await resolver.aclose()
         if owns_store:
             store.close()
 

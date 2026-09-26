@@ -292,6 +292,26 @@ async def test_run_call_does_not_close_externally_provided_store(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_run_call_cleanup_steps_are_isolated_from_each_other(monkeypatch):
+    # If gliner_pipeline.reset_call raises, llm_baseline.reset_call and resolver.aclose() must
+    # still run rather than being skipped by the same finally block.
+    monkeypatch.setattr(pipeline_core, "iter_batch_ticks", lambda call_pacer: iter([(0, "", 0)]))
+    monkeypatch.setattr(
+        pipeline_core.gliner_pipeline, "reset_call", Mock(side_effect=RuntimeError("session gone"))
+    )
+    llm_reset_mock = Mock()
+    monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", llm_reset_mock)
+    fake_resolver = FakeResolver(AsyncMock())
+    monkeypatch.setattr(pipeline_core, "JevFieldResolver", lambda: fake_resolver)
+
+    store = FakeStore()
+    await pipeline_core.run_call(1, store, calls=_calls_fixture())  # must not raise
+
+    llm_reset_mock.assert_called_once_with("1")
+    fake_resolver.aclose.assert_awaited_once()
+
+
+@pytest.mark.asyncio
 async def test_run_call_gliner_failure_is_captured_as_error_row_not_raised(monkeypatch):
     # tick_number=1 (not a multiple of LLM_CADENCE_TICKS) so only the gliner+jev step fires.
     monkeypatch.setattr(pipeline_core, "iter_batch_ticks", lambda call_pacer: iter([(0, "", 0), (1, "x", 1)]))
@@ -306,9 +326,11 @@ async def test_run_call_gliner_failure_is_captured_as_error_row_not_raised(monke
     store = FakeStore()
     await pipeline_core.run_call(1, store, calls=_calls_fixture())  # must not raise
 
+    # Both gliner_jev stages get an error row -- extract_candidates runs the PII and zero-shot
+    # models concurrently, so a single raised exception can't be attributed to just one of them.
     errored = [run for run in store.pipeline_runs if run["error"]]
-    assert len(errored) == 1
-    assert errored[0]["pipeline"] == "gliner_jev"
-    assert errored[0]["stage"] == "gliner_standard"
-    assert "boom" in errored[0]["error"]
+    assert len(errored) == 2
+    assert {row["stage"] for row in errored} == {"gliner_stream_pii", "gliner_standard"}
+    assert all(row["pipeline"] == "gliner_jev" for row in errored)
+    assert all("boom" in row["error"] for row in errored)
     fake_resolver.resolve_field.assert_not_called()
