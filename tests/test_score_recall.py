@@ -38,6 +38,63 @@ def test_is_match_false_for_empty_values():
     assert not score_recall.is_match("Tim Barker", "")
 
 
+def test_is_match_true_when_extracted_matches_any_item_in_list_truth():
+    assert score_recall.is_match("gym", ["pool", "gym"])
+
+
+def test_is_match_false_when_extracted_matches_no_item_in_list_truth():
+    assert not score_recall.is_match("gym", ["pool", "clubhouse"])
+
+
+def test_is_match_false_for_empty_list_truth():
+    assert not score_recall.is_match("gym", [])
+
+
+def test_is_match_ignores_none_items_in_list_truth():
+    assert score_recall.is_match("gym", [None, "gym"])
+    assert not score_recall.is_match("pool", [None, "gym"])
+
+
+def test_is_match_ignores_empty_string_items_in_list_truth():
+    assert not score_recall.is_match("gym", [""])
+
+
+def test_score_recall_matches_against_list_valued_ground_truth():
+    ground_truths = {1: {"amenities_requested": ["pool", "gym"]}}
+    committed = {1: {"amenities_requested": "gym"}}
+
+    stats = score_recall.score_recall(ground_truths, committed, fields=("amenities_requested",))
+
+    assert stats["amenities_requested"] == {"n_expected": 1, "n_matched": 1, "recall": 1.0}
+
+
+def test_score_recall_empty_list_ground_truth_does_not_count_as_disclosed():
+    ground_truths = {1: {"amenities_requested": []}}
+    committed = {}
+
+    stats = score_recall.score_recall(ground_truths, committed, fields=("amenities_requested",))
+
+    assert stats["amenities_requested"] == {"n_expected": 0, "n_matched": 0, "recall": None}
+
+
+def test_score_recall_list_of_only_empty_strings_does_not_count_as_disclosed():
+    ground_truths = {1: {"amenities_requested": [""]}}
+    committed = {}
+
+    stats = score_recall.score_recall(ground_truths, committed, fields=("amenities_requested",))
+
+    assert stats["amenities_requested"] == {"n_expected": 0, "n_matched": 0, "recall": None}
+
+
+def test_score_recall_list_with_none_item_does_not_crash_and_matches_remaining_item():
+    ground_truths = {1: {"amenities_requested": [None, "gym"]}}
+    committed = {1: {"amenities_requested": "pool"}}  # doesn't match the non-None item
+
+    stats = score_recall.score_recall(ground_truths, committed, fields=("amenities_requested",))
+
+    assert stats["amenities_requested"] == {"n_expected": 1, "n_matched": 0, "recall": 0.0}
+
+
 def test_score_recall_computes_per_field_stats():
     ground_truths = {
         1: {"caller_name": "Tim Barker", "email": None, "phone_number": "555-0134"},

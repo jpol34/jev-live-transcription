@@ -4,6 +4,8 @@ For each of the 11 target fields, recall is the fraction of calls where the corp
 truth has a non-null value for that field *and* the pipeline's final committed value for that
 call matches it (case/whitespace-insensitive equality or substring containment either way, since
 extracted values are free text rather than guaranteed to match the ground-truth string exactly).
+A field whose ground truth is a list (e.g. `amenities_requested` can disclose several amenities)
+counts as matched if the committed value agrees with any one item in that list.
 
 Usage:
     uv run python scripts/score_recall.py <db_path> [--pipeline gliner_jev]
@@ -33,7 +35,19 @@ def normalize(value: str) -> str:
     return _WHITESPACE_RE.sub(" ", value.strip().lower())
 
 
-def is_match(extracted: str, truth: str) -> bool:
+def _disclosed_items(value: object) -> list[str]:
+    """Return the non-empty string items a ground-truth field value actually discloses.
+
+    A field's ground truth is either a single string or a list of strings (e.g.
+    `amenities_requested`, when a call discloses more than one). Corpus generation has no schema
+    enforcement on array element types, so a list can contain `None` or empty-string noise --
+    filtered out here so it's never treated as a disclosed-but-unmatchable value.
+    """
+    items = value if isinstance(value, list) else [value]
+    return [item for item in items if isinstance(item, str) and item.strip()]
+
+
+def is_match(extracted: str, truth: str | list[str]) -> bool:
     """True if `extracted` and `truth` agree closely enough to count as a recall hit.
 
     Extracted values are free text produced by a model, not guaranteed to match the ground-truth
@@ -43,7 +57,13 @@ def is_match(extracted: str, truth: str) -> bool:
     would count "212" as a match for ground truth "12", or "103" for "3" -- a real risk for the
     short numeric/ID-like fields (unit_number, phone digits, prices), where every digit string is
     a substring of many other digit strings that share no actual value.
+
+    `truth` can be a list (e.g. `amenities_requested`, where a call's ground truth can disclose
+    several amenities) since the pipeline only ever commits a single value per field -- a hit
+    against any one disclosed item counts as recall for that call.
     """
+    if isinstance(truth, list):
+        return any(is_match(extracted, item) for item in _disclosed_items(truth))
     norm_extracted, norm_truth = normalize(extracted), normalize(truth)
     if not norm_extracted or not norm_truth:
         return False
@@ -103,9 +123,7 @@ def score_recall(
     stats: dict[str, dict] = {}
     for field_name in fields:
         expected_call_ids = [
-            call_id
-            for call_id, gt in ground_truths.items()
-            if gt.get(field_name) not in (None, "")
+            call_id for call_id, gt in ground_truths.items() if _disclosed_items(gt.get(field_name))
         ]
         matched = sum(
             1
