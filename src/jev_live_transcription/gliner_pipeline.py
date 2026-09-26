@@ -12,6 +12,7 @@ consumes.
 from __future__ import annotations
 
 import asyncio
+import threading
 
 from gliner import GLiNER
 
@@ -47,26 +48,49 @@ _ZERO_SHOT_LABEL_TO_FIELD = {label: field for field, label in ZERO_SHOT_FIELD_LA
 # importing this module in tests doesn't require a real model download.
 _pii_model: GLiNER | None = None
 _zero_shot_model: GLiNER | None = None
+# Guards the lazy singleton loads above: both models are used from worker
+# threads (via asyncio.to_thread), so two calls' first ticks can race here
+# without a lock, each loading its own model instance and silently dropping
+# whichever one loses the assignment.
+_singleton_load_lock = threading.Lock()
 
 # Count of transcript characters already fed into the PII model's streaming
 # session per call_id. Only the new suffix is sent each tick; the checkpoint's
 # cached-incremental mode reuses decoder KV state, labels, words, and span
 # history for everything already seen. Never shared across call_ids.
 _pii_sent_length: dict[str, int] = {}
+# Per-call_id lock serializing the read-delta/advance-session sequence in
+# `_run_pii_tick`, so overlapping ticks for the same call can't race on
+# `_pii_sent_length` or send overlapping chunks into the streaming session.
+_pii_call_locks: dict[str, threading.Lock] = {}
+_pii_call_locks_guard = threading.Lock()
 
 
 def _get_pii_model() -> GLiNER:
     global _pii_model
     if _pii_model is None:
-        _pii_model = GLiNER.from_pretrained(PII_MODEL_NAME)
+        with _singleton_load_lock:
+            if _pii_model is None:
+                _pii_model = GLiNER.from_pretrained(PII_MODEL_NAME)
     return _pii_model
 
 
 def _get_zero_shot_model() -> GLiNER:
     global _zero_shot_model
     if _zero_shot_model is None:
-        _zero_shot_model = GLiNER.from_pretrained(ZERO_SHOT_MODEL_NAME)
+        with _singleton_load_lock:
+            if _zero_shot_model is None:
+                _zero_shot_model = GLiNER.from_pretrained(ZERO_SHOT_MODEL_NAME)
     return _zero_shot_model
+
+
+def _get_pii_call_lock(call_id: str) -> threading.Lock:
+    with _pii_call_locks_guard:
+        lock = _pii_call_locks.get(call_id)
+        if lock is None:
+            lock = threading.Lock()
+            _pii_call_locks[call_id] = lock
+        return lock
 
 
 def _entities_to_candidates(
@@ -92,20 +116,21 @@ def _entities_to_candidates(
 def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict]]:
     """Advance `call_id`'s streaming PII session to `transcript_snapshot` and return its candidates."""
     model = _get_pii_model()
-    sent = _pii_sent_length.get(call_id, 0)
-    delta = transcript_snapshot[sent:]
-    if not delta:
-        # No new text this tick. The streaming API requires a non-empty chunk
-        # per call, so there's nothing to feed the session; report no
-        # candidates rather than re-querying stale state.
-        return {field: [] for field in PII_FIELD_LABELS}
-    entities = model.inference(
-        [delta],
-        list(PII_FIELD_LABELS.values()),
-        session_id=[call_id],
-        threshold=0.5,
-    )[0]
-    _pii_sent_length[call_id] = len(transcript_snapshot)
+    with _get_pii_call_lock(call_id):
+        sent = _pii_sent_length.get(call_id, 0)
+        delta = transcript_snapshot[sent:]
+        if not delta:
+            # No new text this tick. The streaming API requires a non-empty
+            # chunk per call, so there's nothing to feed the session; report
+            # no candidates rather than re-querying stale state.
+            return {field: [] for field in PII_FIELD_LABELS}
+        entities = model.inference(
+            [delta],
+            list(PII_FIELD_LABELS.values()),
+            session_id=[call_id],
+            threshold=0.5,
+        )[0]
+        _pii_sent_length[call_id] = len(transcript_snapshot)
     return _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
 
 
@@ -140,5 +165,7 @@ async def extract_candidates(transcript_snapshot: str, call_id: str) -> dict[str
 def reset_call(call_id: str) -> None:
     """Discard cached streaming state for `call_id`, e.g. once its call has ended."""
     _pii_sent_length.pop(call_id, None)
+    with _pii_call_locks_guard:
+        _pii_call_locks.pop(call_id, None)
     if _pii_model is not None:
         _pii_model.clear_session(call_id)
