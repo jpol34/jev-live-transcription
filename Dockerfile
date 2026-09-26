@@ -6,8 +6,6 @@ RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml ./
 COPY src ./src
-COPY scripts ./scripts
-COPY output ./output
 
 RUN uv pip install --system --no-cache -e .
 
@@ -20,3 +18,8 @@ from gliner import GLiNER; \
 from jev_live_transcription import gliner_pipeline as g; \
 GLiNER.from_pretrained(g.PII_MODEL_NAME, map_location='cpu'); \
 GLiNER.from_pretrained(g.ZERO_SHOT_MODEL_NAME, map_location='cpu')"
+
+# Copied last: neither affects package installation or the checkpoint cache above, so changing
+# scripts or regenerating the corpus doesn't invalidate those expensive layers.
+COPY scripts ./scripts
+COPY output ./output
