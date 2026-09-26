@@ -34,6 +34,8 @@ _REMOTE_EXIT_MARKER = "/root/gpu-run.exit"
 _POD_READY_TIMEOUT_S = 600.0
 _POD_READY_POLL_S = 5.0
 _COMPLETION_POLL_S = 15.0
+_SSH_CONNECT_TIMEOUT_S = 120.0
+_SSH_CONNECT_POLL_S = 5.0
 
 
 def _load_state(state_path: Path) -> dict:
@@ -79,6 +81,23 @@ def _wait_for_pod_ready(pod_id: str) -> dict:
             return ssh_direct
         time.sleep(_POD_READY_POLL_S)
     raise TimeoutError(f"pod {pod_id} did not become SSH-ready within {_POD_READY_TIMEOUT_S}s")
+
+
+def _wait_for_ssh_connectable(ssh_direct: dict, ssh_key: str | None) -> None:
+    """Retries a trivial SSH command until it succeeds. `ssh.direct` in the pod's metadata is
+    populated by RunPod slightly before sshd is actually accepting connections -- confirmed live,
+    where a preflight run immediately after `_wait_for_pod_ready` returned hit "Connection
+    refused" -- so readiness has to be confirmed by an actual successful connection, not just the
+    field's presence in the API response."""
+    deadline = time.monotonic() + _SSH_CONNECT_TIMEOUT_S
+    last_result: subprocess.CompletedProcess | None = None
+    while time.monotonic() < deadline:
+        last_result = _run_ssh(ssh_direct, ssh_key, "true", timeout_s=10.0)
+        if last_result.returncode == 0:
+            return
+        time.sleep(_SSH_CONNECT_POLL_S)
+    stderr = last_result.stderr if last_result else "(no attempt made)"
+    raise TimeoutError(f"SSH never became connectable within {_SSH_CONNECT_TIMEOUT_S}s: {stderr}")
 
 
 def _cuda_preflight(ssh_direct: dict, ssh_key: str | None) -> None:
@@ -190,6 +209,7 @@ def run_gpu(
         ssh_direct = _wait_for_pod_ready(pod_id)
         print(f"Pod {pod_id} ready, SSH at {ssh_direct['host']}:{ssh_direct['port']}")
 
+        _wait_for_ssh_connectable(ssh_direct, ssh_key)
         _cuda_preflight(ssh_direct, ssh_key)
 
         _launch_batch_detached(

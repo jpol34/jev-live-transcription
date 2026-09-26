@@ -42,6 +42,8 @@ def _patch_ssh_flow(monkeypatch, *, exit_code=0):
         joined = " ".join(cmd)
         if cmd[0] == "scp":
             return Mock(returncode=0, stdout="", stderr="")
+        if joined.endswith(" true"):
+            return Mock(returncode=0, stdout="", stderr="")
         if "nvidia-smi" in joined:
             return Mock(returncode=0, stdout="NVIDIA L40S, 49140 MiB", stderr="")
         if "nohup" in joined:
@@ -76,11 +78,15 @@ def test_run_gpu_happy_path_terminates_pod_and_returns_remote_exit_code(monkeypa
 def test_run_gpu_terminates_pod_even_when_preflight_fails(monkeypatch, tmp_path):
     _patch_secrets(monkeypatch)
     _patch_hangar(monkeypatch)
-    monkeypatch.setattr(
-        gpu_run.subprocess,
-        "run",
-        Mock(return_value=Mock(returncode=1, stdout="", stderr="no CUDA device")),
-    )
+
+    def fake_run(cmd, **kwargs):
+        # The SSH-connectable check ("true") must succeed so the flow reaches the real CUDA
+        # preflight, which is what this test actually exercises failing.
+        if " ".join(cmd).endswith(" true"):
+            return Mock(returncode=0, stdout="", stderr="")
+        return Mock(returncode=1, stdout="", stderr="no CUDA device")
+
+    monkeypatch.setattr(gpu_run.subprocess, "run", Mock(side_effect=fake_run))
 
     with pytest.raises(RuntimeError, match="CUDA preflight failed"):
         gpu_run.run_gpu(
@@ -213,3 +219,31 @@ def test_wait_for_pod_ready_raises_if_pod_disappears(monkeypatch):
 
     with pytest.raises(RuntimeError, match="disappeared"):
         gpu_run._wait_for_pod_ready("pod-123")
+
+
+def test_wait_for_ssh_connectable_retries_past_connection_refused(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    refused = Mock(returncode=255, stdout="", stderr="ssh: connect to host 1.2.3.4 port 2222: Connection refused")
+    ok = Mock(returncode=0, stdout="", stderr="")
+    run_mock = Mock(side_effect=[refused, refused, ok])
+    monkeypatch.setattr(gpu_run.subprocess, "run", run_mock)
+    monkeypatch.setattr(gpu_run.time, "sleep", Mock())
+
+    gpu_run._wait_for_ssh_connectable(ssh_direct, None)  # must not raise
+
+    assert run_mock.call_count == 3
+
+
+def test_wait_for_ssh_connectable_raises_on_timeout(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    refused = Mock(returncode=255, stdout="", stderr="Connection refused")
+    monkeypatch.setattr(gpu_run.subprocess, "run", Mock(return_value=refused))
+    monkeypatch.setattr(gpu_run.time, "sleep", Mock())
+    # Deterministic timeout: deadline = 100.0 + _SSH_CONNECT_TIMEOUT_S (default 120.0) = 220.0.
+    # First while-check (100.0) passes, runs one attempt; second while-check (300.0) exceeds the
+    # deadline and exits the loop. Controlling time.monotonic() directly avoids a real-clock race
+    # that a near-zero timeout would have.
+    monkeypatch.setattr(gpu_run.time, "monotonic", Mock(side_effect=[100.0, 100.0, 300.0]))
+
+    with pytest.raises(TimeoutError, match="Connection refused"):
+        gpu_run._wait_for_ssh_connectable(ssh_direct, None)
