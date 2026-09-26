@@ -20,9 +20,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import score_recall  # noqa: E402 -- must follow the sys.path insert above
 
-from jev_live_transcription import batch_runner, config, corpus, secrets  # noqa: E402
+from jev_live_transcription import batch_runner, config  # noqa: E402
 from jev_live_transcription import db as db_module  # noqa: E402
-from measure_gliner_concurrency import STAGE, load_stage_latencies, print_table, summarize  # noqa: E402
+from measure_gliner_concurrency import (  # noqa: E402
+    STAGE,
+    _delete_db_file,
+    load_call_subset,
+    load_stage_latencies,
+    print_table,
+    summarize,
+)
 
 DEFAULT_WINDOW_SIZES = (200, 400, 800)
 DEFAULT_DB_DIR = Path("output/window_size_measurements")
@@ -32,10 +39,13 @@ def _format_recall(recall: float | None) -> str:
     return f"{recall:.0%}" if recall is not None else "n/a"
 
 
-def print_recall_table(recall_by_window: dict[int, dict]) -> None:
+def print_recall_table(recall_by_window: dict[int, dict | None]) -> None:
     fields = score_recall.FIELDS
     print(f"\n{'window_chars':<14} " + " ".join(f"{field:<14}" for field in fields))
     for window_chars, stats in recall_by_window.items():
+        if stats is None:
+            print(f"{window_chars:<14} (candidate errored -- see warning above)")
+            continue
         row = " ".join(f"{_format_recall(stats[field]['recall']):<14}" for field in fields)
         print(f"{window_chars:<14} {row}")
 
@@ -43,10 +53,11 @@ def print_recall_table(recall_by_window: dict[int, dict]) -> None:
 async def _run_one_window_size(
     window_chars: int, *, call_ids: list[int], calls: dict, db_path: Path, warm_up: bool
 ) -> tuple[dict, dict]:
+    _delete_db_file(db_path)
     original = config.GLINER_ZERO_SHOT_WINDOW_CHARS
     config.GLINER_ZERO_SHOT_WINDOW_CHARS = window_chars
     try:
-        await batch_runner.run_batch(
+        result = await batch_runner.run_batch(
             call_ids,
             db_path=db_path,
             call_concurrency=1,
@@ -57,9 +68,16 @@ async def _run_one_window_size(
     finally:
         config.GLINER_ZERO_SHOT_WINDOW_CHARS = original
 
+    if result.failed:
+        print(
+            f"WARNING: window_chars={window_chars}: {len(result.failed)} call(s) failed "
+            f"({[call_id for call_id, _exc in result.failed]}) -- latency/recall stats below "
+            "only reflect the calls that succeeded."
+        )
+
     conn = db_module.connect(db_path)
     try:
-        latency_stats = summarize(load_stage_latencies(conn, STAGE))
+        latency_stats = summarize(load_stage_latencies(conn, STAGE), n_failed=len(result.failed))
         ground_truths = score_recall.load_ground_truths(conn)
         committed = score_recall.load_final_committed_values(conn, "gliner_jev")
         recall_stats = score_recall.score_recall(ground_truths, committed)
@@ -70,15 +88,19 @@ async def _run_one_window_size(
 
 async def measure(
     window_sizes: list[int], *, call_ids: list[int], calls: dict, db_dir: Path
-) -> tuple[dict[int, dict], dict[int, dict]]:
+) -> tuple[dict[int, dict | None], dict[int, dict | None]]:
     db_dir.mkdir(parents=True, exist_ok=True)
-    latency_results = {}
-    recall_results = {}
+    latency_results: dict[int, dict | None] = {}
+    recall_results: dict[int, dict | None] = {}
     for i, window_chars in enumerate(window_sizes):
         db_path = db_dir / f"window_{window_chars}.sqlite3"
-        latency_stats, recall_stats = await _run_one_window_size(
-            window_chars, call_ids=call_ids, calls=calls, db_path=db_path, warm_up=(i == 0)
-        )
+        try:
+            latency_stats, recall_stats = await _run_one_window_size(
+                window_chars, call_ids=call_ids, calls=calls, db_path=db_path, warm_up=(i == 0)
+            )
+        except Exception as exc:  # noqa: BLE001 -- isolated per candidate, see measure_gliner_concurrency
+            print(f"WARNING: window_chars={window_chars} errored: {exc}")
+            latency_stats, recall_stats = None, None
         latency_results[window_chars] = latency_stats
         recall_results[window_chars] = recall_stats
     return latency_results, recall_results
@@ -99,18 +121,14 @@ def main() -> int:
     args = parser.parse_args()
 
     window_sizes = [int(w) for w in args.window_sizes.split(",")]
-
-    secrets.load_typesafe_key()
-    calls = corpus.load_all()
-    call_ids = sorted(calls)
-    if args.subset is not None:
-        call_ids = call_ids[: args.subset]
+    calls, call_ids = load_call_subset(args.subset)
 
     print(f"Measuring window sizes={window_sizes} over {len(call_ids)} call(s)...")
     latency_results, recall_results = asyncio.run(
         measure(window_sizes, call_ids=call_ids, calls=calls, db_dir=args.db_dir)
     )
-    print_table(latency_results)
+    print("\nFinal results:")
+    print_table(latency_results, label="window_chars")
     print_recall_table(recall_results)
     return 0
 

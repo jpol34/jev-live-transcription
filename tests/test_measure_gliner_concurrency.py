@@ -2,6 +2,7 @@ import importlib.util
 import sqlite3
 import sys
 from pathlib import Path
+from unittest.mock import Mock
 
 _SCRIPT_PATH = Path(__file__).resolve().parent.parent / "scripts" / "measure_gliner_concurrency.py"
 _spec = importlib.util.spec_from_file_location("measure_gliner_concurrency", _SCRIPT_PATH)
@@ -26,7 +27,12 @@ def test_percentile_p95_biases_toward_high_end():
 
 def test_summarize_empty_latencies():
     stats = measure_gliner_concurrency.summarize([])
-    assert stats == {"n": 0, "p50": None, "p95": None, "mean": None}
+    assert stats == {"n": 0, "n_failed": 0, "p50": None, "p95": None, "mean": None}
+
+
+def test_summarize_records_n_failed():
+    stats = measure_gliner_concurrency.summarize([100.0], n_failed=2)
+    assert stats["n_failed"] == 2
 
 
 def test_summarize_computes_all_stats():
@@ -81,3 +87,65 @@ def test_load_stage_latencies_filters_by_stage_and_excludes_errors(tmp_path):
     finally:
         conn.close()
     assert sorted(latencies) == [100.0, 200.0]
+
+
+def test_delete_db_file_removes_main_file_and_sidecars(tmp_path):
+    db_path = tmp_path / "candidate.sqlite3"
+    db_path.write_text("main")
+    db_path.with_name(db_path.name + "-wal").write_text("wal")
+    db_path.with_name(db_path.name + "-shm").write_text("shm")
+
+    measure_gliner_concurrency._delete_db_file(db_path)
+
+    assert not db_path.exists()
+    assert not db_path.with_name(db_path.name + "-wal").exists()
+    assert not db_path.with_name(db_path.name + "-shm").exists()
+
+
+def test_delete_db_file_tolerates_missing_files(tmp_path):
+    db_path = tmp_path / "does-not-exist.sqlite3"
+    measure_gliner_concurrency._delete_db_file(db_path)  # must not raise
+
+
+def test_measure_isolates_a_failing_candidate_and_keeps_prior_results(monkeypatch, tmp_path):
+    import measure_gliner_concurrency as mgc
+
+    async def fake_run_one_concurrency(concurrency, *, call_ids, calls, db_path, warm_up):
+        if concurrency == 2:
+            raise RuntimeError("boom")
+        return {"n": 1, "n_failed": 0, "p50": 100.0, "p95": 100.0, "mean": 100.0}
+
+    monkeypatch.setattr(mgc, "_run_one_concurrency", fake_run_one_concurrency)
+
+    results = __import__("asyncio").run(
+        mgc.measure([1, 2, 4], call_ids=[1], calls={}, db_dir=tmp_path)
+    )
+
+    assert results[1] is not None
+    assert results[2] is None  # errored candidate recorded as None, not dropped
+    assert results[4] is not None  # later candidate still ran despite candidate 2's failure
+
+
+def test_load_call_subset_loads_secrets_and_trims_call_ids(monkeypatch):
+    import measure_gliner_concurrency as mgc
+
+    load_secret_mock = Mock()
+    monkeypatch.setattr(mgc.secrets, "load_typesafe_key", load_secret_mock)
+    monkeypatch.setattr(mgc.corpus, "load_all", lambda: {3: {}, 1: {}, 2: {}})
+
+    calls, call_ids = mgc.load_call_subset(subset=2)
+
+    load_secret_mock.assert_called_once()
+    assert call_ids == [1, 2]
+    assert calls == {3: {}, 1: {}, 2: {}}
+
+
+def test_load_call_subset_no_subset_returns_all_sorted_ids(monkeypatch):
+    import measure_gliner_concurrency as mgc
+
+    monkeypatch.setattr(mgc.secrets, "load_typesafe_key", Mock())
+    monkeypatch.setattr(mgc.corpus, "load_all", lambda: {3: {}, 1: {}, 2: {}})
+
+    _calls, call_ids = mgc.load_call_subset(subset=None)
+
+    assert call_ids == [1, 2, 3]
