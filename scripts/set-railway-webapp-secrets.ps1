@@ -27,6 +27,6 @@ if (-not $typesafeKey) {
     throw "Could not retrieve TYPESAFE_API_KEY from Strongbox."
 }
 
-railway variables --service $ServiceName --set "TYPESAFE_API_KEY=$typesafeKey"
+$typesafeKey | railway variable set TYPESAFE_API_KEY --stdin --service $ServiceName
 
 Write-Host "Set TYPESAFE_API_KEY on Railway service '$ServiceName'."
