@@ -51,12 +51,10 @@ def _read_public_key(ssh_key: str | None) -> str:
 
     The pod image's own startup script only creates `~/.ssh/authorized_keys`, generates SSH host
     keys, and starts sshd at all when a `PUBLIC_KEY` environment variable is present in the pod's
-    environment -- confirmed by reading that script directly inside a live pod, after `startSsh`
-    alone (with no `PUBLIC_KEY` env var passed) left the pod running with no sshd process and
-    nothing listening on port 22, which is indistinguishable from the outside from a slow-starting
-    sshd (both look like a connection refused during the readiness wait). RunPod's REST API does
-    not inject this on its own the way pod creation through the web console does, so this project
-    must supply it explicitly on every pod creation.
+    environment. RunPod's REST API does not inject this on its own the way pod creation through the
+    web console does, so this project must supply it explicitly on every pod creation -- without
+    it, the pod comes up with no sshd running at all, which looks identical from the outside to a
+    slow-starting sshd (both are a connection refused for the entire readiness wait).
     """
     if not ssh_key:
         raise ValueError(
