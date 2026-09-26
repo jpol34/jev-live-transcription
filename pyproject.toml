@@ -9,6 +9,7 @@ dependencies = [
     "gliner>=0.2.28",
     "rich",
     "pytest",
+    "protobuf>=7.36.2",
 ]
 
 [build-system]
