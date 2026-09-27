@@ -18,8 +18,9 @@ own workload shape: the 11-field zero-shot label set
 | bfloat16_10ms_30ms | bfloat16 | 30ms | 55 | 0 | 26989ms | 27027ms | 27029ms | 24540ms | 2.20 req/s |
 
 `throughput_req_s` is `n` divided by the requested 25s test window, not actual measured wall-clock
-duration; for the two 10ms configs, per-request latency (~50s) exceeds the test window, so the
-true sustained rate is lower than the reported figure, not higher. The `int8` quantization path
+duration; for the two 10ms configs and `bfloat16_10ms_30ms`, per-request latency (~27-50s) exceeds
+the test window, so the true sustained rate for those three configs is lower than the reported
+figure, not higher. The `int8` quantization path
 never answered a single request within the 600s startup timeout applied to every config (the same
 timeout that covers this model's own bfloat16 torch.compile warmup, which took up to ~7 minutes) --
 it is excluded from the batch-window sweep rather than compared unfavorably.
@@ -34,7 +35,8 @@ No, for `gliner[serve]`'s stock Ray Serve + native-PyTorch path as configured in
 not for GLiNER-based GPU serving in general. Every config's p50 is at minimum 15x over the
 ~250ms GLiNER sub-budget of the ~400ms whole-pipeline latency ceiling (best case: 3775ms at 20ms
 batch-wait), and p95/p99 land in the tens of seconds. Batch-window tuning across 5/10/20/30ms
-changes the picture by at most ~2x and does not close a three-orders-of-magnitude gap.
+changes the picture by at most ~2x and does not close the gap, which ranges from ~15x at best-case
+p50 to over 200x at worst-case p99 (one to just over two orders of magnitude, not three).
 
 The model itself is not the bottleneck: `scripts/measure_gliner_concurrency.py`'s raw single-call
 baseline (concurrency=1, no serving layer involved) is 23.2ms mean per call -- two orders of

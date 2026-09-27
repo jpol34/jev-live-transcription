@@ -200,8 +200,9 @@ throughput, backpressure/cost) are done. What's left is empirical, not more rese
 - **`gliner[serve]`'s stock request-handling path doesn't hit the latency/throughput bar, but the
   scope of that finding is narrower than "GLiNER-based GPU serving in general"**: a real
   `gliner[serve]` deployment benchmarked against this project's own workload shape (11 labels,
-  ~200-char window, `urchade/gliner_medium-v2.1`, A100) across bfloat16/float16/int8 and 5/10/20/30ms
-  batch windows never gets within an order of magnitude of the ~250ms GLiNER sub-budget -- best
+  ~200-char window, `urchade/gliner_medium-v2.1`, A100) -- bfloat16/float16/int8 at the 10ms
+  default batch window, then a 5/10/20/30ms batch-window sweep on the best-performing dtype
+  (bfloat16) -- never gets within an order of magnitude of the ~250ms GLiNER sub-budget -- best
   case p50 is ~3.8s, with p95/p99 in the tens of seconds, and per-replica throughput tops out
   around 4 req/s (int8 failed to become ready at all within the shared startup timeout). Hitting
   the 200-500 req/s target via replica count alone would need on the order of 46-116 A100
