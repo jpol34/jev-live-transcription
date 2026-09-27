@@ -2,12 +2,8 @@
 
 Runs one GLiNER checkpoint (`urchade/gliner_medium-v2.1`) against a bounded trailing window of
 the transcript-so-far (`config.GLINER_ZERO_SHOT_WINDOW_CHARS`) on every tick, stateless, covering
-all 11 fields including `caller_name`/`email`/`phone_number`. A separate streaming PII checkpoint
-was tried for those three fields (session-based, scoped to just the caller's current turn) but
-this checkpoint's "person" label lost essentially all detection confidence given any prior
-conversational turn as input -- a failure mode this model does not share, and windowed context
-actively helps it rather than hurting it. `extract_candidates` is the single entry point the jev
-resolver stage consumes.
+all 11 fields including `caller_name`/`email`/`phone_number`. `extract_candidates` is the single
+entry point the jev resolver stage consumes.
 """
 
 from __future__ import annotations
@@ -162,6 +158,11 @@ async def extract_candidates_timed(
 ) -> tuple[dict[str, list[dict]], float]:
     """Same as `extract_candidates`, but also returns the model's own latency in milliseconds as
     `(candidates, latency_ms)`.
+
+    `call_id` isn't used by extraction itself (the model call is stateless) -- kept so callers
+    (`pipeline_core`, `batch_runner`, `scripts/smoke_gliner.py`) can pass the same per-call
+    identity through every stage of the pipeline without a signature that varies by which
+    extraction strategy is in use.
     """
     start = time.monotonic()
     candidates = await asyncio.to_thread(_run_zero_shot_tick, transcript_snapshot)
