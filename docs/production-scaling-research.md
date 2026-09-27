@@ -69,6 +69,37 @@ latency/throughput tradeoff point is the right one for this project. A fresh ben
 *low-latency* profile (small batch, short window) rather than the throughput-maximizing defaults
 above is a real open question, not yet answered by any source found.
 
+### Model-level throughput options
+
+- **The throughput-optimized batching table above likely doesn't reflect a sensibly-configured
+  deployment.** `gliner[serve]`'s own default `--batch-wait-timeout-ms` is 10ms; the GLiNER Guard
+  benchmark's 480-900ms figures came from a much larger, throughput-maximizing batch window (its
+  own paper doesn't state the exact value). General Ray Serve tuning guidance recommends setting
+  the batch window to 10-20% of the latency SLA -- for a ~250ms extraction sub-budget, that's
+  ~25-50ms, in the same range as `gliner[serve]`'s 10ms default, not the window likely driving the
+  cited 480-900ms numbers. This softens the "central tension" above: a default or lightly-tuned
+  `gliner[serve]` deployment may already sit much closer to the latency budget than the cited table
+  suggests -- but **no source publishes real throughput at a 10-30ms window for this input shape**,
+  which remains the single most important number to get from a real benchmark.
+- **Quantization is worth testing, cheaply.** `gliner[serve]` natively supports `--quantization
+  int8` and `--dtype {float32,float16,bfloat16}` (bfloat16 default) as flags, no model swap or
+  export pipeline required. Its impact specifically in a low-latency (small-batch) regime is
+  unmeasured anywhere found, for GLiNER or a close analog -- worth including in the own-workload
+  benchmark since it's a zero-effort toggle.
+- **No smaller/distilled checkpoint is a clear win here.** Knowledgator's bi-encoder GLiNER line
+  (`gliner-bi-small/base/large-v2.0`) solves a problem this project doesn't have -- large/dynamic
+  label counts via cacheable label embeddings, with an headline result of ~130x throughput at 1024
+  labels. This pipeline uses 11 fixed labels, where the current uni-encoder architecture
+  (`gliner_medium-v2.1`) doesn't pay that label-count penalty. Worse, the bi-encoder-small's own
+  reported batch-1 throughput on an H100 (newer/faster than this project's A100) is ~66ms/example --
+  slower than this project's current ~19-23ms/example on the older A100. Edge-oriented PII variants
+  (`gliner-pii-small/edge-v1.0`) exist but publish no numbers and explicitly trade away recall.
+- **ONNX/TensorRT export is not natively supported by `gliner[serve]`** (only via a manual export
+  path outside the official server), and no source gives a real single-request or small-batch
+  latency number for it specifically -- general (non-GLiNER) transformer INT8 literature suggests
+  the optimization pays off much more at large batch sizes than at the small batches a tight
+  latency budget would require.
+
 ### Production analogs
 
 Real-time call-center PII redaction in practice favors a **hybrid** pipeline, not NER-only:
@@ -113,17 +144,15 @@ Reached via `/grill` on 2026-09-27. All four recommendations below were accepted
 
 ## Open items (not yet researched / not yet decided)
 
-- **Model-level throughput options** (in progress as of this writing): real low-latency-profile
-  ONNX/TensorRT quantization numbers (the table above is throughput-optimized, not
-  latency-optimized), smaller/distilled GLiNER checkpoints and their recall/speed tradeoff, and
-  whether `gliner[serve]` has been tuned anywhere for a tight-latency-SLA profile (short
-  batch-collection window) rather than the throughput-maximizing defaults.
 - **Backpressure and cost modeling**: not yet researched. Open questions: what happens when
   instantaneous demand exceeds capacity (queue with a drop policy, autoscaling, graceful
   degradation), and the realistic infrastructure cost shape (RunPod A100 SXM is $1.59/hr secure
   cloud as of this research) for each scaling approach at the 200-500-concurrent-call target.
-- **The core latency/throughput tension above is unresolved**: whether a `gliner[serve]`
-  configuration exists that hits both the ~400ms whole-pipeline ceiling and meaningful throughput
-  gain over the ~10-20-concurrent-call ceiling of the current unbatched architecture is an open
-  empirical question, not yet answered by any source found. This is exactly what decision 6's
-  own-workload benchmark would need to resolve.
+- **The core latency/throughput question remains empirically open, though less dire than first
+  found**: no source publishes real throughput at a 10-30ms batch window for this project's input
+  shape (~200-char, 11 labels) -- the cited 480-900ms figures likely reflect a much larger,
+  throughput-maximizing window than `gliner[serve]`'s own 10ms default. Whether a
+  sensibly-tuned deployment hits both the ~400ms whole-pipeline ceiling and meaningful throughput
+  gain over the current ~10-20-concurrent-call ceiling is exactly what decision 6's own-workload
+  benchmark would need to resolve -- quantization (a zero-effort `gliner[serve]` flag) is worth
+  including in that same benchmark pass.
