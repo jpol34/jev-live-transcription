@@ -1,6 +1,8 @@
-"""Stands up a RunPod A100 pod, installs `gliner[serve]`, and either smoke-tests it or runs the
-full batch-window/quantization benchmark matrix (`run_matrix.py`) against it -- retrieving
-`results.json` for the matrix mode. Always terminates the pod on exit, success or failure.
+"""Stands up a RunPod A100 pod, installs `gliner[serve]`, and runs one of three modes against it:
+a quick smoke test, the full batch-window/quantization benchmark matrix (`run_matrix.py`), or the
+blocking-handler/batch-churn latency diagnosis (`diagnose.py`) -- retrieving `results.json`/
+`diagnosis.json` for the matrix/diagnose modes. Always terminates the pod on exit, success or
+failure.
 
 Mirrors `src/jev_live_transcription/gpu_run.py`'s pod-lifecycle pattern (create/resume via
 `hangar`, poll for `RUNNING` + `ssh.direct`, retry real SSH connectability rather than trusting
@@ -56,6 +58,7 @@ _REMOTE_DIR = "/root/gliner_serve_bench"
 _REMOTE_LOG_PATH = f"{_REMOTE_DIR}/gliner-serve.log"
 _REMOTE_PID_PATH = f"{_REMOTE_DIR}/gliner-serve.pid"
 _REMOTE_RESULTS_PATH = f"{_REMOTE_DIR}/results.json"
+_REMOTE_DIAGNOSIS_PATH = f"{_REMOTE_DIR}/diagnosis.json"
 
 _SSH_CONNECT_TIMEOUT_S = 300.0
 _SSH_CONNECT_POLL_S = 5.0
@@ -282,6 +285,59 @@ def _run_matrix(ssh_direct: dict, ssh_key: str, local_results_path: Path) -> Non
     print(f"Results retrieved to {local_results_path}")
 
 
+def _run_diagnose(ssh_direct: dict, ssh_key: str, local_results_path: Path) -> None:
+    """Upload diagnose.py + its dependencies, run it in one blocking SSH call, and retrieve
+    diagnosis.json -- mirrors `_run_matrix`'s upload/execute/retrieve pattern exactly."""
+    scp_up_args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-i", ssh_key, "-P", str(ssh_direct["port"])]
+    target = f"{ssh_direct['username']}@{ssh_direct['host']}"
+    local_files = [
+        (Path(__file__).parent / "fixtures" / "sample_windows.json", "fixtures/sample_windows.json"),
+        (Path(__file__).parent / "load_test.py", "load_test.py"),
+        (Path(__file__).parent / "diagnose.py", "diagnose.py"),
+    ]
+    missing = [local_path for local_path, _ in local_files if not local_path.exists()]
+    if missing:
+        raise FileNotFoundError(f"diagnose mode needs these files built first: {missing}")
+
+    _run_ssh(ssh_direct, ssh_key, f"mkdir -p {_REMOTE_DIR}/fixtures")
+    for local_path, remote_rel_path in local_files:
+        result = subprocess.run(
+            ["scp", *scp_up_args, str(local_path), f"{target}:{_REMOTE_DIR}/{remote_rel_path}"],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"failed to upload {remote_rel_path}: {result.stderr}")
+
+    # Streamed rather than captured, same reasoning as `_run_matrix`: this invocation runs the
+    # full two-phase diagnosis plus the int8 retry and can take a while, and `_run_ssh`'s
+    # `capture_output=True` would buffer all of that silently until the whole thing finishes.
+    run_result = subprocess.run(
+        [
+            "ssh",
+            *_ssh_target(ssh_key),
+            "-p",
+            str(ssh_direct["port"]),
+            target,
+            f"cd {_REMOTE_DIR} && python diagnose.py --results-path {_REMOTE_DIAGNOSIS_PATH}",
+        ],
+        timeout=3600.0,
+    )
+    if run_result.returncode != 0:
+        raise RuntimeError(f"diagnose.py failed on the pod (exit code {run_result.returncode})")
+
+    local_results_path.parent.mkdir(parents=True, exist_ok=True)
+    scp_down_args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-i", ssh_key, "-P", str(ssh_direct["port"])]
+    result = subprocess.run(
+        ["scp", *scp_down_args, f"{target}:{_REMOTE_DIAGNOSIS_PATH}", str(local_results_path)],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"failed to retrieve diagnosis.json: {result.stderr}")
+    print(f"Diagnosis retrieved to {local_results_path}")
+
+
 def run(*, mode: str, ssh_key: str, results_path: Path, keep_pod: bool) -> int:
     secrets.load_runpod_key()
     hangar.init(os.environ[secrets.RUNPOD_ENV_VAR])
@@ -311,8 +367,10 @@ def run(*, mode: str, ssh_key: str, results_path: Path, keep_pod: bool) -> int:
         if mode == "smoke":
             _smoke_test(ssh_direct, ssh_key)
             print("Smoke test passed.")
-        else:
+        elif mode == "matrix":
             _run_matrix(ssh_direct, ssh_key, results_path)
+        else:
+            _run_diagnose(ssh_direct, ssh_key, results_path)
 
         return 0
     finally:
@@ -329,7 +387,11 @@ def run(*, mode: str, ssh_key: str, results_path: Path, keep_pod: bool) -> int:
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["smoke", "matrix"], help="smoke: one quick default-config check. matrix: the full sweep.")
+    parser.add_argument(
+        "mode",
+        choices=["smoke", "matrix", "diagnose"],
+        help="smoke: one quick default-config check. matrix: the full sweep. diagnose: the latency-pathology diagnosis.",
+    )
     parser.add_argument(
         "--ssh-key",
         required=True,
@@ -339,7 +401,7 @@ def main(argv: list[str] | None = None) -> int:
         "--results-path",
         type=Path,
         default=Path("benchmarks/gliner_serve/results.json"),
-        help="Local path to copy the pod's results.json back to (matrix mode only).",
+        help="Local path to copy the pod's results.json/diagnosis.json back to (matrix/diagnose modes only).",
     )
     parser.add_argument(
         "--keep-pod",
