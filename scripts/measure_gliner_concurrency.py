@@ -1,13 +1,19 @@
-"""Measures gliner_standard-stage latency across candidate `gliner_concurrency` levels.
+"""Measures gliner_standard-stage latency across candidate `gliner_concurrency` levels, under real
+cross-call contention.
 
 Runs the corpus (or a subset) once per candidate `gliner_concurrency` level into its own capture
-DB, holding `call_concurrency` fixed at 1 (the harness's real purpose is per-call latency, which
-`batch_runner`'s own docstring already documents as invalid above `call_concurrency=1` regardless
-of device), then prints a p50/p95 latency comparison table across the candidates.
+DB, at `call_concurrency=config.CALL_CONCURRENCY` -- deliberately NOT 1. `gliner_concurrency`
+bounds how many calls' GLiNER steps may run at once (a separate semaphore from `call_concurrency`,
+see `batch_runner.run_batch`); with only one call ever running its tick loop at a time, that
+semaphore's capacity is never actually contended, so `gliner_concurrency`'s effect can only show
+up when multiple calls are genuinely in flight together. The resulting latency numbers are exactly
+as `batch_runner`'s docstring warns -- inflated by queueing delay a real single call wouldn't see
+-- but that inflation, and whether raising `gliner_concurrency` reduces it, is the thing being
+measured here, not a benchmark-data contamination to avoid.
 
 This script only measures -- whether to actually raise `config.GLINER_CONCURRENCY` from its
-default of 1 is a separate, deliberate step made from this printed data, per the plan's decision
-to decide concurrency empirically rather than assume it.
+default is a separate, deliberate step made from this printed data, per the plan's decision to
+decide concurrency empirically rather than assume it.
 
 Usage:
     uv run python scripts/measure_gliner_concurrency.py [--subset N] [--concurrencies 1,2,4]
@@ -20,7 +26,7 @@ import sqlite3
 import statistics
 from pathlib import Path
 
-from jev_live_transcription import batch_runner, corpus, secrets
+from jev_live_transcription import batch_runner, config, corpus, secrets
 from jev_live_transcription import db as db_module
 
 DEFAULT_CONCURRENCIES = (1, 2, 4)
@@ -100,7 +106,7 @@ async def _run_one_concurrency(
     result = await batch_runner.run_batch(
         call_ids,
         db_path=db_path,
-        call_concurrency=1,
+        call_concurrency=config.CALL_CONCURRENCY,
         gliner_concurrency=concurrency,
         calls=calls,
         warm_up=warm_up,

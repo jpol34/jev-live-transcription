@@ -117,12 +117,10 @@ async def run_batch(
     without real models, pass `warm_up=False`.
 
     `call_concurrency`/`gliner_concurrency` default to `1` (fully sequential) for the
-    cross-call-contention reason explained in this module's docstring; raising `call_concurrency`
-    above 1 trades away methodologically valid latency numbers for wall-clock throughput, so only
-    do so for a run whose latency data won't be used (e.g. `config.CALL_CONCURRENCY` for a quick
-    smoke pass across the corpus). `gliner_concurrency` has no such tradeoff to make -- real
-    measurement found no latency benefit to raising it (see `config.GLINER_CONCURRENCY`), so it
-    stays at 1 regardless of what this call is for.
+    cross-call-contention reason explained in this module's docstring; raising them above 1 trades
+    away methodologically valid latency numbers for wall-clock throughput, so only do so for a run
+    whose latency data won't be used (e.g. `config.CALL_CONCURRENCY`/`config.GLINER_CONCURRENCY`
+    for a quick smoke pass across the corpus).
 
     `enable_llm_baseline` defaults to `False` and is forwarded as-is to every call's
     `pipeline_core.run_call` -- see its docstring for why the GPT-5.1 comparison arm is opt-in
