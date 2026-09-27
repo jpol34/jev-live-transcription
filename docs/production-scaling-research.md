@@ -115,6 +115,56 @@ literature suggests CPU is competitive at low-to-moderate throughput and GPUs pu
 batched throughput is high, consistent with the GLiNER Guard numbers above, but this is a reasoned
 synthesis, not a single controlled study.
 
+### Backpressure architecture
+
+Ray Serve (which `gliner[serve]` is built on) has a real, documented mechanism: each replica
+queues up to `max_ongoing_requests` in-flight requests; beyond that, new requests immediately raise
+`BackPressureError` -> HTTP 503, rather than queueing indefinitely. Two caveats: `max_ongoing_requests`
+defaults to infinity in recent Ray Serve versions, and the 503-on-overflow guarantee only applies
+once `autoscaling_config` is also set -- an unconfigured deployment could otherwise queue without
+bound. For an autoscaled deployment, `max_ongoing_requests` is recommended at 1.2-1.5x
+`target_ongoing_requests`, giving the autoscaler headroom before hard rejection.
+
+For a real-time-deadline workload (a live call tick that can't usefully wait long), reject-fast
+is not the only real pattern found: **Snowflake's production model-serving system instead uses
+"no-wait" adaptive batching** -- process whatever has arrived when a slot opens rather than
+waiting to fill a batch -- reporting ~585ms p99 even at 1,000 concurrent requests per pod, trading
+batch efficiency for bounded latency growth instead of rejecting requests outright. Research-stage
+work (Niyama, SuperServe, CascadeServe) converges on deadline-aware, priority-based dropping as the
+more principled fix, but none of it is shown running in a named production system at this scale --
+flagging as promising but unproven, not a source to build on directly yet.
+
+### Autoscaling
+
+Real (`num_replicas="auto"` + `autoscaling_config`), but **too slow to react to a sudden live-call
+burst on its own**: the autoscaler evaluates load over a ~30s moving-average window, so a spike can
+queue 100+ requests before it reacts. GPU cold start compounds this -- bringing up a GPU replica
+from `min_replicas=0` takes 60+ seconds (model load + CUDA init), so official guidance is
+`min_replicas>=2` to keep GPU replicas always warm. **Practical implication: autoscaling here can
+only ever add capacity on top of an always-on floor sized for a realistic baseline load -- it
+cannot be relied on to react to a burst starting from zero.**
+
+### Cost modeling
+
+Using real RunPod A100 SXM Secure Cloud pricing ($1.59/hr, confirmed; 730 hrs/month) and the
+throughput figures already found, for a 200-500 req/s target (1 req/s x 200-500 concurrent calls):
+
+| Approach | GPUs needed | Monthly cost |
+|---|---|---|
+| Peak-provisioned, unbatched (54 req/s/GPU, measured) | 4-10 | $4,643-$11,607 |
+| Peak-provisioned, throughput-batched (148-194 req/s/GPU, measured but at an unverified-for-our-latency-budget batch window) | 2-3 | $2,321-$3,482 |
+| Autoscaled | 2-GPU always-on floor (cold-start-forced) + burst capacity | Savings only above the 2-GPU floor; depends on real traffic shape, not sourced |
+| CPU fleet | not GPU-priced | Plausibly 5-15x cheaper than GPU, but unverified for GLiNER specifically |
+
+CPU precedent, real and at scale: **Roblox served BERT-base (110M params, smaller than this
+project's 184M model) at 1B+ requests/day on CPU**, reaching ~3,000 inferences/sec on one 36-core
+Xeon box after optimization. A separate case study cites ~100 req/s under 100ms latency for under
+$250/month on a modest CPU instance. Neither is GLiNER-specific -- reasoning from BERT-base as a
+same-size-class proxy suggests hundreds of req/s is plausibly reachable on a handful of modest CPU
+instances for a few hundred dollars/month, an order of magnitude below the GPU fleet costs above --
+but this is extrapolation from a different model, not a measured GLiNER number, and would need its
+own real benchmark before being treated as a real alternative to the GPU-based design above.
+
 ## Design decisions (settled)
 
 Reached via `/grill` on 2026-09-27. All four recommendations below were accepted as stated.
@@ -142,17 +192,24 @@ Reached via `/grill` on 2026-09-27. All four recommendations below were accepted
    an LLM"; a future service would *reuse* this project's findings (recall threshold, window size)
    but live in its own codebase with its own deployment lifecycle.
 
-## Open items (not yet researched / not yet decided)
+## Open items (not yet decided -- research is complete)
 
-- **Backpressure and cost modeling**: not yet researched. Open questions: what happens when
-  instantaneous demand exceeds capacity (queue with a drop policy, autoscaling, graceful
-  degradation), and the realistic infrastructure cost shape (RunPod A100 SXM is $1.59/hr secure
-  cloud as of this research) for each scaling approach at the 200-500-concurrent-call target.
+All four planned research clusters (batching/serving frameworks, scaling topology, model-level
+throughput, backpressure/cost) are done. What's left is empirical, not more research:
+
 - **The core latency/throughput question remains empirically open, though less dire than first
   found**: no source publishes real throughput at a 10-30ms batch window for this project's input
   shape (~200-char, 11 labels) -- the cited 480-900ms figures likely reflect a much larger,
-  throughput-maximizing window than `gliner[serve]`'s own 10ms default. Whether a
-  sensibly-tuned deployment hits both the ~400ms whole-pipeline ceiling and meaningful throughput
-  gain over the current ~10-20-concurrent-call ceiling is exactly what decision 6's own-workload
-  benchmark would need to resolve -- quantization (a zero-effort `gliner[serve]` flag) is worth
-  including in that same benchmark pass.
+  throughput-maximizing window than `gliner[serve]`'s own 10ms default. Whether a sensibly-tuned
+  deployment hits both the ~400ms whole-pipeline ceiling and meaningful throughput gain over the
+  current ~10-20-concurrent-call ceiling is exactly what decision 6's own-workload benchmark would
+  need to resolve -- quantization (a zero-effort `gliner[serve]` flag) is worth including in that
+  same pass.
+- **Backpressure policy is a real decision, not yet made**: reject-fast (Ray Serve's native 503) vs.
+  Snowflake-style no-wait adaptive batching (bounded latency growth instead of rejection) is a
+  genuine tradeoff for whoever builds this, informed by how a live call should degrade under
+  overload -- not resolved here since it depends on product requirements this research can't supply.
+- **CPU-fleet alternative is unverified for GLiNER specifically**: real (Roblox/BERT-base) precedent
+  suggests it could be 5-15x cheaper than the GPU-based design, but needs its own benchmark before
+  being taken as a real alternative rather than a same-size-class extrapolation from a different
+  model.
