@@ -205,7 +205,7 @@ def start_gpu_sampling(log_path: Path):
     launches, which solve a different problem: surviving past the SSH command that started them)."""
     log_file = open(log_path, "w", encoding="utf-8")
     proc = subprocess.Popen(
-        ["nvidia-smi", f"--query-gpu=utilization.gpu,memory.used", "--format=csv", "-l", str(GPU_SAMPLE_INTERVAL_S)],
+        ["nvidia-smi", "--query-gpu=utilization.gpu,memory.used", "--format=csv", "-l", str(GPU_SAMPLE_INTERVAL_S)],
         stdout=log_file,
         stderr=subprocess.STDOUT,
     )
@@ -234,11 +234,15 @@ def parse_gpu_log(log_path: Path) -> dict[str, Any] | None:
         parts = line.split(",")
         if len(parts) != 2:
             continue
+        # Parse both fields into locals before appending either -- an unparsable field (e.g. an
+        # "N/A" reading) must drop the whole row, not leave `utils`/`mems` desynchronized.
         try:
-            utils.append(float(parts[0].strip().rstrip("%").strip()))
-            mems.append(float(parts[1].strip().rstrip("MiB").strip()))
+            util = float(parts[0].strip().rstrip("%").strip())
+            mem = float(parts[1].strip().rstrip("MiB").strip())
         except ValueError:
             continue
+        utils.append(util)
+        mems.append(mem)
     if not utils:
         return None
     return {

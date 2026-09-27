@@ -409,8 +409,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--results-path",
         type=Path,
-        default=Path("benchmarks/gliner_serve/results.json"),
-        help="Local path to copy the pod's results.json/diagnosis.json back to (matrix/diagnose modes only).",
+        default=None,
+        help=(
+            "Local path to copy the pod's results.json/diagnosis.json back to (matrix/diagnose "
+            "modes only). Defaults to benchmarks/gliner_serve/results.json for matrix and "
+            "benchmarks/gliner_serve/diagnosis.json for diagnose -- kept mode-specific so running "
+            "one mode without overriding this flag can't silently overwrite the other's output."
+        ),
     )
     parser.add_argument(
         "--keep-pod",
@@ -419,7 +424,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Don't terminate the pod on exit (debugging only -- the pod keeps billing).",
     )
     args = parser.parse_args(argv)
-    return run(mode=args.mode, ssh_key=args.ssh_key, results_path=args.results_path, keep_pod=args.keep_pod)
+    results_path = args.results_path
+    if results_path is None:
+        default_name = "diagnosis.json" if args.mode == "diagnose" else "results.json"
+        results_path = Path(f"benchmarks/gliner_serve/{default_name}")
+    return run(mode=args.mode, ssh_key=args.ssh_key, results_path=results_path, keep_pod=args.keep_pod)
 
 
 if __name__ == "__main__":
