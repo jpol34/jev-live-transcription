@@ -23,12 +23,12 @@ JEV_RECONFIRM_SETTLE_TICKS = 2
 
 # Maximum trailing character count of the transcript-so-far fed to the GLiNER model per tick.
 # Bounding it to a recent sliding window, rather than the full growing transcript, keeps its
-# per-tick latency flat regardless of call length instead of growing unboundedly. Sized against
-# real transcript text on the benchmark machine, where this model's forward pass scales roughly
-# linearly with input length -- deliberately smaller than a "few turns" of raw transcript might
-# suggest, to keep typical per-tick latency close to the 400ms target (occasional spikes above it
-# are still possible under CPU contention; the property this constant guarantees is flatness with
-# call length, not a hard per-tick ceiling).
+# per-tick latency flat regardless of call length instead of growing unboundedly. Originally sized
+# for CPU latency; re-measured for real on the GPU pod across all 11 fields
+# (scripts/measure_window_size.py, full corpus) after GPU latency stopped being the constraint --
+# wider windows (400/800 chars) cost negligible extra latency but net-hurt recall (amenities_
+# requested and move_in_date both decline sharply with more context, outweighing smaller gains
+# elsewhere), so 200 stays the best of the candidates measured, not just the cheapest.
 GLINER_ZERO_SHOT_WINDOW_CHARS = 200
 
 # Minimum confidence the GLiNER model requires to report a candidate span, on
@@ -45,9 +45,12 @@ GLINER_ZERO_SHOT_THRESHOLD = 0.30
 RAM_GB = 16
 CALL_CONCURRENCY = (RAM_GB - 4) // 4  # 3
 
-# GLiNER concurrency is tuned independently of call concurrency since the
-# model runs locally rather than per-call against a remote API.
-GLINER_CONCURRENCY = 2
+# GLiNER concurrency is tuned independently of call concurrency since the model runs locally
+# rather than per-call against a remote API. Measured for real on the GPU pod
+# (scripts/measure_gliner_concurrency.py, 20-call subset): p50/p95/mean latency were flat across
+# concurrency 1/2/4 (~37-38ms regardless) -- no throughput benefit to raising it, unlike
+# CALL_CONCURRENCY, so this stays at 1 rather than recommending a higher value.
+GLINER_CONCURRENCY = 1
 
 # Rough cost-per-million-token estimates, USD. These are NOT authoritative —
 # GPT-5.1 pricing is from public list pricing and may drift, and the jev

@@ -78,9 +78,9 @@ def _build_parser() -> argparse.ArgumentParser:
         type=int,
         default=1,
         help=(
-            "Max concurrent GLiNER inferences across all calls (default: 1). Same caveat as "
-            f"--call-concurrency -- config.GLINER_CONCURRENCY ({config.GLINER_CONCURRENCY}) is a "
-            "throughput setting, not a benchmark-data-collection one."
+            "Max concurrent GLiNER inferences across all calls (default: 1). Real measurement "
+            "(see config.GLINER_CONCURRENCY) found no latency benefit to raising this on GPU -- "
+            "unlike --call-concurrency, there's no throughput tradeoff to opt into here."
         ),
     )
     batch_parser.add_argument(

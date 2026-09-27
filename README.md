@@ -90,8 +90,8 @@ the RunPod account; `--subset N` limits the run to the first N calls, and `--kee
 teardown for debugging. GPU is the canonical device for this benchmark's numbers -- a local,
 CPU-only run remains available via `jlt batch` directly, but its latency is not representative.
 
-On an NVIDIA A100-SXM4-80GB, GLiNER's forward pass runs well under its CPU baseline of
-~226ms/tick.
+On an NVIDIA A100-SXM4-80GB, GLiNER's forward pass averages ~19-27ms/tick (depending on
+`GLINER_ZERO_SHOT_WINDOW_CHARS`), against a ~226ms/tick CPU baseline for the same model.
 
 Score per-field recall against the corpus's ground truth from any capture DB:
 
