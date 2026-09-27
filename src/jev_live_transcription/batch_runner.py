@@ -106,7 +106,7 @@ async def run_batch(
     *,
     db_path: str | Path,
     call_concurrency: int = 1,
-    gliner_concurrency: int = 1,
+    gliner_concurrency: int = config.GLINER_CONCURRENCY,
     calls: dict[int, dict] | None = None,
     warm_up: bool = True,
     enable_llm_baseline: bool = False,
@@ -120,13 +120,13 @@ async def run_batch(
     callers that already warmed up GLiNER in this process, or tests exercising this function
     without real models, pass `warm_up=False`.
 
-    `call_concurrency`/`gliner_concurrency` default to `1` (fully sequential) for the
-    cross-call-contention reason explained in this module's docstring; raising `call_concurrency`
-    above 1 trades away methodologically valid latency numbers for wall-clock throughput, so only
-    do so for a run whose latency data won't be used (e.g. `config.CALL_CONCURRENCY` for a quick
-    smoke pass across the corpus). `gliner_concurrency` has no such tradeoff to make (see
-    `config.GLINER_CONCURRENCY`) -- a value other than that constant logs a warning but is not
-    clamped, since `scripts/measure_gliner_concurrency.py` deliberately passes other values to
+    `call_concurrency` defaults to `1` and `gliner_concurrency` to `config.GLINER_CONCURRENCY`
+    (fully sequential) for the cross-call-contention reason explained in this module's docstring;
+    raising `call_concurrency` above 1 trades away methodologically valid latency numbers for
+    wall-clock throughput, so only do so for a run whose latency data won't be used (e.g.
+    `config.CALL_CONCURRENCY` for a quick smoke pass across the corpus). `gliner_concurrency` has
+    no such tradeoff to make -- a value above `config.GLINER_CONCURRENCY` logs a warning but is not
+    clamped, since `scripts/measure_gliner_concurrency.py` deliberately passes higher values to
     re-measure it.
 
     `enable_llm_baseline` defaults to `False` and is forwarded as-is to every call's
@@ -140,9 +140,9 @@ async def run_batch(
         raise ValueError(f"call_concurrency must be >= 1, got {call_concurrency!r}")
     if gliner_concurrency < 1:
         raise ValueError(f"gliner_concurrency must be >= 1, got {gliner_concurrency!r}")
-    if gliner_concurrency != config.GLINER_CONCURRENCY:
+    if gliner_concurrency > config.GLINER_CONCURRENCY:
         _LOGGER.warning(
-            "gliner_concurrency=%d differs from the empirically-recommended config.GLINER_CONCURRENCY"
+            "gliner_concurrency=%d is above the empirically-recommended config.GLINER_CONCURRENCY"
             "=%d -- the model call is fully serialized by a lock regardless of this value, so real "
             "measurement found anything above the recommended value only adds queueing delay, no "
             "throughput gain (see config.GLINER_CONCURRENCY's comment). Proceeding anyway.",
