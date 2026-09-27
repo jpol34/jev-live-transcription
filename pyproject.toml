@@ -15,6 +15,7 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "httpx",
+    "aiohttp",
     "hangar @ git+https://github.com/jpol34/hangar",
 ]
 
