@@ -197,14 +197,17 @@ Reached via `/grill` on 2026-09-27. All four recommendations below were accepted
 All four planned research clusters (batching/serving frameworks, scaling topology, model-level
 throughput, backpressure/cost) are done. What's left is empirical, not more research:
 
-- **The core latency/throughput question remains empirically open, though less dire than first
-  found**: no source publishes real throughput at a 10-30ms batch window for this project's input
-  shape (~200-char, 11 labels) -- the cited 480-900ms figures likely reflect a much larger,
-  throughput-maximizing window than `gliner[serve]`'s own 10ms default. Whether a sensibly-tuned
-  deployment hits both the ~400ms whole-pipeline ceiling and meaningful throughput gain over the
-  current ~10-20-concurrent-call ceiling is exactly what decision 6's own-workload benchmark would
-  need to resolve -- quantization (a zero-effort `gliner[serve]` flag) is worth including in that
-  same pass.
+- **The core latency/throughput question is resolved, and the answer is no**: a real
+  `gliner[serve]` deployment benchmarked against this project's own workload shape (11 labels,
+  ~200-char window, `urchade/gliner_medium-v2.1`, A100) across bfloat16/float16/int8 and 5/10/20/30ms
+  batch windows never gets within an order of magnitude of the ~250ms GLiNER sub-budget -- best
+  case p50 is ~3.8s, with p95/p99 in the tens of seconds, and per-replica throughput tops out
+  around 4 req/s (int8 failed to become ready at all within the shared startup timeout). Hitting
+  the 200-500 req/s target via replica count alone would need on the order of 46-116 A100
+  replicas. See `benchmarks/gliner_serve/RESULTS.md` for the full data and analysis. This rules out
+  `gliner[serve]`'s stock request-handling path (one label set per request) at this label count and
+  concurrency for a low-latency deployment; a real fix needs a different design (fewer labels per
+  request, a smaller model, or a different serving layer), not a config flag.
 - **Backpressure policy is a real decision, not yet made**: reject-fast (Ray Serve's native 503) vs.
   Snowflake-style no-wait adaptive batching (bounded latency growth instead of rejection) is a
   genuine tradeoff for whoever builds this, informed by how a live call should degrade under
