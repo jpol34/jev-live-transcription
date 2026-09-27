@@ -41,7 +41,11 @@ import load_test  # noqa: E402
 MODEL = "urchade/gliner_medium-v2.1"
 DEFAULT_URL = "http://localhost:8000"
 
-READY_TIMEOUT_S = 120
+# gliner.serve enables torch.compile by default, and its first real request pays a one-time
+# warmup cost measured directly (via pod_bench.py's own smoke test) to take up to ~7 minutes on
+# an A100 with this model -- dynamo hits its recompile limit partway through. 120s was nowhere
+# near enough; this is a real property of the default config, not a bug to shrink away.
+READY_TIMEOUT_S = 600
 READY_POLL_INTERVAL_S = 2
 SERVER_STOP_TIMEOUT_S = 30
 
