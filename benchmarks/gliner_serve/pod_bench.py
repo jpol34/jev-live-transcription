@@ -228,34 +228,47 @@ def _smoke_test(ssh_direct: dict, ssh_key: str) -> None:
 def _run_matrix(ssh_direct: dict, ssh_key: str, local_results_path: Path) -> None:
     scp_up_args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-i", ssh_key, "-P", str(ssh_direct["port"])]
     target = f"{ssh_direct['username']}@{ssh_direct['host']}"
+    # (local path, remote path relative to _REMOTE_DIR) -- the fixture keeps its `fixtures/`
+    # subdirectory since `load_test.load_fixture` resolves it relative to the script's own
+    # location, not the remote dir's top level.
     local_files = [
-        Path(__file__).parent / "fixtures" / "sample_windows.json",
-        Path(__file__).parent / "load_test.py",
-        Path(__file__).parent / "run_matrix.py",
+        (Path(__file__).parent / "fixtures" / "sample_windows.json", "fixtures/sample_windows.json"),
+        (Path(__file__).parent / "load_test.py", "load_test.py"),
+        (Path(__file__).parent / "run_matrix.py", "run_matrix.py"),
     ]
-    missing = [f for f in local_files if not f.exists()]
+    missing = [local_path for local_path, _ in local_files if not local_path.exists()]
     if missing:
         raise FileNotFoundError(f"matrix mode needs these files built first: {missing}")
 
-    _run_ssh(ssh_direct, ssh_key, f"mkdir -p {_REMOTE_DIR}")
-    for local_file in local_files:
+    _run_ssh(ssh_direct, ssh_key, f"mkdir -p {_REMOTE_DIR}/fixtures")
+    for local_path, remote_rel_path in local_files:
         result = subprocess.run(
-            ["scp", *scp_up_args, str(local_file), f"{target}:{_REMOTE_DIR}/{local_file.name}"],
+            ["scp", *scp_up_args, str(local_path), f"{target}:{_REMOTE_DIR}/{remote_rel_path}"],
             capture_output=True,
             text=True,
         )
         if result.returncode != 0:
-            raise RuntimeError(f"failed to upload {local_file.name}: {result.stderr}")
+            raise RuntimeError(f"failed to upload {remote_rel_path}: {result.stderr}")
 
-    run_result = _run_ssh(
-        ssh_direct,
-        ssh_key,
-        f"cd {_REMOTE_DIR} && python run_matrix.py --results-path {_REMOTE_RESULTS_PATH}",
-        timeout_s=3600.0,
+    # Streamed rather than captured (unlike every other `_run_ssh` call in this file): this
+    # invocation runs the full multi-config sweep and can take the better part of an hour, and
+    # `_run_ssh`'s `capture_output=True` would buffer all of that output silently until the whole
+    # thing finishes -- leaving no way to notice a stalled config short of waiting out the full
+    # timeout. `stdout=None`/`stderr=None` let the child inherit this process's own streams so
+    # `run_matrix.py`'s own per-config progress prints appear live.
+    run_result = subprocess.run(
+        [
+            "ssh",
+            *_ssh_target(ssh_key),
+            "-p",
+            str(ssh_direct["port"]),
+            target,
+            f"cd {_REMOTE_DIR} && python run_matrix.py --results-path {_REMOTE_RESULTS_PATH}",
+        ],
+        timeout=3600.0,
     )
-    print(run_result.stdout)
     if run_result.returncode != 0:
-        raise RuntimeError(f"run_matrix.py failed on the pod: {run_result.stderr}")
+        raise RuntimeError(f"run_matrix.py failed on the pod (exit code {run_result.returncode})")
 
     local_results_path.parent.mkdir(parents=True, exist_ok=True)
     scp_down_args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-i", ssh_key, "-P", str(ssh_direct["port"])]
