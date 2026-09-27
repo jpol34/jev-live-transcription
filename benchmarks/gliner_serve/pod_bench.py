@@ -24,13 +24,26 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
+import shlex
 import subprocess
+import sys
 import time
 from pathlib import Path
 
 import hangar
 
 from jev_live_transcription import config, secrets
+from jev_live_transcription.gpu_run import _cuda_preflight, _read_public_key, _wait_for_pod_ready
+
+# `load_test.py` lives alongside this file and defines the one real request shape this benchmark
+# uses (confirmed against the installed gliner[serve] package, not guessed) -- imported rather than
+# duplicated so the warmup/readiness check here exercises the exact same payload shape as the real
+# load-tested traffic in `run_matrix.py`.
+_THIS_DIR = Path(__file__).resolve().parent
+if str(_THIS_DIR) not in sys.path:
+    sys.path.insert(0, str(_THIS_DIR))
+import load_test  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,8 +57,6 @@ _REMOTE_LOG_PATH = f"{_REMOTE_DIR}/gliner-serve.log"
 _REMOTE_PID_PATH = f"{_REMOTE_DIR}/gliner-serve.pid"
 _REMOTE_RESULTS_PATH = f"{_REMOTE_DIR}/results.json"
 
-_POD_READY_TIMEOUT_S = 600.0
-_POD_READY_POLL_S = 5.0
 _SSH_CONNECT_TIMEOUT_S = 300.0
 _SSH_CONNECT_POLL_S = 5.0
 # Generous: the first real request against a freshly-started replica pays a one-time torch.compile
@@ -53,15 +64,6 @@ _SSH_CONNECT_POLL_S = 5.0
 # limit during warmup) -- a real finding about gliner.serve's default config, not a bug to paper
 # over by shrinking this number.
 _SERVER_READY_TIMEOUT_S = 600.0
-
-
-def _read_public_key(ssh_key: str) -> str:
-    """Return `<ssh_key>.pub`'s contents -- required by the pod image's startup script to start
-    sshd at all (see module docstring)."""
-    pub_key_path = Path(f"{ssh_key}.pub")
-    if not pub_key_path.exists():
-        raise FileNotFoundError(f"no public key found at {pub_key_path} (expected alongside --ssh-key)")
-    return pub_key_path.read_text().strip()
 
 
 def _ssh_target(ssh_key: str) -> list[str]:
@@ -84,19 +86,6 @@ def _run_ssh(
     )
 
 
-def _wait_for_pod_ready(pod_id: str) -> dict:
-    deadline = time.monotonic() + _POD_READY_TIMEOUT_S
-    while time.monotonic() < deadline:
-        pod = hangar.get_pod(pod_id)
-        if pod is None:
-            raise RuntimeError(f"pod {pod_id} disappeared while waiting for it to become ready")
-        ssh_direct = (pod.get("ssh") or {}).get("direct")
-        if pod.get("status") == "RUNNING" and pod.get("runtime") and ssh_direct:
-            return ssh_direct
-        time.sleep(_POD_READY_POLL_S)
-    raise TimeoutError(f"pod {pod_id} did not become SSH-ready within {_POD_READY_TIMEOUT_S}s")
-
-
 def _wait_for_ssh_connectable(ssh_direct: dict, ssh_key: str) -> None:
     deadline = time.monotonic() + _SSH_CONNECT_TIMEOUT_S
     last_result: subprocess.CompletedProcess | None = None
@@ -107,13 +96,6 @@ def _wait_for_ssh_connectable(ssh_direct: dict, ssh_key: str) -> None:
         time.sleep(_SSH_CONNECT_POLL_S)
     stderr = last_result.stderr if last_result else "(no attempt made)"
     raise TimeoutError(f"SSH never became connectable within {_SSH_CONNECT_TIMEOUT_S}s: {stderr}")
-
-
-def _cuda_preflight(ssh_direct: dict, ssh_key: str) -> None:
-    result = _run_ssh(ssh_direct, ssh_key, "nvidia-smi --query-gpu=name,memory.total --format=csv,noheader")
-    if result.returncode != 0:
-        raise RuntimeError(f"CUDA preflight failed (nvidia-smi rc={result.returncode}): {result.stderr}")
-    print(f"CUDA preflight ok: {result.stdout.strip()}")
 
 
 def _install_deps(ssh_direct: dict, ssh_key: str) -> None:
@@ -149,9 +131,8 @@ def _start_server(
     # The `&` must sit directly after the single command being backgrounded, not after a `&&`
     # chain: `A && nohup B &` backgrounds the *whole* `A && B` compound as one job, so `nohup B`
     # still runs synchronously inside it and the SSH channel blocks until B exits (i.e. forever,
-    # for a server) -- confirmed by reproducing the hang directly over `ssh` outside this script
-    # before landing on this fix. All paths here are already absolute, so `cd` is skipped rather
-    # than working around the same trap with `cd DIR && nohup ... &`.
+    # for a server). All paths here are already absolute, so `cd` is skipped rather than working
+    # around the same trap with `cd DIR && nohup ... &`.
     remote_command = (
         f"mkdir -p {_REMOTE_DIR}; nohup {cmd} < /dev/null > {_REMOTE_LOG_PATH} 2>&1 & "
         f"echo $! > {_REMOTE_PID_PATH}; disown; echo STARTED"
@@ -165,13 +146,20 @@ def _start_server(
     # bound (Ray's own startup) or the GLiNERDeployment replica has finished loading the model and
     # its first-request torch.compile warmup (observed directly to take over a minute on this
     # model/GPU). Retried rather than a single long-timeout attempt: early attempts fail fast with
-    # connection-refused (Ray hasn't bound the port yet) rather than hanging, and `curl`'s `-s`
-    # silences its own connection-refused message, so `-S` is added back to keep it visible for
-    # debugging. Each attempt gets a generous per-try timeout (covering an attempt that lands mid
-    # torch.compile and genuinely takes a while) but `subprocess.TimeoutExpired` on any single
-    # attempt is treated as "not ready yet" rather than fatal, so a slow-but-progressing attempt
-    # doesn't abort the whole readiness wait.
-    payload = json.dumps({"text": "warmup", "labels": ["person name"]})
+    # connection-refused (Ray hasn't bound the port yet) rather than hanging. `-f` makes curl treat
+    # an HTTP error status as a failure (not just a non-empty body) and `-S` keeps its error message
+    # visible despite `-s`. Each attempt gets a generous per-try timeout (covering an attempt that
+    # lands mid torch.compile and genuinely takes a while) but `subprocess.TimeoutExpired` on any
+    # single attempt is treated as "not ready yet" rather than fatal, so a slow-but-progressing
+    # attempt doesn't abort the whole readiness wait. Uses `load_test.build_request` against a real
+    # fixture window so this warmup request exercises the exact same payload shape as the real
+    # load-tested traffic, not a hand-rolled shape that could silently diverge from it. The payload
+    # is `shlex.quote`d, not hand-wrapped in single quotes -- real transcript text routinely
+    # contains apostrophes (contractions like "I'm"), which would otherwise break out of a naively
+    # single-quoted shell argument and fail with a shell syntax error, not an HTTP error.
+    labels, windows = load_test.load_fixture()
+    payload = json.dumps(load_test.build_request(windows[0], labels))
+    quoted_payload = shlex.quote(payload)
     deadline = time.monotonic() + _SERVER_READY_TIMEOUT_S
     last_result: subprocess.CompletedProcess | None = None
     while time.monotonic() < deadline:
@@ -180,8 +168,8 @@ def _start_server(
             last_result = _run_ssh(
                 ssh_direct,
                 ssh_key,
-                f"curl -sS -X POST http://localhost:{_SERVE_PORT}/gliner "
-                f"-H 'Content-Type: application/json' -d '{payload}'",
+                f"curl -sSf -X POST http://localhost:{_SERVE_PORT}{load_test.ROUTE_PREFIX} "
+                f"-H 'Content-Type: application/json' -d {quoted_payload}",
                 timeout_s=min(60.0, remaining),
             )
         except subprocess.TimeoutExpired:
@@ -223,11 +211,15 @@ def _smoke_test(ssh_direct: dict, ssh_key: str) -> None:
     response_body = _start_server(ssh_direct, ssh_key, batch_wait_ms=10)
     try:
         print(f"Smoke-test response (from the readiness-confirming request):\n{response_body}")
-        entities_present = '"' in response_body and "[" in response_body
-        if not entities_present:
+        try:
+            parsed = json.loads(response_body)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"smoke-test response isn't valid JSON: {response_body!r}") from exc
+        if not isinstance(parsed, dict) or not isinstance(parsed.get("entities"), list):
             raise RuntimeError(
-                f"smoke-test response doesn't look like entity output: {response_body!r} -- check "
-                "the route/schema against the installed package before trusting the real matrix run"
+                f"smoke-test response doesn't have the expected {{'entities': [...]}} shape: "
+                f"{parsed!r} -- check the route/schema against the installed package before "
+                "trusting the real matrix run"
             )
     finally:
         _stop_server(ssh_direct, ssh_key)
@@ -279,7 +271,7 @@ def _run_matrix(ssh_direct: dict, ssh_key: str, local_results_path: Path) -> Non
 
 def run(*, mode: str, ssh_key: str, results_path: Path, keep_pod: bool) -> int:
     secrets.load_runpod_key()
-    hangar.init(__import__("os").environ[secrets.RUNPOD_ENV_VAR])
+    hangar.init(os.environ[secrets.RUNPOD_ENV_VAR])
 
     spec = hangar.PodSpec(
         name=_POD_NAME,
