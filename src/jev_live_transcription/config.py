@@ -1,6 +1,6 @@
 """Shared constants for the benchmark harness."""
 
-# Device both GLiNER checkpoints load onto: "auto" (resolved to "cuda" if available, else "cpu" --
+# Device the GLiNER checkpoint loads onto: "auto" (resolved to "cuda" if available, else "cpu" --
 # see gliner_pipeline._resolve_device), or an explicit "cpu"/"cuda" override.
 GLINER_DEVICE = "auto"
 
@@ -21,19 +21,17 @@ JEV_COMMIT_THRESHOLD = 0.6
 # ticks, so gating on a settled set avoids re-confirming jev on every one of them.
 JEV_RECONFIRM_SETTLE_TICKS = 2
 
-# Maximum trailing character count of the transcript-so-far fed to the standard zero-shot GLiNER
-# model per tick. Bounding it to a recent sliding window, rather than the full growing transcript,
-# keeps its per-tick latency flat regardless of call length instead of growing unboundedly. Sized
-# against real transcript text on the benchmark machine, where this model's forward pass scales
-# roughly linearly with input length -- deliberately smaller than a "few turns" of raw transcript
-# might suggest, to keep typical per-tick latency close to the 400ms target (occasional spikes
-# above it are still possible under CPU contention; the property this constant guarantees is
-# flatness with call length, not a hard per-tick ceiling). The PII model is unaffected by this
-# constant -- it is scoped to just the caller's current turn (see
-# `gliner_pipeline._current_caller_turn`), which stays small on its own.
+# Maximum trailing character count of the transcript-so-far fed to the GLiNER model per tick.
+# Bounding it to a recent sliding window, rather than the full growing transcript, keeps its
+# per-tick latency flat regardless of call length instead of growing unboundedly. Sized against
+# real transcript text on the benchmark machine, where this model's forward pass scales roughly
+# linearly with input length -- deliberately smaller than a "few turns" of raw transcript might
+# suggest, to keep typical per-tick latency close to the 400ms target (occasional spikes above it
+# are still possible under CPU contention; the property this constant guarantees is flatness with
+# call length, not a hard per-tick ceiling).
 GLINER_ZERO_SHOT_WINDOW_CHARS = 200
 
-# Minimum confidence the standard zero-shot GLiNER model requires to report a candidate span, on
+# Minimum confidence the GLiNER model requires to report a candidate span, on
 # GLiNER's 0-1 scale (library default is 0.5). Set below that default because nothing downstream
 # double-checks a candidate's confidence before jev resolution sees it: a field GLiNER never
 # surfaces at all is unrecoverable, while a low-confidence false positive is just one more

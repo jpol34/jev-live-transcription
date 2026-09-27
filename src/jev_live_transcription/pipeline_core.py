@@ -6,8 +6,8 @@ transcript grows, runs the GLiNER+jev pipeline; the GPT-5.1 baseline, when `run_
 Two logical pipelines are recorded, named by the `pipeline` column on `pipeline_runs` and
 `field_extractions`:
 
-- `"gliner_jev"`: local GLiNER candidate extraction (stages `"gliner_standard"` and
-  `"gliner_stream_pii"`) feeding the hosted jev resolver (stage `"jev"`).
+- `"gliner_jev"`: local GLiNER candidate extraction (stage `"gliner_standard"`) feeding the
+  hosted jev resolver (stage `"jev"`).
 - `"llm"`: the GPT-5.1 baseline (stage `"llm"`).
 
 Both `gliner_pipeline.extract_candidates` and `jev_pipeline.JevFieldResolver.resolve_field`
@@ -270,68 +270,37 @@ async def _run_gliner_jev_step(
     gliner_semaphore: asyncio.Semaphore | None = None,
 ) -> None:
     # `start` is taken *inside* the semaphore, matching where extract_candidates_timed's own
-    # internal per-model timers start -- taking it before acquiring the semaphore would fold
-    # queueing wait (real under gliner_concurrency > 1) into the error path's latency_ms while the
-    # success path's pii_latency_ms/zero_shot_latency_ms never include it, making the two
-    # incomparable for the same stage.
+    # internal timer starts -- taking it before acquiring the semaphore would fold queueing wait
+    # (real under gliner_concurrency > 1) into the error path's latency_ms while the success
+    # path's latency_ms never includes it, making the two incomparable for the same stage.
     semaphore_ctx = gliner_semaphore if gliner_semaphore is not None else contextlib.nullcontext()
     try:
         async with semaphore_ctx:
             start = time.monotonic()
-            candidates, pii_latency_ms, zero_shot_latency_ms = await gliner_pipeline.extract_candidates_timed(
+            candidates, gliner_latency_ms = await gliner_pipeline.extract_candidates_timed(
                 snapshot, pipeline_call_id
             )
     except Exception as exc:  # noqa: BLE001 -- GLiNER failures are captured as data, not raised
-        # extract_candidates runs both underlying models concurrently and surfaces whichever one
-        # raised first -- there is no way to tell from here whether the PII or zero-shot model (or
-        # both) actually failed, so both stages get an error row rather than misattributing the
-        # failure to just one.
         latency_ms = (time.monotonic() - start) * 1000
-        await asyncio.gather(
-            _enqueue_pipeline_run(
-                store,
-                tick_id=tick_id,
-                call_id=call_id,
-                pipeline=GLINER_JEV_PIPELINE,
-                stage="gliner_stream_pii",
-                latency_ms=latency_ms,
-                error=str(exc),
-            ),
-            _enqueue_pipeline_run(
-                store,
-                tick_id=tick_id,
-                call_id=call_id,
-                pipeline=GLINER_JEV_PIPELINE,
-                stage="gliner_standard",
-                latency_ms=latency_ms,
-                error=str(exc),
-            ),
-        )
-        return
-
-    pii_candidates = {field: candidates.get(field, []) for field in gliner_pipeline.PII_FIELD_LABELS}
-    zero_shot_candidates = {
-        field: candidates.get(field, []) for field in gliner_pipeline.ZERO_SHOT_FIELD_LABELS
-    }
-    await asyncio.gather(
-        _enqueue_pipeline_run(
-            store,
-            tick_id=tick_id,
-            call_id=call_id,
-            pipeline=GLINER_JEV_PIPELINE,
-            stage="gliner_stream_pii",
-            latency_ms=pii_latency_ms,
-            raw_output_json=json.dumps(pii_candidates),
-        ),
-        _enqueue_pipeline_run(
+        await _enqueue_pipeline_run(
             store,
             tick_id=tick_id,
             call_id=call_id,
             pipeline=GLINER_JEV_PIPELINE,
             stage="gliner_standard",
-            latency_ms=zero_shot_latency_ms,
-            raw_output_json=json.dumps(zero_shot_candidates),
-        ),
+            latency_ms=latency_ms,
+            error=str(exc),
+        )
+        return
+
+    await _enqueue_pipeline_run(
+        store,
+        tick_id=tick_id,
+        call_id=call_id,
+        pipeline=GLINER_JEV_PIPELINE,
+        stage="gliner_standard",
+        latency_ms=gliner_latency_ms,
+        raw_output_json=json.dumps(candidates),
     )
 
     # Computed once per tick and shared across every field's context window below, instead of
