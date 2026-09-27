@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from jev_live_transcription import corpus
+from jev_live_transcription import config, corpus
 from jev_live_transcription.gliner_pipeline import ZERO_SHOT_FIELD_LABELS, _zero_shot_window
 
 FIXTURE_PATH = Path(__file__).resolve().parent / "fixtures" / "sample_windows.json"
@@ -27,6 +27,15 @@ _NUM_CALLS = 10
 # `_zero_shot_window` sees a growing transcript-so-far on each tick -- rather than only the single
 # longest snapshot.
 _TRUNCATION_FRACTIONS = (0.2, 0.4, 0.6, 0.8, 1.0)
+
+# A low truncation fraction against a short transcript can slice a snapshot far shorter than a real
+# trailing window would ever be -- discard those instead of writing unrepresentative near-empty
+# entries into the fixture.
+_MIN_WINDOW_CHARS = config.GLINER_ZERO_SHOT_WINDOW_CHARS // 2
+
+# The fixture is committed and consumed as a static golden file, so a degenerate run (e.g. an empty
+# or not-yet-generated corpus) must fail loudly rather than silently overwriting it with near-nothing.
+_MIN_TOTAL_WINDOWS = 30
 
 
 def _sample_call_ids(call_ids: list[int], count: int) -> list[int]:
@@ -49,7 +58,7 @@ def generate_windows() -> list[str]:
             snapshot = full_text[:cutoff]
             window_text, _ = _zero_shot_window(snapshot)
             window_text = window_text.strip()
-            if window_text and window_text not in seen:
+            if len(window_text) >= _MIN_WINDOW_CHARS and window_text not in seen:
                 seen.add(window_text)
                 windows.append(window_text)
     return windows
@@ -57,6 +66,12 @@ def generate_windows() -> list[str]:
 
 def main() -> None:
     windows = generate_windows()
+    if len(windows) < _MIN_TOTAL_WINDOWS:
+        raise RuntimeError(
+            f"Only generated {len(windows)} windows (need >= {_MIN_TOTAL_WINDOWS}) -- is the "
+            "corpus (output/transcripts, output/metadata) populated? Refusing to overwrite "
+            f"{FIXTURE_PATH} with an unrepresentative fixture."
+        )
     FIXTURE_PATH.parent.mkdir(parents=True, exist_ok=True)
     FIXTURE_PATH.write_text(
         json.dumps({"labels": ZERO_SHOT_FIELD_LABELS, "windows": windows}, indent=2) + "\n",
