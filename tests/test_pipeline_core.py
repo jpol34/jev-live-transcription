@@ -245,10 +245,10 @@ async def test_run_call_gating_and_carry_forward(monkeypatch):
             ]
         },
     ]
-    # Distinct, deliberately unequal per-model latencies on every tick -- proves the two stages'
-    # pipeline_runs rows each get their own timing rather than sharing one identical number.
+    # Distinct latency per tick -- proves each pipeline_runs row gets its own timing rather than
+    # sharing one identical number.
     gliner_side_effects = [
-        (candidates, 11.0 + i, 44.0 + i) for i, candidates in enumerate(gliner_candidates_effects)
+        (candidates, 11.0 + i) for i, candidates in enumerate(gliner_candidates_effects)
     ]
     extract_candidates_timed_mock = AsyncMock(side_effect=gliner_side_effects)
     monkeypatch.setattr(
@@ -293,13 +293,11 @@ async def test_run_call_gating_and_carry_forward(monkeypatch):
     assert extract_candidates_timed_mock.await_count == 4  # ticks 1, 3, 5, 6
     assert len(store.ticks) == 7  # every tick gets a ticks row regardless of growth
 
-    # --- per-model GLiNER latency: each stage's pipeline_runs row gets its own timing, not a
-    # shared value from timing the outer extract_candidates_timed call as one unit ---
+    # --- GLiNER latency: each tick's pipeline_runs row gets its own timing ---
     gliner_stage_rows = [run for run in store.pipeline_runs if run["pipeline"] == "gliner_jev" and not run["error"]]
-    pii_latencies = [run["latency_ms"] for run in gliner_stage_rows if run["stage"] == "gliner_stream_pii"]
-    zero_shot_latencies = [run["latency_ms"] for run in gliner_stage_rows if run["stage"] == "gliner_standard"]
-    assert len(pii_latencies) == len(zero_shot_latencies) == 4
-    assert all(pii != zs for pii, zs in zip(pii_latencies, zero_shot_latencies))
+    gliner_latencies = [run["latency_ms"] for run in gliner_stage_rows if run["stage"] == "gliner_standard"]
+    assert len(gliner_latencies) == 4
+    assert len(set(gliner_latencies)) == 4
 
     # --- jev latency: every jev pipeline_runs row records a real latency, not NULL ---
     jev_rows = [run for run in store.pipeline_runs if run["stage"] == "jev"]
@@ -386,13 +384,11 @@ async def test_run_call_jev_choice_context_covers_candidate_that_stopped_being_r
         (
             {"phone_number": [{"text": "555-3212", "score": 0.9, "start": start_1, "end": start_1 + 8}]},
             10.0,
-            20.0,
         ),
         (
             # "555-3212" is no longer reported at all this tick -- only the new candidate is.
             {"phone_number": [{"text": "555-4321", "score": 0.9, "start": start_6, "end": start_6 + 8}]},
             11.0,
-            21.0,
         ),
     ]
 
@@ -457,7 +453,6 @@ async def test_run_call_on_tick_callback_fires_every_tick_with_committed_snapsho
         return_value=(
             {"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]},
             10.0,
-            20.0,
         )
     )
     monkeypatch.setattr(
@@ -517,7 +512,7 @@ async def test_run_call_confident_none_of_these_clears_committed_value(monkeypat
     )
     gliner_candidates = {"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]}
     extract_candidates_timed_mock = AsyncMock(
-        side_effect=[(gliner_candidates, 10.0, 20.0), (gliner_candidates, 11.0, 21.0)]
+        side_effect=[(gliner_candidates, 10.0), (gliner_candidates, 11.0)]
     )
     monkeypatch.setattr(
         pipeline_core.gliner_pipeline, "extract_candidates_timed", extract_candidates_timed_mock
@@ -569,7 +564,7 @@ async def test_run_call_llm_confident_null_clears_committed_value(monkeypatch):
     monkeypatch.setattr(
         pipeline_core.gliner_pipeline,
         "extract_candidates_timed",
-        AsyncMock(return_value=({}, 1.0, 1.0)),
+        AsyncMock(return_value=({}, 1.0)),
     )
     monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
     monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", Mock())
@@ -614,7 +609,7 @@ async def test_run_call_skips_llm_baseline_by_default(monkeypatch):
     monkeypatch.setattr(
         pipeline_core.gliner_pipeline,
         "extract_candidates_timed",
-        AsyncMock(return_value=({}, 1.0, 1.0)),
+        AsyncMock(return_value=({}, 1.0)),
     )
     monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
     llm_extract_mock = AsyncMock()
@@ -638,7 +633,7 @@ async def test_run_call_runs_llm_baseline_when_explicitly_enabled(monkeypatch):
     monkeypatch.setattr(
         pipeline_core.gliner_pipeline,
         "extract_candidates_timed",
-        AsyncMock(return_value=({}, 1.0, 1.0)),
+        AsyncMock(return_value=({}, 1.0)),
     )
     monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
     llm_extract_mock = AsyncMock(return_value=_all_llm_fields())
@@ -706,11 +701,9 @@ async def test_run_call_gliner_failure_is_captured_as_error_row_not_raised(monke
     store = FakeStore()
     await pipeline_core.run_call(1, store, calls=_calls_fixture())  # must not raise
 
-    # Both gliner_jev stages get an error row -- extract_candidates_timed runs the PII and
-    # zero-shot models concurrently, so a single raised exception can't be attributed to just one.
     errored = [run for run in store.pipeline_runs if run["error"]]
-    assert len(errored) == 2
-    assert {row["stage"] for row in errored} == {"gliner_stream_pii", "gliner_standard"}
-    assert all(row["pipeline"] == "gliner_jev" for row in errored)
-    assert all("boom" in row["error"] for row in errored)
+    assert len(errored) == 1
+    assert errored[0]["stage"] == "gliner_standard"
+    assert errored[0]["pipeline"] == "gliner_jev"
+    assert "boom" in errored[0]["error"]
     fake_resolver.resolve_field.assert_not_called()

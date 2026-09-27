@@ -76,7 +76,7 @@ def test_load_stage_latencies_filters_by_stage_and_excludes_errors(tmp_path):
             ("gliner_standard", 100.0, None),
             ("gliner_standard", 200.0, None),
             ("gliner_standard", None, "boom"),  # error row -- excluded
-            ("gliner_stream_pii", 999.0, None),  # different stage -- excluded
+            ("jev", 999.0, None),  # different stage -- excluded
         ],
     )
     from jev_live_transcription import db as db_module

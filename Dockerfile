@@ -11,14 +11,12 @@ COPY src ./src
 # the container is dedicated to this one app -- there's no system package manager state to protect.
 RUN uv pip install --system --break-system-packages --no-cache -e .
 
-# Pre-bakes both GLiNER checkpoints into the image's HF cache so the pod's first tick doesn't pay
-# a Hub download. map_location="cpu" is correct here regardless of config.GLINER_DEVICE -- the
-# build container has no GPU, and these loaded objects are discarded immediately after populating
-# the cache.
+# Pre-bakes the GLiNER checkpoint into the image's HF cache so the pod's first tick doesn't pay a
+# Hub download. map_location="cpu" is correct here regardless of config.GLINER_DEVICE -- the build
+# container has no GPU, and this loaded object is discarded immediately after populating the cache.
 RUN python -c "\
 from gliner import GLiNER; \
 from jev_live_transcription import gliner_pipeline as g; \
-GLiNER.from_pretrained(g.PII_MODEL_NAME, map_location='cpu'); \
 GLiNER.from_pretrained(g.ZERO_SHOT_MODEL_NAME, map_location='cpu')"
 
 # Copied last: neither affects package installation or the checkpoint cache above, so changing

@@ -42,8 +42,8 @@ def _is_retryable_status(status_code: int) -> bool:
 
 
 # The 11 target fields, shared with the GLiNER+jev pipeline for a fair,
-# apples-to-apples comparison (see gliner_pipeline.PII_FIELD_LABELS /
-# ZERO_SHOT_FIELD_LABELS for that side's equivalent field list).
+# apples-to-apples comparison (see gliner_pipeline.ZERO_SHOT_FIELD_LABELS for
+# that side's equivalent field list).
 FIELDS: tuple[str, ...] = (
     "caller_name",
     "email",
