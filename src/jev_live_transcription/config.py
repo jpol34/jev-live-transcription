@@ -23,12 +23,13 @@ JEV_RECONFIRM_SETTLE_TICKS = 2
 
 # Maximum trailing character count of the transcript-so-far fed to the GLiNER model per tick.
 # Bounding it to a recent sliding window, rather than the full growing transcript, keeps its
-# per-tick latency flat regardless of call length instead of growing unboundedly. Sized against
-# real transcript text on the benchmark machine, where this model's forward pass scales roughly
-# linearly with input length -- deliberately smaller than a "few turns" of raw transcript might
-# suggest, to keep typical per-tick latency close to the 400ms target (occasional spikes above it
-# are still possible under CPU contention; the property this constant guarantees is flatness with
-# call length, not a hard per-tick ceiling).
+# per-tick latency flat regardless of call length instead of growing unboundedly -- the property
+# this constant guarantees is flatness with call length, not a hard per-tick ceiling (occasional
+# spikes above the ~400ms/tick target, relative to TICK_SECONDS=1, are still possible under
+# contention). 200 is also the best of the candidates measured on real GPU data across all 11
+# fields (scripts/measure_window_size.py, full corpus): wider windows (400/800 chars) cost
+# negligible extra latency but net-hurt recall -- amenities_requested and move_in_date both
+# decline sharply with more context, outweighing smaller gains elsewhere.
 GLINER_ZERO_SHOT_WINDOW_CHARS = 200
 
 # Minimum confidence the GLiNER model requires to report a candidate span, on
@@ -45,9 +46,15 @@ GLINER_ZERO_SHOT_THRESHOLD = 0.30
 RAM_GB = 16
 CALL_CONCURRENCY = (RAM_GB - 4) // 4  # 3
 
-# GLiNER concurrency is tuned independently of call concurrency since the
-# model runs locally rather than per-call against a remote API.
-GLINER_CONCURRENCY = 2
+# GLiNER concurrency is tuned independently of call concurrency since the model runs locally
+# rather than per-call against a remote API. `gliner_pipeline._zero_shot_inference_lock` fully
+# serializes every model call regardless of this value, so raising it only adds more concurrent
+# waiters for that one lock -- real measurement confirms this is pure queueing overhead, not a
+# throughput win: mean latency rose from 23.2ms (concurrency=1) to 50.5ms (concurrency=4), p95 to
+# 86ms (scripts/measure_gliner_concurrency.py, 20-call subset under genuine cross-call contention).
+# Stays at 1 until the pipeline actually batches concurrent requests into one model call, which
+# would remove the lock's serialization instead of just queueing behind it.
+GLINER_CONCURRENCY = 1
 
 # Rough cost-per-million-token estimates, USD. These are NOT authoritative —
 # GPT-5.1 pricing is from public list pricing and may drift, and the jev

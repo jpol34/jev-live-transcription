@@ -1,13 +1,21 @@
-"""Measures gliner_standard-stage latency across candidate `gliner_concurrency` levels.
+"""Measures gliner_standard-stage latency across candidate `gliner_concurrency` levels, under real
+cross-call contention.
 
 Runs the corpus (or a subset) once per candidate `gliner_concurrency` level into its own capture
-DB, holding `call_concurrency` fixed at 1 (the harness's real purpose is per-call latency, which
-`batch_runner`'s own docstring already documents as invalid above `call_concurrency=1` regardless
-of device), then prints a p50/p95 latency comparison table across the candidates.
+DB, at `call_concurrency=max(config.CALL_CONCURRENCY, max(candidates))` -- deliberately not 1, and
+always at least as high as the largest `gliner_concurrency` candidate under test. `gliner_concurrency`
+bounds how many calls' GLiNER steps may run at once (a separate semaphore from `call_concurrency`,
+see `batch_runner.run_batch`); that semaphore is only ever contended by coroutines that already
+hold a `call_concurrency` slot, so a candidate's real contention is capped at whichever of the two
+is smaller -- `call_concurrency` must be at least as large as every candidate, or a higher
+candidate silently never gets tested at its own configured capacity. The resulting latency numbers
+are exactly as `batch_runner`'s docstring warns -- inflated by queueing delay a real single call
+wouldn't see -- but that inflation, and whether raising `gliner_concurrency` reduces it, is the
+thing being measured here, not a benchmark-data contamination to avoid.
 
 This script only measures -- whether to actually raise `config.GLINER_CONCURRENCY` from its
-default of 1 is a separate, deliberate step made from this printed data, per the plan's decision
-to decide concurrency empirically rather than assume it.
+default is a separate, deliberate step made from this printed data, per the plan's decision to
+decide concurrency empirically rather than assume it.
 
 Usage:
     uv run python scripts/measure_gliner_concurrency.py [--subset N] [--concurrencies 1,2,4]
@@ -20,7 +28,7 @@ import sqlite3
 import statistics
 from pathlib import Path
 
-from jev_live_transcription import batch_runner, corpus, secrets
+from jev_live_transcription import batch_runner, config, corpus, secrets
 from jev_live_transcription import db as db_module
 
 DEFAULT_CONCURRENCIES = (1, 2, 4)
@@ -94,13 +102,13 @@ def _delete_db_file(db_path: Path) -> None:
 
 
 async def _run_one_concurrency(
-    concurrency: int, *, call_ids: list[int], calls: dict, db_path: Path, warm_up: bool
+    concurrency: int, *, call_concurrency: int, call_ids: list[int], calls: dict, db_path: Path, warm_up: bool
 ) -> dict:
     _delete_db_file(db_path)
     result = await batch_runner.run_batch(
         call_ids,
         db_path=db_path,
-        call_concurrency=1,
+        call_concurrency=call_concurrency,
         gliner_concurrency=concurrency,
         calls=calls,
         warm_up=warm_up,
@@ -122,6 +130,11 @@ async def measure(
     concurrencies: list[int], *, call_ids: list[int], calls: dict, db_dir: Path
 ) -> dict[int, dict | None]:
     db_dir.mkdir(parents=True, exist_ok=True)
+    # A gliner_concurrency candidate's semaphore is only ever contended by coroutines already
+    # holding a call_concurrency slot (see pipeline_core._run_gliner_jev_step, reached only from
+    # within batch_runner's call_semaphore) -- call_concurrency below the highest candidate tested
+    # would silently cap that candidate's real contention below its own configured value.
+    call_concurrency = max(config.CALL_CONCURRENCY, max(concurrencies))
     results: dict[int, dict | None] = {}
     for i, concurrency in enumerate(concurrencies):
         db_path = db_dir / f"gliner_concurrency_{concurrency}.sqlite3"
@@ -130,7 +143,12 @@ async def measure(
             # one warm, already-loaded process, so later candidates' latency numbers aren't
             # inflated by a cost real usage would only ever pay once per process lifetime.
             results[concurrency] = await _run_one_concurrency(
-                concurrency, call_ids=call_ids, calls=calls, db_path=db_path, warm_up=(i == 0)
+                concurrency,
+                call_concurrency=call_concurrency,
+                call_ids=call_ids,
+                calls=calls,
+                db_path=db_path,
+                warm_up=(i == 0),
             )
         except Exception as exc:  # noqa: BLE001 -- isolated per candidate, see docstring below
             # A bad later candidate must not discard every already-completed (expensive) prior
