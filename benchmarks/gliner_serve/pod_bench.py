@@ -84,7 +84,12 @@ def _run_ssh(
     return subprocess.run(
         ["ssh", *_ssh_target(ssh_key), "-p", str(ssh_direct["port"]), target, command],
         capture_output=True,
-        text=True,
+        # Explicit UTF-8 rather than `text=True`'s platform-default decoding: on Windows that
+        # default is cp1252, which crashes decoding remote output containing multi-byte UTF-8
+        # sequences (observed directly -- pip's install progress bar during `_install_deps`).
+        # `errors="replace"` keeps a decode hiccup from crashing the whole SSH call outright.
+        encoding="utf-8",
+        errors="replace",
         timeout=timeout_s,
     )
 
@@ -248,7 +253,8 @@ def _run_matrix(ssh_direct: dict, ssh_key: str, local_results_path: Path) -> Non
         result = subprocess.run(
             ["scp", *scp_up_args, str(local_path), f"{target}:{_REMOTE_DIR}/{remote_rel_path}"],
             capture_output=True,
-            text=True,
+            encoding="utf-8",
+            errors="replace",
         )
         if result.returncode != 0:
             raise RuntimeError(f"failed to upload {remote_rel_path}: {result.stderr}")
@@ -278,7 +284,8 @@ def _run_matrix(ssh_direct: dict, ssh_key: str, local_results_path: Path) -> Non
     result = subprocess.run(
         ["scp", *scp_down_args, f"{target}:{_REMOTE_RESULTS_PATH}", str(local_results_path)],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     if result.returncode != 0:
         raise RuntimeError(f"failed to retrieve results.json: {result.stderr}")
@@ -304,7 +311,8 @@ def _run_diagnose(ssh_direct: dict, ssh_key: str, local_results_path: Path) -> N
         result = subprocess.run(
             ["scp", *scp_up_args, str(local_path), f"{target}:{_REMOTE_DIR}/{remote_rel_path}"],
             capture_output=True,
-            text=True,
+            encoding="utf-8",
+            errors="replace",
         )
         if result.returncode != 0:
             raise RuntimeError(f"failed to upload {remote_rel_path}: {result.stderr}")
@@ -331,7 +339,8 @@ def _run_diagnose(ssh_direct: dict, ssh_key: str, local_results_path: Path) -> N
     result = subprocess.run(
         ["scp", *scp_down_args, f"{target}:{_REMOTE_DIAGNOSIS_PATH}", str(local_results_path)],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     if result.returncode != 0:
         raise RuntimeError(f"failed to retrieve diagnosis.json: {result.stderr}")
