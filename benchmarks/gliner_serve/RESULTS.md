@@ -30,10 +30,21 @@ p95/p99 within noise of 30ms's).
 
 ## Decision 6: can a sensibly-tuned deployment meet the latency/throughput bar?
 
-No. Every config's p50 is at minimum 15x over the ~250ms GLiNER sub-budget of the ~400ms
-whole-pipeline latency ceiling (best case: 3775ms at 20ms batch-wait), and p95/p99 land in the
-tens of seconds. Batch-window tuning across 5/10/20/30ms changes the picture by at most ~2x and
-does not close a three-orders-of-magnitude gap.
+No, for `gliner[serve]`'s stock Ray Serve + native-PyTorch path as configured in this sweep --
+not for GLiNER-based GPU serving in general. Every config's p50 is at minimum 15x over the
+~250ms GLiNER sub-budget of the ~400ms whole-pipeline latency ceiling (best case: 3775ms at 20ms
+batch-wait), and p95/p99 land in the tens of seconds. Batch-window tuning across 5/10/20/30ms
+changes the picture by at most ~2x and does not close a three-orders-of-magnitude gap.
+
+The model itself is not the bottleneck: `scripts/measure_gliner_concurrency.py`'s raw single-call
+baseline (concurrency=1, no serving layer involved) is 23.2ms mean per call -- two orders of
+magnitude below the multi-second latencies measured here. The two 10ms-batch-wait configs
+(`bfloat16_10ms`, `float16_10ms`) show p50/p95/p99 within ~1% of each other (~48-51s across all
+three percentiles), a signature consistent with every request serializing through one blocking
+handler rather than a distribution of queueing delay across concurrent callers -- pointing at
+this serving layer's request-handling path, not compute capacity, as the cause. `int8` was never
+measured (excluded for failing to become ready within the shared 600s startup timeout); the
+literature's ~1.9x speedup claim for GLiNER int8 quantization remains untested here.
 
 Per-replica throughput in this sweep tops out at 4.32 req/s (20ms batch-wait; the true sustained
 rate is likely lower per the caveat above). Reaching the 200-500 req/s target from
@@ -51,11 +62,26 @@ labels per request, a smaller model, request coalescing tuned around `--precompi
 or a different serving layer entirely -- each a real design change, not a config flag, and out of
 scope for this benchmark pass.
 
+### Open follow-up
+
+Whether the multi-second latency is a serving-layer pathology (fixable by changing how
+`gliner[serve]` handles requests) or reflects a harder architectural ceiling is not yet settled
+by this benchmark pass. Two pieces of follow-up work remain, tracked separately and not done as
+part of this write-up:
+
+- **Diagnostic pass (issue #60)**: isolate why the two 10ms-batch-wait configs show a
+  blocking-handler-shaped latency signature -- e.g. whether `@serve.batch` is actually coalescing
+  concurrent requests, or whether requests are being serialized somewhere in the handler path.
+- **Conditional vLLM validation**: if the diagnostic pass confirms a serving-layer-specific
+  pathology rather than a GLiNER-architecture ceiling, validate that a different serving layer
+  (e.g. vLLM) does not reproduce the same blowup against this project's workload shape.
+
 ## Schema note
 
-The real installed `gliner[serve]` (`gliner==0.2.29`) request schema accepts
-`{"text", "labels", "threshold", "relation_threshold", "adapter_id"}` with no `multi_label` field.
-This project's own pipeline calls `predict_entities(..., multi_label=True)`
-(`gliner_pipeline.py`). A future service reusing this project's label set would get `multi_label`
-at gliner[serve]'s own default (`False`) unless a version of gliner[serve] adds that parameter --
-worth checking at build time rather than assumed.
+The real installed `gliner[serve]` (`gliner==0.2.29`) request schema includes a real, present
+`multi_label` field: the server's request handler reads `payload.get("multi_label", False)`
+(`gliner/serve/server.py`). This benchmark's own request builder does not set it, so every
+request in this sweep ran with `multi_label=False`. This project's own pipeline calls
+`predict_entities(..., multi_label=True)` (`gliner_pipeline.py`); a future service reusing this
+project's label set should pass `multi_label=True` in the request payload to match that behavior,
+rather than relying on gliner[serve]'s default.
