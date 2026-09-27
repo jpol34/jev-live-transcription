@@ -1,0 +1,105 @@
+[
+  {
+    "config": {
+      "name": "bfloat16_10ms",
+      "batch_wait_timeout_ms": 10,
+      "dtype": null,
+      "quantization": null
+    },
+    "result": {
+      "n": 50,
+      "n_failed": 0,
+      "p50_ms": 50490.31532404479,
+      "p95_ms": 50547.03389003407,
+      "p99_ms": 50553.095943061635,
+      "mean_ms": 49948.64024623996,
+      "throughput_req_s": 2.0
+    }
+  },
+  {
+    "config": {
+      "name": "float16_10ms",
+      "batch_wait_timeout_ms": 10,
+      "dtype": "float16",
+      "quantization": null
+    },
+    "result": {
+      "n": 52,
+      "n_failed": 0,
+      "p50_ms": 48121.90471799113,
+      "p95_ms": 51836.60448202863,
+      "p99_ms": 51837.75063895155,
+      "mean_ms": 47326.77722988256,
+      "throughput_req_s": 2.08
+    }
+  },
+  {
+    "config": {
+      "name": "int8_10ms",
+      "batch_wait_timeout_ms": 10,
+      "dtype": null,
+      "quantization": "int8"
+    },
+    "result": {
+      "n": 0,
+      "n_failed": 0,
+      "p50_ms": null,
+      "p95_ms": null,
+      "p99_ms": null,
+      "mean_ms": null,
+      "throughput_req_s": null,
+      "error": "server did not become ready within 600s"
+    }
+  },
+  {
+    "config": {
+      "name": "bfloat16_10ms_5ms",
+      "batch_wait_timeout_ms": 5,
+      "dtype": null,
+      "quantization": null
+    },
+    "result": {
+      "n": 101,
+      "n_failed": 0,
+      "p50_ms": 3814.4420320168138,
+      "p95_ms": 28214.64473893866,
+      "p99_ms": 28216.99869609438,
+      "mean_ms": 14102.893966915188,
+      "throughput_req_s": 4.04
+    }
+  },
+  {
+    "config": {
+      "name": "bfloat16_10ms_20ms",
+      "batch_wait_timeout_ms": 20,
+      "dtype": null,
+      "quantization": null
+    },
+    "result": {
+      "n": 108,
+      "n_failed": 0,
+      "p50_ms": 3774.970927974209,
+      "p95_ms": 27232.507958076894,
+      "p99_ms": 27241.858965950087,
+      "mean_ms": 12750.23774425305,
+      "throughput_req_s": 4.32
+    }
+  },
+  {
+    "config": {
+      "name": "bfloat16_10ms_30ms",
+      "batch_wait_timeout_ms": 30,
+      "dtype": null,
+      "quantization": null
+    },
+    "result": {
+      "n": 55,
+      "n_failed": 0,
+      "p50_ms": 26988.816615892574,
+      "p95_ms": 27026.542833074927,
+      "p99_ms": 27028.543615946546,
+      "mean_ms": 24539.669310456058,
+      "throughput_req_s": 2.2
+    }
+  }
+]

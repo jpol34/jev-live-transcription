@@ -197,14 +197,25 @@ Reached via `/grill` on 2026-09-27. All four recommendations below were accepted
 All four planned research clusters (batching/serving frameworks, scaling topology, model-level
 throughput, backpressure/cost) are done. What's left is empirical, not more research:
 
-- **The core latency/throughput question remains empirically open, though less dire than first
-  found**: no source publishes real throughput at a 10-30ms batch window for this project's input
-  shape (~200-char, 11 labels) -- the cited 480-900ms figures likely reflect a much larger,
-  throughput-maximizing window than `gliner[serve]`'s own 10ms default. Whether a sensibly-tuned
-  deployment hits both the ~400ms whole-pipeline ceiling and meaningful throughput gain over the
-  current ~10-20-concurrent-call ceiling is exactly what decision 6's own-workload benchmark would
-  need to resolve -- quantization (a zero-effort `gliner[serve]` flag) is worth including in that
-  same pass.
+- **`gliner[serve]`'s stock request-handling path doesn't hit the latency/throughput bar, but the
+  scope of that finding is narrower than "GLiNER-based GPU serving in general"**: a real
+  `gliner[serve]` deployment benchmarked against this project's own workload shape (11 labels,
+  ~200-char window, `urchade/gliner_medium-v2.1`, A100) -- bfloat16/float16/int8 at the 10ms
+  default batch window, then a 5/10/20/30ms batch-window sweep on the best-performing dtype
+  (bfloat16) -- never gets within an order of magnitude of the ~250ms GLiNER sub-budget -- best
+  case p50 is ~3.8s, with p95/p99 in the tens of seconds, and per-replica throughput tops out
+  around 4 req/s (int8 failed to become ready at all within the shared startup timeout). Hitting
+  the 200-500 req/s target via replica count alone would need on the order of 46-116 A100
+  replicas. The model itself is not the bottleneck -- `scripts/measure_gliner_concurrency.py`'s
+  raw single-call baseline is 23.2ms, two orders of magnitude below the measured multi-second
+  latencies -- and the two 10ms-batch-wait configs show a near-identical p50/p95/p99 signature
+  consistent with a blocking/serialized request handler rather than a compute ceiling. See
+  `benchmarks/gliner_serve/RESULTS.md` for the full data and analysis. This rules out
+  `gliner[serve]`'s stock request-handling path (one label set per request) at this label count and
+  concurrency for a low-latency deployment; a real fix needs a different design (fewer labels per
+  request, a smaller model, or a different serving layer), not a config flag. Whether the blowup
+  is a fixable serving-layer pathology or a harder architectural ceiling is not yet settled --
+  open pending a diagnostic pass and, conditionally, a vLLM validation benchmark.
 - **Backpressure policy is a real decision, not yet made**: reject-fast (Ray Serve's native 503) vs.
   Snowflake-style no-wait adaptive batching (bounded latency growth instead of rejection) is a
   genuine tradeoff for whoever builds this, informed by how a live call should degrade under
