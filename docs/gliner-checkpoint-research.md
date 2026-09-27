@@ -5,6 +5,14 @@ and use the two GLiNER checkpoints this project depends on
 (`src/jev_live_transcription/gliner_pipeline.py`). Gathered to sanity-check this project's own
 usage against both real-world consumption and upstream documentation.
 
+**Superseded note:** the streaming-session usage this section describes (`session_id`,
+`_run_pii_tick`'s delta-only feeding, `reset_call`'s `clear_session`) was later replaced with a
+stateless, per-turn-windowed call after a real corpus benchmark found the streaming session's
+accumulated context was collapsing this checkpoint's `person`-label recall to near zero. This
+section is kept as the historical record of the research that originally justified the streaming
+approach, not as a description of the pipeline's current behavior -- see `gliner_pipeline.py`'s
+module docstring and `_current_caller_turn` for what it does now.
+
 ## `knowledgator/gliner-stream-pii-v1.0` (streaming PII model)
 
 Third-party adoption is thin but real: three genuine third-party consumers found. No GitHub issues

@@ -11,9 +11,9 @@ writer thread and each `sqlite3.connect(":memory:")` call gets its own unshared,
 Fully public and unauthenticated by design (viewer-triggered jev calls cost trivial, already-
 established amounts) -- `MAX_CONCURRENT_SESSIONS` bounds concurrent replay load/cost instead, so
 one visitor can't degrade the demo for everyone else. `ActiveCallGuard` separately prevents two
-viewers from replaying the *same* call_id at once: `gliner_pipeline`'s streaming-PII state is
-keyed only by call_id at module scope, so two concurrent sessions for the same call_id would race
-on (and, on cleanup, destroy) each other's streaming state.
+viewers from replaying the *same* call_id at once: `llm_baseline`'s GPT-5.1 chain state is keyed
+only by call_id at module scope, so two concurrent sessions for the same call_id would race on
+(and, on cleanup, destroy) each other's chain state.
 """
 
 from __future__ import annotations

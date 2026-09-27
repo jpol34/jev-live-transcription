@@ -28,9 +28,9 @@ JEV_RECONFIRM_SETTLE_TICKS = 2
 # roughly linearly with input length -- deliberately smaller than a "few turns" of raw transcript
 # might suggest, to keep typical per-tick latency close to the 400ms target (occasional spikes
 # above it are still possible under CPU contention; the property this constant guarantees is
-# flatness with call length, not a hard per-tick ceiling). The streaming PII model is unaffected by
-# this constant -- it already processes only the delta since the last tick via its own incremental
-# caching.
+# flatness with call length, not a hard per-tick ceiling). The PII model is unaffected by this
+# constant -- it is scoped to just the caller's current turn (see
+# `gliner_pipeline._current_caller_turn`), which stays small on its own.
 GLINER_ZERO_SHOT_WINDOW_CHARS = 200
 
 # Minimum confidence the standard zero-shot GLiNER model requires to report a candidate span, on

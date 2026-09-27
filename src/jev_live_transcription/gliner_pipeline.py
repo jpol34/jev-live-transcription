@@ -1,13 +1,15 @@
 """Local, device-configurable candidate-extraction stage for the live-transcription benchmark.
 
-Runs two GLiNER models against the transcript-so-far on every tick: a streaming
-PII checkpoint (`knowledgator/gliner-stream-pii-v1.0`) that reuses its decoder
-KV cache incrementally per call for `caller_name`/`email`/`phone_number`, and a
-standard zero-shot checkpoint (`urchade/gliner_medium-v2.1`) that re-encodes a
-bounded trailing window of the transcript-so-far (`config.GLINER_ZERO_SHOT_WINDOW_CHARS`) for the
-remaining 8 domain fields, keeping its latency flat regardless of call length.
-`extract_candidates` is the single entry point the jev resolver stage
-consumes.
+Runs two GLiNER models against the transcript-so-far on every tick, both stateless: a PII
+checkpoint (`knowledgator/gliner-stream-pii-v1.0`) scoped to just the caller's current turn for
+`caller_name`/`email`/`phone_number` (this checkpoint's "person" label loses essentially all
+confidence once any prior conversational turn is present in its input, confirmed empirically
+against this project's own corpus -- so it is deliberately given the least context that still
+contains an entity, not the most), and a standard zero-shot checkpoint
+(`urchade/gliner_medium-v2.1`) that re-encodes a bounded trailing window of the transcript-so-far
+(`config.GLINER_ZERO_SHOT_WINDOW_CHARS`) for the remaining 8 domain fields, keeping its latency
+flat regardless of call length. `extract_candidates` is the single entry point the jev resolver
+stage consumes.
 """
 
 from __future__ import annotations
@@ -27,8 +29,7 @@ _LOGGER = logging.getLogger(__name__)
 PII_MODEL_NAME = "knowledgator/gliner-stream-pii-v1.0"
 ZERO_SHOT_MODEL_NAME = "urchade/gliner_medium-v2.1"
 
-# Native labels the streaming PII checkpoint was trained on, mapped to this
-# project's field names.
+# Native labels the PII checkpoint was trained on, mapped to this project's field names.
 PII_FIELD_LABELS: dict[str, str] = {
     "caller_name": "person",
     "email": "email address",
@@ -66,30 +67,16 @@ _zero_shot_model: GLiNER | None = None
 # whichever one loses the assignment.
 _singleton_load_lock = threading.Lock()
 
-# Count of transcript characters already fed into the PII model's streaming
-# session per call_id. Only the new suffix is sent each tick; the checkpoint's
-# cached-incremental mode reuses decoder KV state, labels, words, and span
-# history for everything already seen. Never shared across call_ids.
-_pii_sent_length: dict[str, int] = {}
-# Per-call_id lock serializing the read-delta/advance-session sequence in
-# `_run_pii_tick`, so overlapping ticks for the same call can't race on
-# `_pii_sent_length` or send overlapping chunks into the streaming session.
-_pii_call_locks: dict[str, threading.Lock] = {}
-_pii_call_locks_guard = threading.Lock()
-
-# Guards `model.inference(...)` for the streaming PII model below, serializing every call across
-# every session_id/call_id (the per-call_id lock above only serializes ticks for the *same* call).
-# This project owns that serialization itself rather than relying on the installed `gliner`
-# library's own internal locking around that call: that locking is a private implementation detail
-# with no documented API contract, and `pyproject.toml` places no upper bound on the installed
-# version, so a future upgrade could narrow or remove it without this project ever noticing.
+# Guards `model.predict_entities(...)` for the PII model below. GLiNER's stateless inference has
+# no internal lock of its own -- only `torch.no_grad()`, no serialization -- so without this,
+# concurrent PII ticks for different calls (once call_concurrency/gliner_concurrency are ever
+# raised above their current default of 1) would race on the shared `_pii_model` singleton with
+# nothing guarding it on either side. This is the same reasoning as `_zero_shot_inference_lock`
+# below, for the same kind of call.
 _pii_inference_lock = threading.Lock()
 
-# Guards `model.predict_entities(...)` for the zero-shot model below. Unlike the streaming PII
-# path, GLiNER's stateless inference has no internal lock of its own -- only `torch.no_grad()`, no
-# serialization -- so without this, concurrent zero-shot ticks for different calls (once
-# call_concurrency/gliner_concurrency are ever raised above their current default of 1) would race
-# on the shared `_zero_shot_model` singleton with nothing guarding it on either side.
+# Guards `model.predict_entities(...)` for the zero-shot model below, for the same reason as
+# `_pii_inference_lock` above.
 _zero_shot_inference_lock = threading.Lock()
 
 
@@ -129,15 +116,6 @@ def _get_zero_shot_model() -> GLiNER:
     return _zero_shot_model
 
 
-def _get_pii_call_lock(call_id: str) -> threading.Lock:
-    with _pii_call_locks_guard:
-        lock = _pii_call_locks.get(call_id)
-        if lock is None:
-            lock = threading.Lock()
-            _pii_call_locks[call_id] = lock
-        return lock
-
-
 def _entities_to_candidates(
     entities: list[dict], label_to_field: dict[str, str]
 ) -> dict[str, list[dict]]:
@@ -158,26 +136,59 @@ def _entities_to_candidates(
     return candidates
 
 
-def _run_pii_tick(transcript_snapshot: str, call_id: str) -> dict[str, list[dict]]:
-    """Advance `call_id`'s streaming PII session to `transcript_snapshot` and return its candidates."""
+_CALLER_TURN_PREFIX = "Caller: "
+
+
+def _current_caller_turn(transcript_snapshot: str) -> tuple[str, int]:
+    """Return `(text, start)` for the caller's current, possibly still-growing turn -- the last
+    line of `transcript_snapshot` if it's a caller turn, along with that text's start offset
+    within the full snapshot (mirroring `_zero_shot_window`'s return shape, for the same reason:
+    so callers can translate entity spans back to full-snapshot coordinates).
+
+    Returns `("", 0)` when the last line isn't a caller turn (the agent is currently speaking) or
+    the snapshot is empty. Only the current turn is used -- not the full transcript-so-far, and
+    not a raw trailing character window -- because the PII checkpoint's "person" label loses
+    essentially all confidence the moment ANY prior turn (even the caller's own previous turn) is
+    present in its input, confirmed empirically against this project's real corpus. `email`/
+    `phone_number` do not share this failure mode -- they score confidently on minimal context
+    too -- so the same single window is used for all three PII labels rather than giving each its
+    own.
+    """
+    line_start = transcript_snapshot.rfind("\n") + 1
+    line = transcript_snapshot[line_start:]
+    if not line.startswith(_CALLER_TURN_PREFIX):
+        return "", 0
+    text_start = line_start + len(_CALLER_TURN_PREFIX)
+    return transcript_snapshot[text_start:], text_start
+
+
+def _run_pii_tick(transcript_snapshot: str) -> dict[str, list[dict]]:
+    """Extract PII candidates from the caller's current turn only (see `_current_caller_turn`).
+
+    A name split across two of the caller's own turns (e.g. first name in one turn, last name
+    given after an agent question in the next) is not reconstructed here -- concatenating the
+    caller's own turns collapses the model's confidence just as much as including the agent's
+    turn does, so this deliberately doesn't try. `pipeline_core`'s jev resolution stage builds its
+    own context window around whatever candidate this does find (a sentence before and after, by
+    full-snapshot position -- which the offset translation below makes correct), so jev's own
+    reasoning gets a real chance to stitch a split name back together even though GLiNER itself
+    cannot.
+    """
+    turn_text, turn_start = _current_caller_turn(transcript_snapshot)
+    if not turn_text:
+        return {field: [] for field in PII_FIELD_LABELS}
     model = _get_pii_model()
-    with _get_pii_call_lock(call_id):
-        sent = _pii_sent_length.get(call_id, 0)
-        delta = transcript_snapshot[sent:]
-        if not delta:
-            # No new text this tick. The streaming API requires a non-empty
-            # chunk per call, so there's nothing to feed the session; report
-            # no candidates rather than re-querying stale state.
-            return {field: [] for field in PII_FIELD_LABELS}
-        with _pii_inference_lock:
-            entities = model.inference(
-                [delta],
-                list(PII_FIELD_LABELS.values()),
-                session_id=[call_id],
-                threshold=0.5,
-            )[0]
-        _pii_sent_length[call_id] = len(transcript_snapshot)
-    return _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
+    with _pii_inference_lock:
+        entities = model.predict_entities(turn_text, list(PII_FIELD_LABELS.values()), threshold=0.5)
+    candidates = _entities_to_candidates(entities, _PII_LABEL_TO_FIELD)
+    if turn_start:
+        for spans in candidates.values():
+            for span in spans:
+                if span["start"] is not None:
+                    span["start"] += turn_start
+                if span["end"] is not None:
+                    span["end"] += turn_start
+    return candidates
 
 
 def _zero_shot_window(transcript_snapshot: str) -> tuple[str, int]:
@@ -254,7 +265,7 @@ async def extract_candidates_timed(
     `_timed_to_thread`) so a caller recording per-stage latency (e.g. `pipeline_core`) never
     attributes one model's wall-clock time to the other.
     """
-    pii_task = _timed_to_thread(_run_pii_tick, transcript_snapshot, call_id)
+    pii_task = _timed_to_thread(_run_pii_tick, transcript_snapshot)
     zero_shot_task = _timed_to_thread(_run_zero_shot_tick, transcript_snapshot)
     (pii_candidates, pii_latency_ms), (zero_shot_candidates, zero_shot_latency_ms) = await asyncio.gather(
         pii_task, zero_shot_task
@@ -265,11 +276,10 @@ async def extract_candidates_timed(
 async def extract_candidates(transcript_snapshot: str, call_id: str) -> dict[str, list[dict]]:
     """Return per-field candidate spans for one call's transcript-so-far.
 
-    Runs the streaming PII checkpoint (`caller_name`/`email`/`phone_number`,
-    cached incrementally per `call_id`) and the zero-shot domain checkpoint
-    (the other 8 fields, re-encoding only a bounded trailing window of the
-    transcript-so-far) concurrently via `asyncio.to_thread`, so wall-clock
-    latency is the max of the two rather than their sum. The result covers
+    Runs the PII checkpoint (`caller_name`/`email`/`phone_number`, scoped to just the caller's
+    current turn) and the zero-shot domain checkpoint (the other 8 fields, re-encoding only a
+    bounded trailing window of the transcript-so-far) concurrently via `asyncio.to_thread`, so
+    wall-clock latency is the max of the two rather than their sum. The result covers
     all 11 fields; each maps to a list of candidate spans shaped
     `{"text", "score", "start", "end"}`, empty when no candidate was found
     this tick. Every span's offsets are in full-transcript coordinates
@@ -285,9 +295,8 @@ async def extract_candidates(transcript_snapshot: str, call_id: str) -> dict[str
 
 
 def reset_call(call_id: str) -> None:
-    """Discard cached streaming state for `call_id`, e.g. once its call has ended."""
-    _pii_sent_length.pop(call_id, None)
-    with _pii_call_locks_guard:
-        _pii_call_locks.pop(call_id, None)
-    if _pii_model is not None:
-        _pii_model.clear_session(call_id)
+    """No-op: both GLiNER models are called statelessly per tick, so there is no per-call state
+    left to discard once a call ends. Kept as a callable, rather than removed, so callers (call
+    teardown in `pipeline_core`, `batch_runner`'s warm-up, `scripts/smoke_gliner.py`) don't need to
+    know which extraction strategy is in use behind this module's API.
+    """
