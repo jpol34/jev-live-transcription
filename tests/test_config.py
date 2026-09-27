@@ -7,7 +7,7 @@ def test_call_concurrency_derived_from_ram():
 
 
 def test_gliner_concurrency_independent_of_call_concurrency():
-    assert config.GLINER_CONCURRENCY == 2
+    assert config.GLINER_CONCURRENCY == 1
 
 
 def test_pricing_table_has_both_models():

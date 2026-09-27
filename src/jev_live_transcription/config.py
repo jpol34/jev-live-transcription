@@ -46,9 +46,14 @@ GLINER_ZERO_SHOT_THRESHOLD = 0.30
 RAM_GB = 16
 CALL_CONCURRENCY = (RAM_GB - 4) // 4  # 3
 
-# GLiNER concurrency is tuned independently of call concurrency since the
-# model runs locally rather than per-call against a remote API.
-GLINER_CONCURRENCY = 2
+# GLiNER concurrency is tuned independently of call concurrency since the model runs locally
+# rather than per-call against a remote API. Measured for real under genuine cross-call contention
+# on the GPU pod (scripts/measure_gliner_concurrency.py, call_concurrency=CALL_CONCURRENCY, 20-call
+# subset): raising it makes latency worse, not better -- mean latency was 20.5ms at concurrency=1,
+# 30.2ms at 2, 33.1ms at 4 (p95 up to 59ms). A single GPU doesn't parallelize multiple concurrent
+# forward passes of this small a model efficiently; they contend for the same device and each one
+# slows down, outweighing any queueing relief. Stays at 1.
+GLINER_CONCURRENCY = 1
 
 # Rough cost-per-million-token estimates, USD. These are NOT authoritative —
 # GPT-5.1 pricing is from public list pricing and may drift, and the jev
