@@ -110,7 +110,7 @@ def test_delete_db_file_tolerates_missing_files(tmp_path):
 def test_measure_isolates_a_failing_candidate_and_keeps_prior_results(monkeypatch, tmp_path):
     import measure_gliner_concurrency as mgc
 
-    async def fake_run_one_concurrency(concurrency, *, call_ids, calls, db_path, warm_up):
+    async def fake_run_one_concurrency(concurrency, *, call_concurrency, call_ids, calls, db_path, warm_up):
         if concurrency == 2:
             raise RuntimeError("boom")
         return {"n": 1, "n_failed": 0, "p50": 100.0, "p95": 100.0, "mean": 100.0}
@@ -124,6 +124,34 @@ def test_measure_isolates_a_failing_candidate_and_keeps_prior_results(monkeypatc
     assert results[1] is not None
     assert results[2] is None  # errored candidate recorded as None, not dropped
     assert results[4] is not None  # later candidate still ran despite candidate 2's failure
+
+
+def test_measure_uses_call_concurrency_at_least_as_high_as_the_largest_candidate(monkeypatch, tmp_path):
+    # Regression guard: gliner_concurrency's semaphore is only ever contended by coroutines that
+    # already hold a call_concurrency slot, so a candidate above call_concurrency would silently
+    # never see real contention at its own configured capacity.
+    import measure_gliner_concurrency as mgc
+
+    monkeypatch.setattr(mgc.config, "CALL_CONCURRENCY", 3)
+    captured_call_concurrency = []
+
+    async def fake_run_batch(call_ids, *, db_path, call_concurrency, gliner_concurrency, calls, warm_up):
+        captured_call_concurrency.append(call_concurrency)
+
+        class _Result:
+            failed = []
+
+        return _Result()
+
+    monkeypatch.setattr(mgc.batch_runner, "run_batch", fake_run_batch)
+    monkeypatch.setattr(mgc, "load_stage_latencies", lambda conn, stage=mgc.STAGE: [])
+    monkeypatch.setattr(mgc.db_module, "connect", lambda db_path: Mock(close=lambda: None))
+
+    __import__("asyncio").run(mgc.measure([1, 2, 4], call_ids=[1], calls={}, db_dir=tmp_path))
+
+    # CALL_CONCURRENCY=3 is below the largest candidate (4) -- every candidate must run at
+    # call_concurrency=4 (max(3, 4)), not 3, or the gliner_concurrency=4 candidate is undertested.
+    assert captured_call_concurrency == [4, 4, 4]
 
 
 def test_load_call_subset_loads_secrets_and_trims_call_ids(monkeypatch):

@@ -12,9 +12,12 @@ concurrency above 1 makes calls contend for the same GLiNER model, which is a si
 resource regardless of which device it runs on. That contention shows up as queueing delay inside
 `pipeline_runs.latency_ms` indistinguishably from real inference time, even though a real live
 call would never experience it -- so it silently inflates the exact number this benchmark exists
-to measure. Raising either default is a throughput/correctness trade a caller can make deliberately
-(e.g. a quick smoke run across the whole corpus to check for crashes, not to read its latency
-numbers), never the right choice for collecting real benchmark data.
+to measure. Raising `call_concurrency` is a throughput/correctness trade a caller can make
+deliberately (e.g. a quick smoke run across the whole corpus to check for crashes, not to read its
+latency numbers), never the right choice for collecting real benchmark data. `gliner_concurrency`
+has no such tradeoff -- real measurement under genuine contention found raising it strictly worse
+on latency, with no throughput upside on this hardware (see `config.GLINER_CONCURRENCY`), so it
+stays at 1 regardless of what a run is for.
 """
 
 from __future__ import annotations
@@ -135,6 +138,14 @@ async def run_batch(
         raise ValueError(f"call_concurrency must be >= 1, got {call_concurrency!r}")
     if gliner_concurrency < 1:
         raise ValueError(f"gliner_concurrency must be >= 1, got {gliner_concurrency!r}")
+    if gliner_concurrency != 1:
+        _LOGGER.warning(
+            "gliner_concurrency=%d: real measurement found raising this above 1 strictly hurts "
+            "GPU latency with no throughput upside on this hardware (see "
+            "config.GLINER_CONCURRENCY) -- proceeding anyway, but this is never the right choice "
+            "outside a deliberate re-measurement.",
+            gliner_concurrency,
+        )
 
     calls = calls if calls is not None else corpus.load_all()
     if call_ids is None:
