@@ -15,9 +15,10 @@ call would never experience it -- so it silently inflates the exact number this 
 to measure. Raising `call_concurrency` is a throughput/correctness trade a caller can make
 deliberately (e.g. a quick smoke run across the whole corpus to check for crashes, not to read its
 latency numbers), never the right choice for collecting real benchmark data. `gliner_concurrency`
-has no such tradeoff -- real measurement under genuine contention found raising it strictly worse
-on latency, with no throughput upside on this hardware (see `config.GLINER_CONCURRENCY`), so it
-stays at 1 regardless of what a run is for.
+has no such tradeoff -- the model call is fully serialized by a lock regardless of its value (see
+`config.GLINER_CONCURRENCY`), so raising it only adds more concurrent waiters for that same lock,
+never real parallelism. `run_batch` warns, but does not clamp, if it's passed a value other than
+`config.GLINER_CONCURRENCY`.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import corpus, gliner_pipeline, pipeline_core
+from . import config, corpus, gliner_pipeline, pipeline_core
 from . import db as db_module
 from .jev_pipeline import JevFieldResolver
 
@@ -123,9 +124,10 @@ async def run_batch(
     cross-call-contention reason explained in this module's docstring; raising `call_concurrency`
     above 1 trades away methodologically valid latency numbers for wall-clock throughput, so only
     do so for a run whose latency data won't be used (e.g. `config.CALL_CONCURRENCY` for a quick
-    smoke pass across the corpus). `gliner_concurrency` has no such tradeoff to make -- real
-    measurement under genuine contention found raising it actively hurts latency (see
-    `config.GLINER_CONCURRENCY`), so it stays at 1 regardless of what this call is for.
+    smoke pass across the corpus). `gliner_concurrency` has no such tradeoff to make (see
+    `config.GLINER_CONCURRENCY`) -- a value other than that constant logs a warning but is not
+    clamped, since `scripts/measure_gliner_concurrency.py` deliberately passes other values to
+    re-measure it.
 
     `enable_llm_baseline` defaults to `False` and is forwarded as-is to every call's
     `pipeline_core.run_call` -- see its docstring for why the GPT-5.1 comparison arm is opt-in
@@ -138,13 +140,14 @@ async def run_batch(
         raise ValueError(f"call_concurrency must be >= 1, got {call_concurrency!r}")
     if gliner_concurrency < 1:
         raise ValueError(f"gliner_concurrency must be >= 1, got {gliner_concurrency!r}")
-    if gliner_concurrency != 1:
+    if gliner_concurrency != config.GLINER_CONCURRENCY:
         _LOGGER.warning(
-            "gliner_concurrency=%d: real measurement found raising this above 1 strictly hurts "
-            "GPU latency with no throughput upside on this hardware (see "
-            "config.GLINER_CONCURRENCY) -- proceeding anyway, but this is never the right choice "
-            "outside a deliberate re-measurement.",
+            "gliner_concurrency=%d differs from the empirically-recommended config.GLINER_CONCURRENCY"
+            "=%d -- the model call is fully serialized by a lock regardless of this value, so real "
+            "measurement found anything above the recommended value only adds queueing delay, no "
+            "throughput gain (see config.GLINER_CONCURRENCY's comment). Proceeding anyway.",
             gliner_concurrency,
+            config.GLINER_CONCURRENCY,
         )
 
     calls = calls if calls is not None else corpus.load_all()

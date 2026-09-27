@@ -27,6 +27,34 @@ async def test_run_batch_rejects_non_positive_concurrency(monkeypatch, kwarg, ba
         )
 
 
+@pytest.mark.asyncio
+async def test_run_batch_warns_when_gliner_concurrency_differs_from_recommended(monkeypatch, caplog):
+    _patch_store_and_resolver(monkeypatch)
+    monkeypatch.setattr(batch_runner.pipeline_core, "run_call", AsyncMock())
+    monkeypatch.setattr(batch_runner.config, "GLINER_CONCURRENCY", 1)
+
+    with caplog.at_level("WARNING", logger=batch_runner._LOGGER.name):
+        await batch_runner.run_batch(
+            [1], db_path="ignored.sqlite3", calls={1: {}}, warm_up=False, gliner_concurrency=4
+        )
+
+    assert any("gliner_concurrency" in record.message for record in caplog.records)
+
+
+@pytest.mark.asyncio
+async def test_run_batch_does_not_warn_when_gliner_concurrency_matches_recommended(monkeypatch, caplog):
+    _patch_store_and_resolver(monkeypatch)
+    monkeypatch.setattr(batch_runner.pipeline_core, "run_call", AsyncMock())
+    monkeypatch.setattr(batch_runner.config, "GLINER_CONCURRENCY", 1)
+
+    with caplog.at_level("WARNING", logger=batch_runner._LOGGER.name):
+        await batch_runner.run_batch(
+            [1], db_path="ignored.sqlite3", calls={1: {}}, warm_up=False, gliner_concurrency=1
+        )
+
+    assert caplog.records == []
+
+
 class FakeStore:
     def __init__(self, db_path):
         self.db_path = db_path

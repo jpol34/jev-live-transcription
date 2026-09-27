@@ -47,13 +47,13 @@ RAM_GB = 16
 CALL_CONCURRENCY = (RAM_GB - 4) // 4  # 3
 
 # GLiNER concurrency is tuned independently of call concurrency since the model runs locally
-# rather than per-call against a remote API. Measured for real under genuine cross-call contention
-# on the GPU pod (scripts/measure_gliner_concurrency.py, 20-call subset, call_concurrency high
-# enough to actually contend every candidate): raising it makes latency worse, not better -- mean
-# latency was 23.2ms at concurrency=1, 39.5ms at 2, 50.5ms at 4 (p95 blows out to 86ms at 4). A
-# single GPU doesn't parallelize multiple concurrent forward passes of this small a model
-# efficiently; they contend for the same device and each one slows down, outweighing any queueing
-# relief. Stays at 1.
+# rather than per-call against a remote API. `gliner_pipeline._zero_shot_inference_lock` fully
+# serializes every model call regardless of this value, so raising it only adds more concurrent
+# waiters for that one lock -- real measurement confirms this is pure queueing overhead, not a
+# throughput win: mean latency rose from 23.2ms (concurrency=1) to 50.5ms (concurrency=4), p95 to
+# 86ms (scripts/measure_gliner_concurrency.py, 20-call subset under genuine cross-call contention).
+# Stays at 1 until the pipeline actually batches concurrent requests into one model call, which
+# would remove the lock's serialization instead of just queueing behind it.
 GLINER_CONCURRENCY = 1
 
 # Rough cost-per-million-token estimates, USD. These are NOT authoritative —

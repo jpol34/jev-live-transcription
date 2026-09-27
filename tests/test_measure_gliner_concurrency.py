@@ -137,11 +137,7 @@ def test_measure_uses_call_concurrency_at_least_as_high_as_the_largest_candidate
 
     async def fake_run_batch(call_ids, *, db_path, call_concurrency, gliner_concurrency, calls, warm_up):
         captured_call_concurrency.append(call_concurrency)
-
-        class _Result:
-            failed = []
-
-        return _Result()
+        return mgc.batch_runner.BatchResult()
 
     monkeypatch.setattr(mgc.batch_runner, "run_batch", fake_run_batch)
     monkeypatch.setattr(mgc, "load_stage_latencies", lambda conn, stage=mgc.STAGE: [])
