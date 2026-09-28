@@ -453,6 +453,22 @@ def test_read_remote_expected_calls_raises_when_running_line_is_absent(monkeypat
         gpu_run._read_remote_expected_calls(ssh_direct, None)
 
 
+def test_read_remote_expected_calls_raises_ssh_error_not_missing_line_error(monkeypatch):
+    # An SSH-level failure (dropped connection, permission denied, ...) must surface as that
+    # failure, not be misread as "the log doesn't have the line yet" -- those are different
+    # problems with different fixes, and conflating them sends whoever's debugging down the wrong
+    # path entirely.
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    monkeypatch.setattr(
+        gpu_run.subprocess,
+        "run",
+        Mock(return_value=Mock(returncode=255, stdout="", stderr="ssh: connect to host: Connection refused")),
+    )
+
+    with pytest.raises(RuntimeError, match="failed to read remote log.*Connection refused"):
+        gpu_run._read_remote_expected_calls(ssh_direct, None)
+
+
 # --- retrieved-DB verification ----------------------------------------------------------------
 
 

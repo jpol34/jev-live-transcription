@@ -259,6 +259,8 @@ def _read_remote_expected_calls(ssh_direct: dict, ssh_key: str | None) -> int:
     checkout's `output/transcripts`/`output/metadata` at the moment `run_gpu` is invoked.
     """
     result = _run_ssh(ssh_direct, ssh_key, f"cat {_REMOTE_LOG_PATH}")
+    if result.returncode != 0:
+        raise RuntimeError(f"failed to read remote log at {_REMOTE_LOG_PATH}: {result.stderr}")
     match = _REMOTE_RUNNING_LINE_RE.search(result.stdout)
     if not match:
         raise RuntimeError(
