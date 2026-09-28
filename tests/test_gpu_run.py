@@ -370,3 +370,106 @@ def test_write_remote_env_raises_on_failure(monkeypatch):
 
     with pytest.raises(RuntimeError, match="failed to write remote env file"):
         gpu_run._write_remote_env(ssh_direct, None, {"FOO": "bar"})
+
+
+# --- retrieved-DB integrity check -----------------------------------------------------------
+
+
+def _write_valid_db(path):
+    # scp overwrites the destination wholesale, so these helpers do too -- a stale corrupt file
+    # left at `path` from a prior "attempt" would otherwise make sqlite3 error opening it, rather
+    # than exercising the retry path each test actually means to simulate.
+    path.unlink(missing_ok=True)
+    conn = gpu_run.db_module.connect(path)
+    try:
+        conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
+        conn.execute("INSERT INTO t (v) VALUES ('x')")
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def _write_corrupt_db(path):
+    # Not a real SQLite file at all -- the cheapest reliable way to make `integrity_check` fail
+    # without depending on reproducing a specific on-disk corruption pattern.
+    path.unlink(missing_ok=True)
+    path.write_bytes(b"not a sqlite database")
+
+
+def test_integrity_check_ok_true_for_valid_db(tmp_path):
+    db_path = tmp_path / "valid.sqlite3"
+    _write_valid_db(db_path)
+
+    assert gpu_run._integrity_check_ok(db_path) is True
+
+
+def test_integrity_check_ok_false_for_corrupt_db(tmp_path):
+    db_path = tmp_path / "corrupt.sqlite3"
+    _write_corrupt_db(db_path)
+
+    assert gpu_run._integrity_check_ok(db_path) is False
+
+
+def test_retrieve_db_succeeds_when_scp_output_passes_integrity_check(monkeypatch, tmp_path):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    local_db_path = tmp_path / "out.sqlite3"
+
+    def fake_scp(cmd, **kwargs):
+        _write_valid_db(local_db_path)
+        return Mock(returncode=0, stdout="", stderr="")
+
+    run_mock = Mock(side_effect=fake_scp)
+    monkeypatch.setattr(gpu_run.subprocess, "run", run_mock)
+
+    gpu_run._retrieve_db(ssh_direct, None, local_db_path)
+
+    assert run_mock.call_count == 1
+
+
+def test_retrieve_db_retries_once_then_succeeds_after_a_bad_first_copy(monkeypatch, tmp_path):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    local_db_path = tmp_path / "out.sqlite3"
+    attempts = []
+
+    def fake_scp(cmd, **kwargs):
+        attempts.append(1)
+        if len(attempts) == 1:
+            _write_corrupt_db(local_db_path)
+        else:
+            _write_valid_db(local_db_path)
+        return Mock(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(gpu_run.subprocess, "run", Mock(side_effect=fake_scp))
+
+    gpu_run._retrieve_db(ssh_direct, None, local_db_path)
+
+    assert len(attempts) == 2
+    assert gpu_run._integrity_check_ok(local_db_path)
+
+
+def test_retrieve_db_raises_after_two_consecutive_integrity_failures(monkeypatch, tmp_path):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    local_db_path = tmp_path / "out.sqlite3"
+
+    def fake_scp(cmd, **kwargs):
+        _write_corrupt_db(local_db_path)
+        return Mock(returncode=0, stdout="", stderr="")
+
+    run_mock = Mock(side_effect=fake_scp)
+    monkeypatch.setattr(gpu_run.subprocess, "run", run_mock)
+
+    with pytest.raises(RuntimeError, match="failed PRAGMA integrity_check twice"):
+        gpu_run._retrieve_db(ssh_direct, None, local_db_path)
+
+    assert run_mock.call_count == 2
+
+
+def test_retrieve_db_still_raises_on_scp_failure_before_any_integrity_check(monkeypatch, tmp_path):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    local_db_path = tmp_path / "out.sqlite3"
+    monkeypatch.setattr(
+        gpu_run.subprocess, "run", Mock(return_value=Mock(returncode=1, stdout="", stderr="connection lost"))
+    )
+
+    with pytest.raises(RuntimeError, match="failed to retrieve capture DB"):
+        gpu_run._retrieve_db(ssh_direct, None, local_db_path)

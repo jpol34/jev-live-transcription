@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import shlex
+import sqlite3
 import subprocess
 import time
 from pathlib import Path
@@ -25,6 +26,7 @@ from pathlib import Path
 import hangar
 
 from . import config, secrets
+from . import db as db_module
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -214,15 +216,53 @@ def _wait_for_completion(ssh_direct: dict, ssh_key: str | None) -> int:
         time.sleep(_COMPLETION_POLL_S)
 
 
+def _integrity_check_ok(db_path: Path) -> bool:
+    """True if `db_path` passes SQLite's own `PRAGMA integrity_check`.
+
+    A capture DB can scp over successfully (exit code 0) while still being a structurally
+    corrupted SQLite file -- the pod's disk durability under a high `--call-concurrency` write
+    rate isn't guaranteed the way a local SSD's would be. Silently handing back a corrupted DB is
+    worse than failing loud here, immediately after retrieval, rather than as an opaque
+    `sqlite3.DatabaseError` several steps later during scoring.
+    """
+    try:
+        conn = db_module.connect(db_path)
+        try:
+            result = conn.execute("PRAGMA integrity_check").fetchall()
+        finally:
+            conn.close()
+    except sqlite3.DatabaseError:
+        return False
+    return result == [("ok",)]
+
+
 def _retrieve_db(ssh_direct: dict, ssh_key: str | None, local_db_path: Path) -> None:
     local_db_path.parent.mkdir(parents=True, exist_ok=True)
     scp_args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-P", str(ssh_direct["port"])]
     if ssh_key:
         scp_args += ["-i", ssh_key]
     source = f"{ssh_direct['username']}@{ssh_direct['host']}:{_REMOTE_DB_PATH}"
-    result = subprocess.run(["scp", *scp_args, source, str(local_db_path)], capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(f"failed to retrieve capture DB from pod: {result.stderr}")
+
+    # One retry on an integrity-check failure: cheap insurance against a transient transfer/flush
+    # issue, distinct from a genuinely corrupted source DB on the pod (which would fail again).
+    for attempt in (1, 2):
+        result = subprocess.run(["scp", *scp_args, source, str(local_db_path)], capture_output=True, text=True)
+        if result.returncode != 0:
+            raise RuntimeError(f"failed to retrieve capture DB from pod: {result.stderr}")
+        if _integrity_check_ok(local_db_path):
+            return
+        _LOGGER.warning(
+            "retrieved capture DB at %s failed PRAGMA integrity_check (attempt %d/2)%s",
+            local_db_path,
+            attempt,
+            "" if attempt == 1 else " -- giving up",
+        )
+
+    raise RuntimeError(
+        f"capture DB retrieved from the pod at {local_db_path} failed PRAGMA integrity_check twice "
+        "in a row -- likely corrupted on the pod itself rather than a transient transfer issue. "
+        "Re-run with --keep-pod to inspect the pod's own copy before it's torn down."
+    )
 
 
 def run_gpu(
