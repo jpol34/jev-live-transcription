@@ -36,6 +36,9 @@ FIXTURE_PATH = (
     Path(__file__).resolve().parent.parent / "gliner_serve" / "fixtures" / "sample_windows.json"
 )
 DEFAULT_URL = "http://localhost:8000"
+# Bounds each individual request -- see run_load_test's docstring for why this must be well below
+# aiohttp's own 300s default.
+DEFAULT_REQUEST_TIMEOUT_S = 30.0
 
 # `src/jev_live_transcription/serving/app.py`'s one real route -- label set is fixed server-side,
 # unlike gliner[serve]'s `/gliner`, so requests here carry no `labels` field at all.
@@ -55,8 +58,16 @@ def percentile(values: list[float], p: float) -> float | None:
 
 
 def summarize(latencies: list[float], *, n_failed: int, duration_s: float) -> dict[str, Any]:
-    """Build the final result dict from raw per-request latencies (ms) and the run's wall time."""
-    n = len(latencies)
+    """Build the final result dict from successful-request latencies (ms), a separate failed-request
+    count, and the run's wall time.
+
+    `latencies` holds only *successful* requests' timings -- a failed request's latency (which can
+    be inflated by the client's own timeout, see `_send_one`) says nothing about real serving
+    speed, so mixing it into `p50_ms`/`p95_ms`/`mean_ms` would silently skew them. `n` (used for
+    `throughput_req_s`) still counts every attempt, successful or not, since a real caller's
+    request rate includes the ones that failed.
+    """
+    n = len(latencies) + n_failed
     return {
         "n": n,
         "n_failed": n_failed,
@@ -114,19 +125,31 @@ async def _worker(
         text = windows[i % n_windows]
         i += 1
         latency_ms, success = await _send_one(session, url, text)
-        latencies.append(latency_ms)
-        if not success:
+        if success:
+            latencies.append(latency_ms)
+        else:
             failures.append(True)
 
 
 async def run_load_test(
-    url: str, concurrency: int, duration_s: float, windows: list[str]
+    url: str,
+    concurrency: int,
+    duration_s: float,
+    windows: list[str],
+    *,
+    request_timeout_s: float = DEFAULT_REQUEST_TIMEOUT_S,
 ) -> dict[str, Any]:
-    """Run `concurrency` closed-loop workers against `url` for `duration_s` seconds."""
+    """Run `concurrency` closed-loop workers against `url` for `duration_s` seconds.
+
+    `request_timeout_s` bounds each individual request -- aiohttp's own default (300s) would let
+    one stuck request under overload make the whole run (and, for `pod_bench.py`'s SSH-wrapped
+    invocation, the wrapping SSH call) run far longer than `duration_s`.
+    """
     endpoint = url.rstrip("/") + ROUTE_PREFIX
     latencies: list[float] = []
     failures: list[bool] = []
-    async with aiohttp.ClientSession() as session:
+    timeout = aiohttp.ClientTimeout(total=request_timeout_s)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
         end_time = time.monotonic() + duration_s
         await asyncio.gather(
             *(
@@ -143,6 +166,12 @@ def main() -> int:
     parser.add_argument("--duration-s", type=float, required=True, help="Wall-clock run duration.")
     parser.add_argument("--url", type=str, default=DEFAULT_URL, help="Base URL of the jlt serve server.")
     parser.add_argument(
+        "--request-timeout-s",
+        type=float,
+        default=DEFAULT_REQUEST_TIMEOUT_S,
+        help=f"Per-request timeout, seconds (default: {DEFAULT_REQUEST_TIMEOUT_S}).",
+    )
+    parser.add_argument(
         "--fixture-path",
         type=Path,
         default=FIXTURE_PATH,
@@ -153,9 +182,21 @@ def main() -> int:
         ),
     )
     args = parser.parse_args()
+    if args.concurrency < 1:
+        parser.error(f"--concurrency must be positive, got {args.concurrency}")
+    if args.duration_s <= 0:
+        parser.error(f"--duration-s must be positive, got {args.duration_s}")
 
     windows = load_fixture(args.fixture_path)
-    result = asyncio.run(run_load_test(args.url, args.concurrency, args.duration_s, windows))
+    result = asyncio.run(
+        run_load_test(
+            args.url,
+            args.concurrency,
+            args.duration_s,
+            windows,
+            request_timeout_s=args.request_timeout_s,
+        )
+    )
     print(json.dumps(result))
     return 0
 

@@ -45,11 +45,16 @@ from jev_live_transcription.gpu_run import _cuda_preflight, _read_public_key, _w
 
 # `load_test.py` lives alongside this file and defines the one real request shape this benchmark
 # uses -- imported rather than duplicated so the readiness check here exercises the exact same
-# payload shape as the real load-tested traffic.
+# payload shape as the real load-tested traffic. `_pod_ssh` is the SSH/scp helper module shared
+# with the sibling `gliner_serve/pod_bench.py`, one level up.
 _THIS_DIR = Path(__file__).resolve().parent
-if str(_THIS_DIR) not in sys.path:
-    sys.path.insert(0, str(_THIS_DIR))
+for _extra_path in (_THIS_DIR, _THIS_DIR.parent):
+    if str(_extra_path) not in sys.path:
+        sys.path.insert(0, str(_extra_path))
 import load_test  # noqa: E402
+from _pod_ssh import run_ssh as _run_ssh  # noqa: E402
+from _pod_ssh import scp_up as _scp_up  # noqa: E402
+from _pod_ssh import wait_for_ssh_connectable as _wait_for_ssh_connectable  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,61 +67,18 @@ _REMOTE_LOG_PATH = f"{_REMOTE_DIR}/jlt-serve.log"
 _REMOTE_PID_PATH = f"{_REMOTE_DIR}/jlt-serve.pid"
 _REMOTE_FIXTURE_PATH = f"{_REMOTE_DIR}/fixtures/sample_windows.json"
 
-_SSH_CONNECT_TIMEOUT_S = 300.0
-_SSH_CONNECT_POLL_S = 5.0
 # Generous: covers a cold HuggingFace Hub download of the checkpoint on top of the model's own
 # load time -- this pod installs the project fresh, so unlike a pre-baked Docker image, the
 # checkpoint is never already cached on first run.
 _SERVER_READY_TIMEOUT_S = 600.0
-
-
-def _ssh_target(ssh_key: str) -> list[str]:
-    # `-n` redirects the local ssh client's own stdin from /dev/null. Without it, a non-interactive
-    # `ssh host 'cmd &'` can hang past the backgrounded command finishing: the client keeps the
-    # channel open waiting on local stdin activity that never comes, regardless of the remote
-    # command's own stdout/stderr redirection.
-    return ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-n", "-i", ssh_key]
-
-
-def _run_ssh(
-    ssh_direct: dict, ssh_key: str, command: str, *, timeout_s: float = 30.0
-) -> subprocess.CompletedProcess:
-    target = f"{ssh_direct['username']}@{ssh_direct['host']}"
-    return subprocess.run(
-        ["ssh", *_ssh_target(ssh_key), "-p", str(ssh_direct["port"]), target, command],
-        capture_output=True,
-        # Explicit UTF-8 rather than `text=True`'s platform-default decoding: on Windows that
-        # default is cp1252, which crashes decoding remote output containing multi-byte UTF-8
-        # sequences (observed directly in the gliner_serve suite's own pip install progress bar).
-        # `errors="replace"` keeps a decode hiccup from crashing the whole SSH call outright.
-        encoding="utf-8",
-        errors="replace",
-        timeout=timeout_s,
-    )
-
-
-def _wait_for_ssh_connectable(ssh_direct: dict, ssh_key: str) -> None:
-    deadline = time.monotonic() + _SSH_CONNECT_TIMEOUT_S
-    last_result: subprocess.CompletedProcess | None = None
-    while time.monotonic() < deadline:
-        last_result = _run_ssh(ssh_direct, ssh_key, "true", timeout_s=10.0)
-        if last_result.returncode == 0:
-            return
-        time.sleep(_SSH_CONNECT_POLL_S)
-    stderr = last_result.stderr if last_result else "(no attempt made)"
-    raise TimeoutError(f"SSH never became connectable within {_SSH_CONNECT_TIMEOUT_S}s: {stderr}")
-
-
-def _scp_up(ssh_direct: dict, ssh_key: str, local_path: Path, remote_path: str, *, recursive: bool = False) -> None:
-    target = f"{ssh_direct['username']}@{ssh_direct['host']}:{remote_path}"
-    args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-i", ssh_key, "-P", str(ssh_direct["port"])]
-    if recursive:
-        args.append("-r")
-    result = subprocess.run(
-        ["scp", *args, str(local_path), target], capture_output=True, encoding="utf-8", errors="replace"
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"failed to upload {local_path} -> {remote_path}: {result.stderr}")
+# Per-request cap for load_test.py's aiohttp client (see load_test.py's run_load_test) -- keeps one
+# stuck request from making the whole load_test.py process run far longer than --duration-s, which
+# would in turn blow past this script's own SSH call timeout below.
+_LOAD_TEST_REQUEST_TIMEOUT_S = 30.0
+# Margin added to --duration-s for the SSH call wrapping each load_test.py invocation: bounds a
+# single request to _LOAD_TEST_REQUEST_TIMEOUT_S, so the worst case is one straggler request still
+# in flight when the run's duration elapses, not an unbounded hang.
+_LOAD_TEST_SSH_MARGIN_S = _LOAD_TEST_REQUEST_TIMEOUT_S + 30.0
 
 
 def _install_deps(ssh_direct: dict, ssh_key: str) -> None:
@@ -211,23 +173,32 @@ def _smoke_test(ssh_direct: dict, ssh_key: str) -> None:
     """Starts the default-config server, confirms it answers `/extract` with the expected shape,
     then tears it down -- a human sanity check before this script is trusted for a real sweep."""
     _start_server(ssh_direct, ssh_key, max_batch_size=None, batch_wait_timeout_ms=None)
-    payload = json.dumps({"text": "Hi, my name is Jane Doe and I live in unit 204."})
-    result = _run_ssh(
-        ssh_direct,
-        ssh_key,
-        f"curl -sSf -X POST http://localhost:{_SERVE_PORT}{load_test.ROUTE_PREFIX} "
-        f"-H 'Content-Type: application/json' -d {shlex.quote(payload)}",
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"smoke-test /extract request failed: {result.stderr}")
     try:
-        parsed = json.loads(result.stdout)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError(f"smoke-test response isn't valid JSON: {result.stdout!r}") from exc
-    if not isinstance(parsed, dict) or not isinstance(parsed.get("entities"), list):
-        raise RuntimeError(f"smoke-test response doesn't have the expected shape: {parsed!r}")
-    print(f"Smoke-test response:\n{result.stdout}")
-    _stop_server(ssh_direct, ssh_key)
+        payload = json.dumps({"text": "Hi, my name is Jane Doe and I live in unit 204."})
+        result = _run_ssh(
+            ssh_direct,
+            ssh_key,
+            f"curl -sSf -X POST http://localhost:{_SERVE_PORT}{load_test.ROUTE_PREFIX} "
+            f"-H 'Content-Type: application/json' -d {shlex.quote(payload)}",
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"smoke-test /extract request failed: {result.stderr}")
+        try:
+            parsed = json.loads(result.stdout)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"smoke-test response isn't valid JSON: {result.stdout!r}") from exc
+        if not isinstance(parsed, dict) or not isinstance(parsed.get("entities"), list):
+            raise RuntimeError(f"smoke-test response doesn't have the expected shape: {parsed!r}")
+        print(f"Smoke-test response:\n{result.stdout}")
+    finally:
+        _stop_server(ssh_direct, ssh_key)
+
+
+def _fmt(value: float | None) -> str:
+    """Format a stat that's `None` when `summarize()` saw zero of that kind (e.g. `p50_ms` with no
+    successful requests) without crashing on `None.__format__`.
+    """
+    return f"{value:.1f}" if value is not None else "n/a"
 
 
 def _write_results(results_path: Path, results: list[dict]) -> None:
@@ -257,10 +228,11 @@ def _run_bench(
             remote_command = (
                 f"cd {_REMOTE_DIR} && python load_test.py --concurrency {concurrency} "
                 f"--duration-s {duration_s} --url http://localhost:{_SERVE_PORT} "
-                f"--fixture-path {_REMOTE_FIXTURE_PATH}"
+                f"--fixture-path {_REMOTE_FIXTURE_PATH} "
+                f"--request-timeout-s {_LOAD_TEST_REQUEST_TIMEOUT_S}"
             )
             run_result = _run_ssh(
-                ssh_direct, ssh_key, remote_command, timeout_s=duration_s + 60.0
+                ssh_direct, ssh_key, remote_command, timeout_s=duration_s + _LOAD_TEST_SSH_MARGIN_S
             )
             if run_result.returncode != 0:
                 raise RuntimeError(
@@ -276,7 +248,10 @@ def _run_bench(
             }
             results.append(entry)
             _write_results(results_path, results)
-            print(f"  -> p50={stats['p50_ms']:.1f}ms p95={stats['p95_ms']:.1f}ms throughput={stats['throughput_req_s']:.1f}req/s")
+            print(
+                f"  -> p50={_fmt(stats['p50_ms'])}ms p95={_fmt(stats['p95_ms'])}ms "
+                f"throughput={_fmt(stats['throughput_req_s'])}req/s"
+            )
     finally:
         _stop_server(ssh_direct, ssh_key)
     print(f"Bench complete -- wrote {len(results)} result(s) to {results_path}")
@@ -380,6 +355,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     concurrencies = [int(c.strip()) for c in args.concurrencies.split(",") if c.strip()]
+    if not concurrencies or any(c < 1 for c in concurrencies):
+        parser.error(f"--concurrencies must be a comma-separated list of positive integers, got {args.concurrencies!r}")
+    if args.duration_s <= 0:
+        parser.error(f"--duration-s must be positive, got {args.duration_s}")
     return run(
         mode=args.mode,
         ssh_key=args.ssh_key,

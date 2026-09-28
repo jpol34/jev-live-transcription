@@ -46,15 +46,17 @@ def test_build_request_has_no_labels_field():
 
 
 def test_summarize_empty_latencies():
+    # n counts every attempt (successes + failures), not just latencies recorded -- an empty
+    # `latencies` list with 3 failures still means 3 real attempts were made.
     stats = load_test.summarize([], n_failed=3, duration_s=1.0)
     assert stats == {
-        "n": 0,
+        "n": 3,
         "n_failed": 3,
         "p50_ms": None,
         "p95_ms": None,
         "p99_ms": None,
         "mean_ms": None,
-        "throughput_req_s": 0.0,
+        "throughput_req_s": 3.0,
     }
 
 
@@ -128,3 +130,33 @@ async def test_run_load_test_records_failures_from_error_responses():
 
     assert result["n"] > 0
     assert result["n_failed"] == result["n"]
+
+
+async def test_run_load_test_excludes_failed_request_latency_from_percentiles():
+    """A failed request's latency (which can be inflated, e.g. by a slow response before an error
+    status) must not pollute the reported percentiles/mean -- only n_failed should reflect it."""
+    call_count = {"n": 0}
+
+    async def handler(request: web.Request) -> web.Response:
+        call_count["n"] += 1
+        if call_count["n"] == 1:
+            await asyncio.sleep(0.2)  # one slow failure
+            return web.json_response({"detail": "boom"}, status=500)
+        return web.json_response({"entities": []})  # fast successes after it
+
+    app = web.Application()
+    app.router.add_post(load_test.ROUTE_PREFIX, handler)
+    server = TestServer(app)
+    await server.start_server()
+    try:
+        url = f"http://{server.host}:{server.port}"
+        result = await load_test.run_load_test(url, concurrency=1, duration_s=0.5, windows=["hello"])
+    finally:
+        await server.close()
+
+    assert result["n_failed"] == 1
+    assert result["n"] > result["n_failed"]
+    # The one slow (200ms) failure must not show up in p99/mean -- every recorded latency should
+    # be a fast local success, far below it.
+    assert result["p99_ms"] < 100
+    assert result["mean_ms"] < 100
