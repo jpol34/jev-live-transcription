@@ -63,6 +63,23 @@ def test_is_match_true_for_whole_numeric_token_within_longer_text():
     assert score_recall.is_match("apartment 204", "204")
 
 
+def test_is_match_true_for_dollar_prefixed_value_preceded_by_whitespace():
+    assert score_recall.is_match("around $950", "$950")
+    assert score_recall.is_match("$950", "the price quoted was $950")
+
+
+def test_is_match_false_for_unrelated_dollar_values():
+    # Substring matching for a symbol-prefixed value stays bounded -- two genuinely different
+    # dollar amounts still don't match.
+    assert not score_recall.is_match("$950", "$1,900")
+
+
+def test_is_match_true_for_dollar_value_directly_abutting_a_word_with_no_separator():
+    # A symbol-prefixed value like "$950" is unambiguously delimited by the symbol itself, so it
+    # matches whether it's preceded by whitespace or abuts a word with no separator at all.
+    assert score_recall.is_match("$950", "the offer was$950 total")
+
+
 def test_is_match_false_for_empty_values():
     assert not score_recall.is_match("", "Tim Barker")
     assert not score_recall.is_match("Tim Barker", "")

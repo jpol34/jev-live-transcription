@@ -64,15 +64,22 @@ def _disclosed_items(value: object) -> list[str]:
 
 
 def is_match(extracted: str, truth: str | list[str]) -> bool:
-    """True if `extracted` and `truth` agree closely enough to count as a recall hit.
+    r"""True if `extracted` and `truth` agree closely enough to count as a recall hit.
 
     Extracted values are free text produced by a model, not guaranteed to match the ground-truth
     string exactly (e.g. "the caller, Tim Barker" vs "Tim Barker") -- normalized equality, or the
     shorter value appearing as a whole word (or run of words) inside the longer one, covers that
-    without requiring an exact match. Plain substring containment (with no word-boundary check)
-    would count "212" as a match for ground truth "12", or "103" for "3" -- a real risk for the
-    short numeric/ID-like fields (unit_number, phone digits, prices), where every digit string is
-    a substring of many other digit strings that share no actual value.
+    without requiring an exact match. Plain substring containment (with no boundary check) would
+    count "212" as a match for ground truth "12", or "103" for "3" -- a real risk for the short
+    numeric/ID-like fields (unit_number, phone digits, prices), where every digit string is a
+    substring of many other digit strings that share no actual value.
+
+    The boundary check requires a non-word lookaround only on a side whose own edge character is
+    itself a word character. A bare-digit edge (e.g. "212") needs it on both sides to block a
+    digit-collision false positive ("212" inside "3212"). A symbol-prefixed edge (e.g. "$950")
+    needs no lookaround at all: the symbol itself unambiguously delimits the value regardless of
+    what's adjacent to it, so "$950" correctly matches whether it's preceded by whitespace
+    ("around $950") or abuts a word with no separator ("was$950 total").
 
     `truth` can be a list (e.g. `amenities_requested`, where a call's ground truth can disclose
     several amenities) since the pipeline only ever commits a single value per field -- a hit
@@ -86,7 +93,9 @@ def is_match(extracted: str, truth: str | list[str]) -> bool:
     if norm_extracted == norm_truth:
         return True
     shorter, longer = sorted((norm_extracted, norm_truth), key=len)
-    return re.search(rf"\b{re.escape(shorter)}\b", longer) is not None
+    lead = r"(?<!\w)" if re.match(r"\w", shorter[0]) else ""
+    trail = r"(?!\w)" if re.match(r"\w", shorter[-1]) else ""
+    return re.search(f"{lead}{re.escape(shorter)}{trail}", longer) is not None
 
 
 def load_ground_truths(conn: sqlite3.Connection) -> dict[int, dict]:
