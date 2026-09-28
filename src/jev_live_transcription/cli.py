@@ -97,6 +97,25 @@ def _build_parser() -> argparse.ArgumentParser:
             "GLiNER+jev data collection."
         ),
     )
+    batch_parser.add_argument(
+        "--enable-gliner-only",
+        action="store_true",
+        default=False,
+        help=(
+            "Also run the fully local, no-jev-call gliner_only resolution arm (default: off). "
+            "See gliner_only_resolver.GlinerOnlyResolver for its commit policy."
+        ),
+    )
+    batch_parser.add_argument(
+        "--disable-jev",
+        action="store_true",
+        default=False,
+        help=(
+            "Skip the jev resolution arm entirely (default: jev runs). No JevFieldResolver is "
+            "constructed and TYPESAFE_API_KEY is never loaded or validated -- pass this for a "
+            "fully local run, e.g. alongside --enable-gliner-only."
+        ),
+    )
 
     gpu_run_parser = subparsers.add_parser(
         "gpu-run", help="Run the benchmark on a real RunPod GPU pod (creates and tears down the pod)."
@@ -122,6 +141,21 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         help="Also run the GPT-5.1 comparison arm -- same real-money caveat as `jlt batch`.",
+    )
+    gpu_run_parser.add_argument(
+        "--enable-gliner-only",
+        action="store_true",
+        default=False,
+        help="Also run the fully local gliner_only resolution arm -- same flag as `jlt batch`.",
+    )
+    gpu_run_parser.add_argument(
+        "--disable-jev",
+        action="store_true",
+        default=False,
+        help=(
+            "Skip the jev resolution arm entirely -- same flag as `jlt batch`. TYPESAFE_API_KEY "
+            "is never loaded or validated, locally or on the pod."
+        ),
     )
     gpu_run_parser.add_argument(
         "--pod-state-path",
@@ -174,10 +208,34 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _check_resolution_arms(args: argparse.Namespace) -> str | None:
+    """Return an error message if `args` would run no resolution arm at all, else `None`.
+
+    GLiNER extraction itself always runs every grown tick regardless of these flags, but
+    `--disable-jev` with neither `--enable-gliner-only` nor `--enable-llm-baseline` means no
+    resolution arm ever commits a field -- the run reports success with a capture DB that has
+    extraction rows but no committed field values, easy to mistake for a working run.
+    """
+    if args.disable_jev and not args.enable_gliner_only and not args.enable_llm_baseline:
+        return (
+            "error: --disable-jev with neither --enable-gliner-only nor --enable-llm-baseline "
+            "leaves no resolution arm running -- GLiNER would extract candidates every tick but "
+            "nothing would ever commit a field. Pass --enable-gliner-only alongside --disable-jev "
+            "for a jev-free run, or drop --disable-jev."
+        )
+    return None
+
+
 def _run_batch(args: argparse.Namespace) -> int:
+    error = _check_resolution_arms(args)
+    if error is not None:
+        print(error)
+        return 2
+
     if args.enable_llm_baseline:
         secrets.load_openai_key()
-    secrets.load_typesafe_key()
+    if not args.disable_jev:
+        secrets.load_typesafe_key()
 
     calls = corpus.load_all()
     call_ids = sorted(calls)
@@ -189,7 +247,8 @@ def _run_batch(args: argparse.Namespace) -> int:
     print(
         f"Running {len(call_ids)} call(s) -> {args.db_path} "
         f"(call_concurrency={args.call_concurrency}, gliner_concurrency={args.gliner_concurrency}, "
-        f"enable_llm_baseline={args.enable_llm_baseline})"
+        f"enable_llm_baseline={args.enable_llm_baseline}, "
+        f"enable_gliner_only={args.enable_gliner_only}, enable_jev={not args.disable_jev})"
     )
 
     result = asyncio.run(
@@ -200,6 +259,8 @@ def _run_batch(args: argparse.Namespace) -> int:
             gliner_concurrency=args.gliner_concurrency,
             calls=calls,
             enable_llm_baseline=args.enable_llm_baseline,
+            enable_gliner_only=args.enable_gliner_only,
+            enable_jev=not args.disable_jev,
         )
     )
 
@@ -217,6 +278,11 @@ def _run_tui(args: argparse.Namespace) -> int:
 
 
 def _run_gpu_run(args: argparse.Namespace) -> int:
+    error = _check_resolution_arms(args)
+    if error is not None:
+        print(error)
+        return 2
+
     from . import gpu_run
 
     return gpu_run.run_gpu(
@@ -225,6 +291,8 @@ def _run_gpu_run(args: argparse.Namespace) -> int:
         call_concurrency=args.call_concurrency,
         gliner_concurrency=args.gliner_concurrency,
         enable_llm_baseline=args.enable_llm_baseline,
+        enable_gliner_only=args.enable_gliner_only,
+        enable_jev=not args.disable_jev,
         pod_state_path=args.pod_state_path,
         ssh_key=args.ssh_key,
         keep_pod=args.keep_pod,

@@ -74,6 +74,124 @@ def test_batch_only_loads_openai_key_when_llm_baseline_enabled(monkeypatch, tmp_
     openai_key_mock.assert_called_once()
 
 
+def test_batch_forwards_enable_gliner_only_flag_when_passed(monkeypatch, tmp_path):
+    _patch_common(monkeypatch)
+    run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
+    monkeypatch.setattr(cli.batch_runner, "run_batch", run_batch_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    cli.main(["batch", "--db-path", str(db_path), "--enable-gliner-only"])
+
+    _, kwargs = run_batch_mock.await_args
+    assert kwargs["enable_gliner_only"] is True
+
+
+def test_batch_defaults_enable_gliner_only_to_false(monkeypatch, tmp_path):
+    _patch_common(monkeypatch)
+    run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
+    monkeypatch.setattr(cli.batch_runner, "run_batch", run_batch_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    cli.main(["batch", "--db-path", str(db_path)])
+
+    _, kwargs = run_batch_mock.await_args
+    assert kwargs["enable_gliner_only"] is False
+
+
+def test_batch_disable_jev_forwards_enable_jev_false(monkeypatch, tmp_path):
+    _patch_common(monkeypatch)
+    run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
+    monkeypatch.setattr(cli.batch_runner, "run_batch", run_batch_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    cli.main(["batch", "--db-path", str(db_path), "--disable-jev", "--enable-gliner-only"])
+
+    _, kwargs = run_batch_mock.await_args
+    assert kwargs["enable_jev"] is False
+
+
+def test_batch_defaults_enable_jev_to_true(monkeypatch, tmp_path):
+    _patch_common(monkeypatch)
+    run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
+    monkeypatch.setattr(cli.batch_runner, "run_batch", run_batch_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    cli.main(["batch", "--db-path", str(db_path)])
+
+    _, kwargs = run_batch_mock.await_args
+    assert kwargs["enable_jev"] is True
+
+
+def test_batch_skips_loading_typesafe_key_when_jev_disabled(monkeypatch, tmp_path):
+    _patch_common(monkeypatch)
+    monkeypatch.setattr(
+        cli.batch_runner, "run_batch", AsyncMock(return_value=batch_runner.BatchResult())
+    )
+    typesafe_key_mock = Mock()
+    monkeypatch.setattr(cli.secrets, "load_typesafe_key", typesafe_key_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    cli.main(["batch", "--db-path", str(db_path), "--disable-jev", "--enable-gliner-only"])
+    typesafe_key_mock.assert_not_called()
+
+    cli.main(["batch", "--db-path", str(db_path)])
+    typesafe_key_mock.assert_called_once()
+
+
+def test_batch_rejects_disable_jev_without_any_other_resolution_arm(monkeypatch, tmp_path):
+    # --disable-jev alone leaves GLiNER extracting every tick with nothing to ever commit a
+    # field -- a silent no-op run that reports success, so it's rejected up front instead.
+    _patch_common(monkeypatch)
+    run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
+    monkeypatch.setattr(cli.batch_runner, "run_batch", run_batch_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    exit_code = cli.main(["batch", "--db-path", str(db_path), "--disable-jev"])
+
+    assert exit_code == 2
+    run_batch_mock.assert_not_awaited()
+
+
+def test_batch_allows_disable_jev_with_enable_gliner_only(monkeypatch, tmp_path):
+    _patch_common(monkeypatch)
+    run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
+    monkeypatch.setattr(cli.batch_runner, "run_batch", run_batch_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    exit_code = cli.main(
+        ["batch", "--db-path", str(db_path), "--disable-jev", "--enable-gliner-only"]
+    )
+
+    assert exit_code == 0
+    run_batch_mock.assert_awaited_once()
+
+
+def test_batch_allows_disable_jev_with_enable_llm_baseline(monkeypatch, tmp_path):
+    _patch_common(monkeypatch)
+    run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
+    monkeypatch.setattr(cli.batch_runner, "run_batch", run_batch_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    exit_code = cli.main(
+        ["batch", "--db-path", str(db_path), "--disable-jev", "--enable-llm-baseline"]
+    )
+
+    assert exit_code == 0
+    run_batch_mock.assert_awaited_once()
+
+
+def test_gpu_run_rejects_disable_jev_without_any_other_resolution_arm(monkeypatch, tmp_path):
+    from jev_live_transcription import gpu_run as real_gpu_run
+
+    run_gpu_mock = Mock(return_value=0)
+    monkeypatch.setattr(real_gpu_run, "run_gpu", run_gpu_mock)
+
+    exit_code = cli.main(["gpu-run", "--ssh-key", "/path/to/key", "--disable-jev"])
+
+    assert exit_code == 2
+    run_gpu_mock.assert_not_called()
+
+
 def test_batch_forwards_subset_and_concurrency_flags(monkeypatch, tmp_path):
     _patch_common(monkeypatch)
     run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
@@ -139,6 +257,8 @@ def test_gpu_run_forwards_flags(monkeypatch, tmp_path):
             "--gliner-concurrency",
             "3",
             "--enable-llm-baseline",
+            "--enable-gliner-only",
+            "--disable-jev",
             "--pod-state-path",
             str(state_path),
             "--ssh-key",
@@ -154,6 +274,8 @@ def test_gpu_run_forwards_flags(monkeypatch, tmp_path):
         call_concurrency=2,
         gliner_concurrency=3,
         enable_llm_baseline=True,
+        enable_gliner_only=True,
+        enable_jev=False,
         pod_state_path=state_path,
         ssh_key="/home/me/.ssh/id_ed25519",
         keep_pod=True,
@@ -173,6 +295,8 @@ def test_gpu_run_defaults(monkeypatch, tmp_path):
     assert kwargs["call_concurrency"] == 1
     assert kwargs["gliner_concurrency"] == cli.config.GLINER_CONCURRENCY
     assert kwargs["enable_llm_baseline"] is False
+    assert kwargs["enable_gliner_only"] is False
+    assert kwargs["enable_jev"] is True
     assert kwargs["ssh_key"] == "/path/to/key"
     assert kwargs["keep_pod"] is False
 

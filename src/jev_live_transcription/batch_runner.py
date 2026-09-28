@@ -1,8 +1,13 @@
 """Drives the full call corpus through `pipeline_core.run_call`.
 
-Constructs and owns exactly one `CaptureStore` and one `JevFieldResolver` for the whole batch --
-shared across every call rather than one per call, per `run_call`'s reuse-or-own pattern -- and
-closes both once every call has finished, regardless of individual failures.
+Constructs and owns exactly one `CaptureStore` for the whole batch -- shared across every call
+rather than one per call, per `run_call`'s reuse-or-own pattern -- and closes it once every call
+has finished, regardless of individual failures. A shared `JevFieldResolver` is constructed the
+same way, but only when `enable_jev` is `True`: `JevFieldResolver.__init__` eagerly validates
+`TYPESAFE_API_KEY`, so constructing one unconditionally would break a jev-free run even when no
+call ever uses it. A shared `GlinerOnlyResolver` is always constructed -- it holds no external
+connection and does no eager validation, so there's no equivalent cost to gate it behind
+`enable_gliner_only`.
 
 Two independent semaphores bound how many calls, and how many of those calls' GLiNER inferences,
 may run at once: `call_concurrency` and `gliner_concurrency`. `call_concurrency` defaults to `1`
@@ -35,6 +40,7 @@ from pathlib import Path
 
 from . import config, corpus, gliner_pipeline, pipeline_core
 from . import db as db_module
+from .gliner_only_resolver import GlinerOnlyResolver
 from .jev_pipeline import JevFieldResolver
 
 _LOGGER = logging.getLogger(__name__)
@@ -74,11 +80,14 @@ async def _run_one(
     call_id: int,
     *,
     store,
-    resolver: JevFieldResolver,
+    resolver: JevFieldResolver | None,
+    gliner_only_resolver: GlinerOnlyResolver,
     calls: dict[int, dict],
     call_semaphore: asyncio.Semaphore,
     gliner_semaphore: asyncio.Semaphore,
     enable_llm_baseline: bool,
+    enable_gliner_only: bool,
+    enable_jev: bool,
     result: BatchResult,
 ) -> None:
     """Run one call under `call_semaphore`, recording its outcome on `result` either way.
@@ -95,8 +104,11 @@ async def _run_one(
                 pacer_mode="batch",
                 calls=calls,
                 resolver=resolver,
+                gliner_only_resolver=gliner_only_resolver,
                 gliner_semaphore=gliner_semaphore,
                 enable_llm_baseline=enable_llm_baseline,
+                enable_gliner_only=enable_gliner_only,
+                enable_jev=enable_jev,
             )
         except Exception as exc:  # noqa: BLE001 -- isolated per call, see docstring
             _LOGGER.exception("batch run_call failed for call_id=%r", call_id)
@@ -114,15 +126,21 @@ async def run_batch(
     calls: dict[int, dict] | None = None,
     warm_up: bool = True,
     enable_llm_baseline: bool = False,
+    enable_gliner_only: bool = False,
+    enable_jev: bool = True,
 ) -> BatchResult:
     """Drive `call_ids` (default: every call in `calls`) through `pipeline_core.run_call`.
 
     Every call replays in `"batch"` pacer mode (no sleeping) against one shared `CaptureStore` at
-    `db_path` and one shared `JevFieldResolver`, both constructed here and closed once at the end.
-    `calls` defaults to `corpus.load_all()`, loaded once and passed to every call rather than
-    re-read per call. `warm_up` (default `True`) runs `warm_up_gliner` before any call starts;
-    callers that already warmed up GLiNER in this process, or tests exercising this function
-    without real models, pass `warm_up=False`.
+    `db_path`, one shared `GlinerOnlyResolver`, and -- only when `enable_jev` is `True` -- one
+    shared `JevFieldResolver`; all constructed here and closed once at the end. When `enable_jev`
+    is `False`, no `JevFieldResolver` is constructed at all and `None` is forwarded as `resolver`
+    to every call, mirroring `pipeline_core.run_call`'s own conditional-construction behavior --
+    this is what lets a fully jev-free run (`enable_jev=False`) proceed without ever validating
+    `TYPESAFE_API_KEY`. `calls` defaults to `corpus.load_all()`, loaded once and passed to every
+    call rather than re-read per call. `warm_up` (default `True`) runs `warm_up_gliner` before any
+    call starts; callers that already warmed up GLiNER in this process, or tests exercising this
+    function without real models, pass `warm_up=False`.
 
     `call_concurrency` defaults to `1` and `gliner_concurrency` to `config.GLINER_CONCURRENCY`
     (fully sequential) for the cross-call-contention reason explained in this module's docstring;
@@ -133,9 +151,9 @@ async def run_batch(
     clamped, since `scripts/measure_gliner_concurrency.py` deliberately passes higher values to
     re-measure it.
 
-    `enable_llm_baseline` defaults to `False` and is forwarded as-is to every call's
-    `pipeline_core.run_call` -- see its docstring for why the GPT-5.1 comparison arm is opt-in
-    rather than routine.
+    `enable_llm_baseline`, `enable_gliner_only`, and `enable_jev` are all forwarded as-is to every
+    call's `pipeline_core.run_call` -- see its docstring for what each arm does and, for
+    `enable_llm_baseline`, why the GPT-5.1 comparison arm is opt-in rather than routine.
     """
     # asyncio.Semaphore(0) is legal but can never be acquired -- every _run_one would block
     # forever waiting to acquire it, hanging the whole batch with no error or log line explaining
@@ -164,7 +182,15 @@ async def run_batch(
     gliner_semaphore = asyncio.Semaphore(gliner_concurrency)
 
     store = db_module.CaptureStore(db_path)
-    resolver = JevFieldResolver()
+    try:
+        resolver = JevFieldResolver() if enable_jev else None
+        gliner_only_resolver = GlinerOnlyResolver()
+    except Exception:
+        # store is already a live resource (background writer thread, open sqlite connection) by
+        # this point -- a resolver construction failure must still close it rather than leak it.
+        store.close()
+        raise
+
     result = BatchResult()
     try:
         await asyncio.gather(
@@ -173,10 +199,13 @@ async def run_batch(
                     call_id,
                     store=store,
                     resolver=resolver,
+                    gliner_only_resolver=gliner_only_resolver,
                     calls=calls,
                     call_semaphore=call_semaphore,
                     gliner_semaphore=gliner_semaphore,
                     enable_llm_baseline=enable_llm_baseline,
+                    enable_gliner_only=enable_gliner_only,
+                    enable_jev=enable_jev,
                     result=result,
                 )
                 for call_id in call_ids
@@ -185,11 +214,13 @@ async def run_batch(
     finally:
         # Isolated like pipeline_core.run_call's own cleanup: resolver.aclose() raising must not
         # skip store.close(), or the CaptureStore's background writer thread and live sqlite
-        # connection leak instead of shutting down cleanly.
-        try:
-            await resolver.aclose()
-        except Exception:
-            _LOGGER.exception("resolver.aclose failed")
+        # connection leak instead of shutting down cleanly. resolver is None whenever
+        # enable_jev=False -- nothing to close in that case.
+        if resolver is not None:
+            try:
+                await resolver.aclose()
+            except Exception:
+                _LOGGER.exception("resolver.aclose failed")
         try:
             store.close()
         except Exception:

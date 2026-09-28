@@ -100,7 +100,17 @@ async def test_run_batch_defaults_to_fully_sequential_execution(monkeypatch):
     lock = asyncio.Lock()
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         nonlocal concurrent_now, max_concurrent
         async with lock:
@@ -130,7 +140,17 @@ async def test_run_batch_respects_call_concurrency(monkeypatch):
     lock = asyncio.Lock()
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         nonlocal concurrent_now, max_concurrent
         async with lock:
@@ -174,7 +194,17 @@ async def test_run_batch_gliner_semaphore_limits_concurrent_gliner_work(monkeypa
     seen_semaphores = set()
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         nonlocal concurrent_gliner, max_concurrent_gliner
         seen_semaphores.add(id(gliner_semaphore))
@@ -212,7 +242,17 @@ async def test_run_batch_isolates_per_call_failures(monkeypatch):
     _patch_store_and_resolver(monkeypatch)
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         if call_id == 2:
             raise RuntimeError("boom")
@@ -234,7 +274,17 @@ async def test_run_batch_cleans_up_store_and_resolver_even_on_failures(monkeypat
     store_instances, resolver_instances = _patch_store_and_resolver(monkeypatch)
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         raise RuntimeError("every call fails")
 
@@ -277,7 +327,17 @@ async def test_run_batch_defaults_call_ids_to_every_call(monkeypatch):
     seen_call_ids = []
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         seen_call_ids.append(call_id)
 
@@ -300,7 +360,17 @@ async def test_run_batch_warms_up_gliner_before_dispatching_calls(monkeypatch):
         events.append("warm_up")
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         events.append(f"call-{call_id}")
 
@@ -333,7 +403,17 @@ async def test_run_batch_disables_llm_baseline_by_default(monkeypatch):
     seen_flags = []
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         seen_flags.append(enable_llm_baseline)
 
@@ -352,7 +432,17 @@ async def test_run_batch_forwards_enable_llm_baseline_when_opted_in(monkeypatch)
     seen_flags = []
 
     async def fake_run_call(
-        call_id, store, *, pacer_mode, calls, resolver, gliner_semaphore, enable_llm_baseline
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
     ):
         seen_flags.append(enable_llm_baseline)
 
@@ -364,3 +454,167 @@ async def test_run_batch_forwards_enable_llm_baseline_when_opted_in(monkeypatch)
     )
 
     assert seen_flags == [True]
+
+
+@pytest.mark.asyncio
+async def test_run_batch_defaults_enable_gliner_only_false_and_enable_jev_true(monkeypatch):
+    _patch_store_and_resolver(monkeypatch)
+    seen = []
+
+    async def fake_run_call(
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
+    ):
+        seen.append((enable_gliner_only, enable_jev))
+
+    monkeypatch.setattr(batch_runner.pipeline_core, "run_call", fake_run_call)
+
+    calls = {1: {}, 2: {}}
+    await batch_runner.run_batch(list(calls), db_path="ignored.sqlite3", calls=calls, warm_up=False)
+
+    # No enable_gliner_only/enable_jev kwargs passed to run_batch -- every call must see the
+    # defaults that preserve today's jev-only behavior.
+    assert seen == [(False, True), (False, True)]
+
+
+@pytest.mark.asyncio
+async def test_run_batch_forwards_enable_gliner_only_and_enable_jev_when_set(monkeypatch):
+    _patch_store_and_resolver(monkeypatch)
+    seen = []
+
+    async def fake_run_call(
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
+    ):
+        seen.append((enable_gliner_only, enable_jev))
+
+    monkeypatch.setattr(batch_runner.pipeline_core, "run_call", fake_run_call)
+
+    calls = {1: {}}
+    await batch_runner.run_batch(
+        list(calls),
+        db_path="ignored.sqlite3",
+        calls=calls,
+        warm_up=False,
+        enable_gliner_only=True,
+        enable_jev=False,
+    )
+
+    assert seen == [(True, False)]
+
+
+@pytest.mark.asyncio
+async def test_run_batch_constructs_one_shared_gliner_only_resolver(monkeypatch):
+    # GlinerOnlyResolver is cheap and holds no external connection, so it's always constructed --
+    # unconditionally, once, and shared across every call, the same way the store is.
+    _patch_store_and_resolver(monkeypatch)
+    instances = []
+
+    def make_gliner_only_resolver():
+        instance = object()
+        instances.append(instance)
+        return instance
+
+    monkeypatch.setattr(batch_runner, "GlinerOnlyResolver", make_gliner_only_resolver)
+
+    seen_resolvers = []
+
+    async def fake_run_call(
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
+    ):
+        seen_resolvers.append(gliner_only_resolver)
+
+    monkeypatch.setattr(batch_runner.pipeline_core, "run_call", fake_run_call)
+
+    calls = {1: {}, 2: {}, 3: {}}
+    await batch_runner.run_batch(list(calls), db_path="ignored.sqlite3", calls=calls, warm_up=False)
+
+    assert len(instances) == 1
+    assert seen_resolvers == [instances[0]] * 3
+
+
+@pytest.mark.asyncio
+async def test_run_batch_never_constructs_jev_field_resolver_when_disabled(monkeypatch):
+    # JevFieldResolver's constructor eagerly validates TYPESAFE_API_KEY and raises if it's unset,
+    # so enable_jev=False must mean it's never constructed at all -- a genuinely jev-free run
+    # depends on that. This deliberately does NOT use `_patch_store_and_resolver`'s JevFieldResolver
+    # monkeypatch, since that patch substitutes a working fake unconditionally and so can't tell
+    # construction-when-disabled apart from no construction. Instead, JevFieldResolver is patched to
+    # explode if constructed at all, which only proves non-construction if the patched constructor
+    # is genuinely never called.
+    store_instances: list[FakeStore] = []
+
+    def make_store(db_path):
+        store = FakeStore(db_path)
+        store_instances.append(store)
+        return store
+
+    monkeypatch.setattr(batch_runner.db_module, "CaptureStore", make_store)
+
+    def exploding_jev_field_resolver():
+        raise AssertionError("JevFieldResolver must not be constructed when enable_jev=False")
+
+    monkeypatch.setattr(batch_runner, "JevFieldResolver", exploding_jev_field_resolver)
+    monkeypatch.setattr(batch_runner, "GlinerOnlyResolver", lambda: object())
+
+    seen_resolvers = []
+
+    async def fake_run_call(
+        call_id,
+        store,
+        *,
+        pacer_mode,
+        calls,
+        resolver,
+        gliner_only_resolver,
+        gliner_semaphore,
+        enable_llm_baseline,
+        enable_gliner_only,
+        enable_jev,
+    ):
+        seen_resolvers.append(resolver)
+
+    monkeypatch.setattr(batch_runner.pipeline_core, "run_call", fake_run_call)
+
+    calls = {1: {}}
+    result = await batch_runner.run_batch(
+        list(calls),
+        db_path="ignored.sqlite3",
+        calls=calls,
+        warm_up=False,
+        enable_gliner_only=True,
+        enable_jev=False,
+    )
+
+    # resolver=None was forwarded to run_call -- no JevFieldResolver instance exists anywhere.
+    assert seen_resolvers == [None]
+    assert set(result.succeeded) == {1}
+    assert store_instances[0].closed is True
