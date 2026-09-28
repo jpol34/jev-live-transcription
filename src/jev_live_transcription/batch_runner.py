@@ -15,9 +15,10 @@ call would never experience it -- so it silently inflates the exact number this 
 to measure. Raising `call_concurrency` is a throughput/correctness trade a caller can make
 deliberately (e.g. a quick smoke run across the whole corpus to check for crashes, not to read its
 latency numbers), never the right choice for collecting real benchmark data. `gliner_concurrency`
-has no such tradeoff -- the model call is fully serialized by a lock regardless of its value (see
-`config.GLINER_CONCURRENCY`), so raising it only adds more concurrent waiters for that same lock,
-never real parallelism. `run_batch` warns, but does not clamp, if it's passed a value other than
+behaves differently: `GlinerBatchEngine` (`gliner_pipeline.py`) batches concurrent GLiNER calls
+into one real batched forward pass rather than serializing them, so raising it can yield genuine
+throughput -- though `config.GLINER_CONCURRENCY`'s own default is still conservative pending real
+batched measurement. `run_batch` warns, but does not clamp, if it's passed a value other than
 `config.GLINER_CONCURRENCY`.
 """
 
@@ -142,10 +143,10 @@ async def run_batch(
         raise ValueError(f"gliner_concurrency must be >= 1, got {gliner_concurrency!r}")
     if gliner_concurrency > config.GLINER_CONCURRENCY:
         _LOGGER.warning(
-            "gliner_concurrency=%d is above the empirically-recommended config.GLINER_CONCURRENCY"
-            "=%d -- the model call is fully serialized by a lock regardless of this value, so real "
-            "measurement found anything above the recommended value only adds queueing delay, no "
-            "throughput gain (see config.GLINER_CONCURRENCY's comment). Proceeding anyway.",
+            "gliner_concurrency=%d is above config.GLINER_CONCURRENCY=%d. GlinerBatchEngine "
+            "batches concurrent GLiNER calls into one real forward pass, so this may now yield "
+            "genuine throughput -- but config.GLINER_CONCURRENCY's own default hasn't yet been "
+            "re-tuned for it. Proceeding anyway.",
             gliner_concurrency,
             config.GLINER_CONCURRENCY,
         )

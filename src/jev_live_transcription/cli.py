@@ -78,10 +78,11 @@ def _build_parser() -> argparse.ArgumentParser:
         type=int,
         default=1,
         help=(
-            "Max concurrent GLiNER inferences across all calls (default: 1). The model call is "
-            f"fully serialized by a lock (see config.GLINER_CONCURRENCY, currently "
-            f"{config.GLINER_CONCURRENCY}), so raising this only adds queueing delay -- not a "
-            "neutral throughput tradeoff like --call-concurrency."
+            "Max concurrent GLiNER inferences across all calls (default: 1). GlinerBatchEngine "
+            f"batches concurrent calls into one real forward pass (see config.GLINER_CONCURRENCY, "
+            f"currently {config.GLINER_CONCURRENCY}), so raising this can yield genuine throughput "
+            "rather than pure queueing delay -- though the configured default hasn't yet been "
+            "re-tuned for it."
         ),
     )
     batch_parser.add_argument(

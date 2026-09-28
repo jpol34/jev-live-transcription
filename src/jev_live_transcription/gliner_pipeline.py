@@ -8,15 +8,16 @@ entry point the jev resolver stage consumes.
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import threading
 import time
 
+import httpx
 import torch
 from gliner import GLiNER
 
 from . import config
+from .gliner_batch_engine import GlinerBatchEngine, get_or_create_engine
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ ZERO_SHOT_FIELD_LABELS: dict[str, str] = {
 
 # Identity mapping: since `ZERO_SHOT_FIELD_LABELS` is passed to GLiNER as a label-description dict,
 # `entity["label"]` already comes back as the field name itself. Kept as an explicit dict, rather
-# than skipping the lookup entirely, so `_entities_to_candidates` has one shape regardless of how
+# than skipping the lookup entirely, so `_postprocess_entities` has one shape regardless of how
 # its `label_to_field` argument was built.
 _ZERO_SHOT_LABEL_TO_FIELD = {field: field for field in ZERO_SHOT_FIELD_LABELS}
 
@@ -52,12 +53,9 @@ _ZERO_SHOT_LABEL_TO_FIELD = {field: field for field in ZERO_SHOT_FIELD_LABELS}
 _zero_shot_model: GLiNER | None = None
 _singleton_load_lock = threading.Lock()
 
-# Guards `model.predict_entities(...)` below. GLiNER's stateless inference has no internal lock of
-# its own -- only `torch.no_grad()`, no serialization -- so without this, concurrent ticks for
-# different calls (once call_concurrency/gliner_concurrency are ever raised above their current
-# default of 1) would race on the shared `_zero_shot_model` singleton with nothing guarding it on
-# either side.
-_zero_shot_inference_lock = threading.Lock()
+# Shared httpx client for GLINER_SERVING_MODE="http", lazily created on first use so importing
+# this module never requires a running event loop.
+_http_client: httpx.AsyncClient | None = None
 
 
 def _resolve_device() -> str:
@@ -85,21 +83,31 @@ def _get_zero_shot_model() -> GLiNER:
     return _zero_shot_model
 
 
-def _entities_to_candidates(
-    entities: list[dict], label_to_field: dict[str, str]
+def _postprocess_entities(
+    entities: list[dict], window_start: int, label_to_field: dict[str, str]
 ) -> dict[str, list[dict]]:
-    """Group raw GLiNER entity dicts into `{field: [candidate, ...]}` buckets."""
+    """Group raw GLiNER entity dicts into `{field: [candidate, ...]}` buckets and translate their
+    spans (reported relative to the windowed slice actually fed to the model) back to
+    full-snapshot character offsets, since every downstream consumer (jev's context window) indexes
+    into the full snapshot, not the windowed slice.
+
+    Shared by both `GLINER_SERVING_MODE` paths (inline batch engine, HTTP service) -- neither the
+    engine's `submit()` nor the serving app's `/extract` response does this translation itself,
+    since it depends on `window_start`, a caller-side concept.
+    """
     candidates: dict[str, list[dict]] = {field: [] for field in label_to_field.values()}
     for entity in entities:
         field = label_to_field.get(entity.get("label"))
         if field is None:
             continue
+        start = entity.get("start")
+        end = entity.get("end")
         candidates[field].append(
             {
                 "text": entity.get("text"),
                 "score": entity.get("score"),
-                "start": entity.get("start"),
-                "end": entity.get("end"),
+                "start": start + window_start if start is not None else None,
+                "end": end + window_start if end is not None else None,
             }
         )
     return candidates
@@ -126,31 +134,45 @@ def _zero_shot_window(transcript_snapshot: str) -> tuple[str, int]:
     return transcript_snapshot[window_start:], window_start
 
 
-def _run_zero_shot_tick(transcript_snapshot: str) -> dict[str, list[dict]]:
-    """Re-encode a bounded trailing window of `transcript_snapshot` against all 11 field labels,
-    instead of the full growing transcript, so latency stays flat regardless of call length.
-    Candidate spans are translated back to full-snapshot character offsets before being returned,
-    since every downstream consumer (jev's context window) indexes into the full snapshot, not the
-    windowed slice actually fed to the model.
+def _make_batch_engine() -> GlinerBatchEngine:
+    return GlinerBatchEngine(
+        _get_zero_shot_model(),
+        ZERO_SHOT_FIELD_LABELS,
+        max_batch_size=config.GLINER_BATCH_MAX_SIZE,
+        batch_wait_timeout_ms=config.GLINER_BATCH_WAIT_TIMEOUT_MS,
+        threshold=config.GLINER_ZERO_SHOT_THRESHOLD,
+        multi_label=True,
+    )
+
+
+async def _get_batch_engine() -> GlinerBatchEngine:
+    """Return the batch engine bound to the current event loop, creating one if needed.
+
+    Loop-keyed rather than a bare module-level singleton: the vendor engine this design is modeled
+    on (`AsyncStreamingEngine`) raises if reused across event loops, and this repo's own test suite
+    calls `asyncio.run(...)` once per test function -- a fresh loop every time -- so a bare
+    singleton would break the second test that touched it.
     """
-    model = _get_zero_shot_model()
-    window_text, window_start = _zero_shot_window(transcript_snapshot)
-    with _zero_shot_inference_lock:
-        entities = model.predict_entities(
-            window_text,
-            ZERO_SHOT_FIELD_LABELS,
-            multi_label=True,
-            threshold=config.GLINER_ZERO_SHOT_THRESHOLD,
-        )
-    candidates = _entities_to_candidates(entities, _ZERO_SHOT_LABEL_TO_FIELD)
-    if window_start:
-        for spans in candidates.values():
-            for span in spans:
-                if span["start"] is not None:
-                    span["start"] += window_start
-                if span["end"] is not None:
-                    span["end"] += window_start
-    return candidates
+    return await get_or_create_engine(_make_batch_engine)
+
+
+def _get_http_client() -> httpx.AsyncClient:
+    global _http_client
+    if _http_client is None:
+        _http_client = httpx.AsyncClient(base_url=config.GLINER_SERVICE_URL, timeout=5.0)
+    return _http_client
+
+
+async def _infer_entities(window_text: str) -> list[dict]:
+    """Return raw GLiNER entity dicts (offsets relative to `window_text`) for one windowed tick,
+    dispatched via whichever `config.GLINER_SERVING_MODE` is selected.
+    """
+    if config.GLINER_SERVING_MODE == "http":
+        response = await _get_http_client().post("/extract", json={"text": window_text})
+        response.raise_for_status()
+        return response.json()["entities"]
+    engine = await _get_batch_engine()
+    return await engine.submit(window_text)
 
 
 async def extract_candidates_timed(
@@ -164,9 +186,12 @@ async def extract_candidates_timed(
     identity through every stage of the pipeline without a signature that varies by which
     extraction strategy is in use.
     """
+    window_text, window_start = _zero_shot_window(transcript_snapshot)
     start = time.monotonic()
-    candidates = await asyncio.to_thread(_run_zero_shot_tick, transcript_snapshot)
-    return candidates, (time.monotonic() - start) * 1000
+    entities = await _infer_entities(window_text)
+    latency_ms = (time.monotonic() - start) * 1000
+    candidates = _postprocess_entities(entities, window_start, _ZERO_SHOT_LABEL_TO_FIELD)
+    return candidates, latency_ms
 
 
 async def extract_candidates(transcript_snapshot: str, call_id: str) -> dict[str, list[dict]]:

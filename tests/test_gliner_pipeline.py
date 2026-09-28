@@ -1,19 +1,26 @@
 import asyncio
+import threading
 import time
 
 from jev_live_transcription import config, gliner_pipeline
 
 
 class FakeZeroShotModel:
-    """Stand-in for the GLiNER checkpoint's `.predict_entities()` surface."""
+    """Stand-in for the GLiNER checkpoint's `.inference()` surface -- the batched, order-preserving
+    method `GlinerBatchEngine` calls (the same method `predict_entities` itself delegates to for a
+    single text). `responses` is a flat queue of per-text entity lists, popped one per text in
+    `texts`, in order -- a single-text call pops exactly one, a batched call of N texts pops N.
+    """
 
     def __init__(self, responses):
         self.calls = []
         self._responses = list(responses)
 
-    def predict_entities(self, text, labels, multi_label=False, threshold=None):
-        self.calls.append({"text": text, "labels": labels, "multi_label": multi_label, "threshold": threshold})
-        return self._responses.pop(0)
+    def inference(self, texts, labels, batch_size=None, multi_label=False, threshold=None):
+        self.calls.append(
+            {"texts": list(texts), "labels": labels, "multi_label": multi_label, "threshold": threshold}
+        )
+        return [self._responses.pop(0) for _ in texts]
 
 
 def _install_fake(monkeypatch, responses=()):
@@ -55,11 +62,14 @@ def test_extract_candidates_returns_candidates_for_multiple_fields(monkeypatch):
 
 
 def test_extract_candidates_timed_returns_latency(monkeypatch):
-    def slow_tick(transcript_snapshot):
-        time.sleep(0.05)
-        return {field: [] for field in gliner_pipeline.ZERO_SHOT_FIELD_LABELS}
+    class SlowModel(FakeZeroShotModel):
+        def inference(self, texts, labels, batch_size=None, multi_label=False, threshold=None):
+            time.sleep(0.05)
+            return super().inference(
+                texts, labels, batch_size=batch_size, multi_label=multi_label, threshold=threshold
+            )
 
-    monkeypatch.setattr(gliner_pipeline, "_run_zero_shot_tick", slow_tick)
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", SlowModel([[]]))
 
     candidates, latency_ms = asyncio.run(
         gliner_pipeline.extract_candidates_timed("some text", "call-timed")
@@ -89,7 +99,7 @@ def test_zero_shot_model_receives_only_the_trailing_window(monkeypatch):
 
     asyncio.run(gliner_pipeline.extract_candidates(long_snapshot, "call-window"))
 
-    sent_text = model.calls[0]["text"]
+    sent_text = model.calls[0]["texts"][0]
     assert len(sent_text) == config.GLINER_ZERO_SHOT_WINDOW_CHARS
     assert sent_text == long_snapshot[-config.GLINER_ZERO_SHOT_WINDOW_CHARS :]
 
@@ -108,7 +118,7 @@ def test_zero_shot_input_length_stays_capped_as_transcript_grows(monkeypatch):
         asyncio.run(gliner_pipeline.extract_candidates(last_snapshot, call_id))
     gliner_pipeline.reset_call(call_id)
 
-    sent_lengths = [len(call["text"]) for call in model.calls]
+    sent_lengths = [len(call["texts"][0]) for call in model.calls]
     assert all(length <= config.GLINER_ZERO_SHOT_WINDOW_CHARS for length in sent_lengths)
     # The final, largest snapshot's window is close to the configured cap (word-boundary snapping
     # can shrink it slightly, never grow it) and far smaller than the full snapshot it was cut
@@ -174,20 +184,107 @@ def test_model_receives_configured_threshold_and_label_descriptions(monkeypatch)
     assert call["labels"] == gliner_pipeline.ZERO_SHOT_FIELD_LABELS
 
 
-def test_inference_lock_is_held_during_the_model_call(monkeypatch):
-    lock_states = []
+def test_concurrent_ticks_share_one_batched_inference_call(monkeypatch):
+    # The whole point of GlinerBatchEngine: concurrent ticks for different calls should land in one
+    # real batched model.inference() call, not be serialized into separate single-text calls.
+    model = _install_fake(
+        monkeypatch,
+        responses=[
+            [{"start": 0, "end": 4, "text": "Jane", "label": "caller_name", "score": 0.9}],
+            [{"start": 0, "end": 8, "text": "unit 204", "label": "unit_number", "score": 0.8}],
+        ],
+    )
 
-    class LockCheckingModel(FakeZeroShotModel):
-        def predict_entities(self, text, labels, multi_label=False, threshold=None):
-            lock_states.append(gliner_pipeline._zero_shot_inference_lock.locked())
-            return super().predict_entities(text, labels, multi_label=multi_label, threshold=threshold)
+    async def run_two_concurrently():
+        return await asyncio.gather(
+            gliner_pipeline.extract_candidates("Jane called", "call-a"),
+            gliner_pipeline.extract_candidates("unit 204 leaking", "call-b"),
+        )
 
-    model = LockCheckingModel([[]])
-    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", model)
+    result_a, result_b = asyncio.run(run_two_concurrently())
 
-    asyncio.run(gliner_pipeline.extract_candidates("some text", "call-lock"))
+    assert len(model.calls) == 1
+    assert len(model.calls[0]["texts"]) == 2
+    assert result_a["caller_name"][0]["text"] == "Jane"
+    assert result_b["unit_number"][0]["text"] == "unit 204"
 
-    assert lock_states == [True]
+
+def test_worker_never_runs_two_inference_calls_concurrently(monkeypatch):
+    # GLiNER's stateless inference has no internal lock of its own, so the property that must hold
+    # is that GlinerBatchEngine's single-worker executor never lets two separate batch dispatches
+    # run at the same time, even when they land in separate batches rather than being merged into
+    # one.
+    active_lock = threading.Lock()
+    active = {"count": 0, "max_seen": 0}
+
+    class ConcurrencyCheckingModel(FakeZeroShotModel):
+        def inference(self, texts, labels, batch_size=None, multi_label=False, threshold=None):
+            with active_lock:
+                active["count"] += 1
+                active["max_seen"] = max(active["max_seen"], active["count"])
+            time.sleep(0.02)
+            result = super().inference(
+                texts, labels, batch_size=batch_size, multi_label=multi_label, threshold=threshold
+            )
+            with active_lock:
+                active["count"] -= 1
+            return result
+
+    monkeypatch.setattr(config, "GLINER_BATCH_WAIT_TIMEOUT_MS", 0)
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", ConcurrencyCheckingModel([[], []]))
+
+    async def run_sequence():
+        first = asyncio.create_task(gliner_pipeline.extract_candidates("first call text", "call-1"))
+        # Give the worker time to pick up and dispatch the first request to its executor thread
+        # before the second one is even submitted, forcing two separate batches.
+        await asyncio.sleep(0.005)
+        second = asyncio.create_task(gliner_pipeline.extract_candidates("second call text", "call-2"))
+        await asyncio.gather(first, second)
+
+    asyncio.run(run_sequence())
+
+    assert active["max_seen"] == 1
+
+
+def test_batch_engine_gets_a_fresh_instance_per_event_loop(monkeypatch):
+    # GlinerBatchEngine (like the vendor AsyncStreamingEngine it's modeled on) raises if reused
+    # across event loops. A bare module-level singleton would break the moment a second loop
+    # touched it -- exactly what happens here, since each asyncio.run() call is its own fresh loop.
+    _install_fake(monkeypatch, responses=[[], []])
+    engine_ids = []
+
+    async def grab_engine_id():
+        engine = await gliner_pipeline._get_batch_engine()
+        engine_ids.append(id(engine))
+
+    asyncio.run(grab_engine_id())
+    asyncio.run(grab_engine_id())
+
+    assert len(engine_ids) == 2
+    assert engine_ids[0] != engine_ids[1]
+
+
+def test_batch_dispatch_failure_rejects_every_request_in_the_batch(monkeypatch):
+    # model.inference() has no per-item exception isolation, so a batch-wide failure must fail
+    # every request sharing that batch with the same exception, not hang or silently drop some.
+    class FailingModel(FakeZeroShotModel):
+        def inference(self, texts, labels, batch_size=None, multi_label=False, threshold=None):
+            raise RuntimeError("boom")
+
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", FailingModel([]))
+
+    async def run_and_collect_errors():
+        results = await asyncio.gather(
+            gliner_pipeline.extract_candidates("first", "call-1"),
+            gliner_pipeline.extract_candidates("second", "call-2"),
+            return_exceptions=True,
+        )
+        return results
+
+    results = asyncio.run(run_and_collect_errors())
+
+    assert len(results) == 2
+    assert all(isinstance(result, RuntimeError) for result in results)
 
 
 def test_reset_call_is_a_safe_no_op():

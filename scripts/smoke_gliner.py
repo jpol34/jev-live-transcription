@@ -5,7 +5,6 @@ per-field candidates alongside ground truth for human review.
 
 import asyncio
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
@@ -38,30 +37,18 @@ async def _run_call(call_id: int, call: dict) -> None:
             continue
         print(f"  {field}: {value!r}")
 
-    # Wrap the zero-shot tick to capture its per-tick latency for display below -- it re-encodes
-    # only a bounded trailing window of the transcript (config.GLINER_ZERO_SHOT_WINDOW_CHARS), so
-    # this is the number to watch for confirming that latency stays flat as the call gets longer.
-    original_zero_shot_tick = gliner_pipeline._run_zero_shot_tick
-    zero_shot_latency_s = 0.0
-
-    def _timed_zero_shot_tick(transcript_snapshot: str) -> dict:
-        nonlocal zero_shot_latency_s
-        start = time.perf_counter()
-        result = original_zero_shot_tick(transcript_snapshot)
-        zero_shot_latency_s = time.perf_counter() - start
-        return result
-
-    gliner_pipeline._run_zero_shot_tick = _timed_zero_shot_tick
+    # `extract_candidates_timed` reports its own latency directly -- it re-encodes only a bounded
+    # trailing window of the transcript (config.GLINER_ZERO_SHOT_WINDOW_CHARS), so this is the
+    # number to watch for confirming that latency stays flat as the call gets longer.
     try:
         tick_ends = range(TICK_TURN_STRIDE, len(turns) + TICK_TURN_STRIDE, TICK_TURN_STRIDE)
         for tick, end in enumerate(tick_ends, start=1):
             snapshot = corpus.render_turns(turns[:end])
-            candidates = await gliner_pipeline.extract_candidates(snapshot, call_id=session_id)
-            shown_turns = min(end, len(turns))
-            print(
-                f"\n--- tick {tick} (turns 1-{shown_turns}, "
-                f"zero-shot latency {zero_shot_latency_s * 1000:.0f}ms) ---"
+            candidates, latency_ms = await gliner_pipeline.extract_candidates_timed(
+                snapshot, call_id=session_id
             )
+            shown_turns = min(end, len(turns))
+            print(f"\n--- tick {tick} (turns 1-{shown_turns}, zero-shot latency {latency_ms:.0f}ms) ---")
             any_candidates = False
             for field, spans in candidates.items():
                 if not spans:
@@ -72,7 +59,6 @@ async def _run_call(call_id: int, call: dict) -> None:
             if not any_candidates:
                 print("  (no candidates yet)")
     finally:
-        gliner_pipeline._run_zero_shot_tick = original_zero_shot_tick
         gliner_pipeline.reset_call(session_id)
 
 
