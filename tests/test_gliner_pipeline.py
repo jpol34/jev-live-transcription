@@ -40,6 +40,18 @@ def test_extract_candidates_covers_all_eleven_fields(monkeypatch):
     assert all(spans == [] for spans in result.values())
 
 
+def test_field_taxonomy_covers_every_zero_shot_field_exactly_once():
+    labeled_fields = set(gliner_pipeline.ZERO_SHOT_FIELD_LABELS)
+    taxonomy_fields = list(gliner_pipeline.FIELD_TAXONOMY)
+
+    assert set(taxonomy_fields) == labeled_fields
+    assert len(taxonomy_fields) == len(set(taxonomy_fields))  # no duplicate entries
+    assert all(
+        value in ("span", "list_span", "determination", "multi_fact")
+        for value in gliner_pipeline.FIELD_TAXONOMY.values()
+    )
+
+
 def test_extract_candidates_returns_candidates_for_multiple_fields(monkeypatch):
     snapshot = "Jane called about unit 204"
     model = _install_fake(
