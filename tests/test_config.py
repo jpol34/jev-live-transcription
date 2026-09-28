@@ -6,8 +6,8 @@ def test_call_concurrency_derived_from_ram():
     assert config.CALL_CONCURRENCY == 3
 
 
-def test_gliner_concurrency_independent_of_call_concurrency():
-    assert config.GLINER_CONCURRENCY == 1
+def test_gliner_concurrency_matches_batch_engine_capacity():
+    assert config.GLINER_CONCURRENCY == config.GLINER_BATCH_MAX_SIZE
 
 
 def test_pricing_table_has_both_models():

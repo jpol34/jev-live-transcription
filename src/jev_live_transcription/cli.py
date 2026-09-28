@@ -81,8 +81,8 @@ def _build_parser() -> argparse.ArgumentParser:
             "Max concurrent GLiNER inferences across all calls (default: 1). GlinerBatchEngine "
             f"batches concurrent calls into one real forward pass (see config.GLINER_CONCURRENCY, "
             f"currently {config.GLINER_CONCURRENCY}), so raising this can yield genuine throughput "
-            "rather than pure queueing delay -- though the configured default hasn't yet been "
-            "re-tuned for it."
+            "rather than pure queueing delay -- but only alongside --call-concurrency above 1, "
+            "since a single sequential call never has concurrent GLiNER ticks to batch."
         ),
     )
     batch_parser.add_argument(

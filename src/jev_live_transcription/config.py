@@ -48,13 +48,6 @@ GLINER_ZERO_SHOT_THRESHOLD = 0.30
 RAM_GB = 16
 CALL_CONCURRENCY = (RAM_GB - 4) // 4  # 3
 
-# GLiNER concurrency is tuned independently of call concurrency since the model runs locally
-# rather than per-call against a remote API. GlinerBatchEngine batches concurrent ticks into one
-# shared model.inference() call instead of serializing them, so raising this value can yield a real
-# throughput benefit rather than pure queueing overhead. Placeholder until re-tuned from real
-# batched measurement.
-GLINER_CONCURRENCY = 1
-
 # Serving mode for gliner_pipeline's extraction path: "inline" wraps the local model singleton
 # directly in this process (no network hop, but still gets real batching for ticks that land
 # concurrently within one process); "http" posts to GLINER_SERVICE_URL instead, for when a
@@ -68,6 +61,13 @@ GLINER_SERVICE_URL = "http://localhost:8000"
 # than guessing.
 GLINER_BATCH_MAX_SIZE = 16
 GLINER_BATCH_WAIT_TIMEOUT_MS = 20.0
+
+# Bounds how many ticks may be concurrently in flight toward GlinerBatchEngine at once. Set equal
+# to GLINER_BATCH_MAX_SIZE rather than independently: below that, this semaphore -- not the
+# engine's own batching capacity -- would be the thing capping how large a real batch can ever get,
+# which would silently waste headroom the engine is otherwise willing to use. Placeholder until
+# re-tuned from real batched measurement, same as the batch engine constants above.
+GLINER_CONCURRENCY = GLINER_BATCH_MAX_SIZE
 
 # Rough cost-per-million-token estimates, USD. These are NOT authoritative —
 # GPT-5.1 pricing is from public list pricing and may drift, and the jev

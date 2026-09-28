@@ -1,5 +1,6 @@
 """Mocked tests for pipeline_core -- no real GLiNER/jev/OpenAI calls (kept fast/offline)."""
 
+import asyncio
 import concurrent.futures
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
@@ -707,3 +708,54 @@ async def test_run_call_gliner_failure_is_captured_as_error_row_not_raised(monke
     assert errored[0]["pipeline"] == "gliner_jev"
     assert "boom" in errored[0]["error"]
     fake_resolver.resolve_field.assert_not_called()
+
+
+# --- _run_gliner_jev_step: gliner_semaphore + GlinerBatchEngine interaction ----------------------
+
+
+class _FakeGlinerModel:
+    """Stand-in for the GLiNER checkpoint's `.inference()` surface -- records every call's texts so
+    a test can tell whether concurrent ticks landed in one shared batch or were serialized.
+    """
+
+    def __init__(self):
+        self.calls: list[list[str]] = []
+
+    def inference(self, texts, labels, batch_size=None, multi_label=False, threshold=None):
+        self.calls.append(list(texts))
+        return [[] for _ in texts]  # no entities -- exercises the real _postprocess_entities path
+
+
+@pytest.mark.asyncio
+async def test_concurrent_gliner_ticks_share_one_batched_inference_call_through_the_real_seam(
+    monkeypatch,
+):
+    """Exercises the exact seam a semaphore sized too low would silently defeat: two ticks for two
+    different calls, gated by pipeline_core's own gliner_semaphore, going through the real
+    gliner_pipeline/GlinerBatchEngine stack (only the checkpoint itself is faked) -- not
+    `gliner_pipeline.extract_candidates_timed` mocked away, unlike this file's other tests.
+    """
+    from jev_live_transcription import config, gliner_pipeline
+
+    fake_model = _FakeGlinerModel()
+    monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", fake_model)
+
+    store = FakeStore()
+    gliner_semaphore = asyncio.Semaphore(config.GLINER_CONCURRENCY)
+
+    async def run_one(call_id: int, pipeline_call_id: str) -> None:
+        await pipeline_core._run_gliner_jev_step(
+            store,
+            call_id=call_id,
+            pipeline_call_id=pipeline_call_id,
+            tick_id=call_id,
+            tick_number=1,
+            snapshot="transcript text with nothing GLiNER will match",
+            resolver=Mock(),
+            committed={},
+            gliner_semaphore=gliner_semaphore,
+        )
+
+    await asyncio.gather(run_one(1, "call-a"), run_one(2, "call-b"))
+
+    assert any(len(batch_texts) == 2 for batch_texts in fake_model.calls), fake_model.calls

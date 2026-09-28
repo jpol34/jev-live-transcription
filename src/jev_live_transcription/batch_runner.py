@@ -5,9 +5,9 @@ shared across every call rather than one per call, per `run_call`'s reuse-or-own
 closes both once every call has finished, regardless of individual failures.
 
 Two independent semaphores bound how many calls, and how many of those calls' GLiNER inferences,
-may run at once: `call_concurrency` and `gliner_concurrency`. Both default to `1` -- fully
-sequential, one call fully processed before the next starts -- because this benchmark's actual
-purpose is measuring how fast the pipeline extracts fields from *one* live call, and any
+may run at once: `call_concurrency` and `gliner_concurrency`. `call_concurrency` defaults to `1`
+-- fully sequential, one call fully processed before the next starts -- because this benchmark's
+actual purpose is measuring how fast the pipeline extracts fields from *one* live call, and any
 concurrency above 1 makes calls contend for the same GLiNER model, which is a single shared
 resource regardless of which device it runs on. That contention shows up as queueing delay inside
 `pipeline_runs.latency_ms` indistinguishably from real inference time, even though a real live
@@ -15,10 +15,13 @@ call would never experience it -- so it silently inflates the exact number this 
 to measure. Raising `call_concurrency` is a throughput/correctness trade a caller can make
 deliberately (e.g. a quick smoke run across the whole corpus to check for crashes, not to read its
 latency numbers), never the right choice for collecting real benchmark data. `gliner_concurrency`
-behaves differently: `GlinerBatchEngine` (`gliner_pipeline.py`) batches concurrent GLiNER calls
-into one real batched forward pass rather than serializing them, so raising it can yield genuine
-throughput -- though `config.GLINER_CONCURRENCY`'s own default is still conservative pending real
-batched measurement. `run_batch` warns, but does not clamp, if it's passed a value other than
+behaves differently and defaults to `config.GLINER_CONCURRENCY` (sized to match
+`GlinerBatchEngine`'s own batching capacity, not `1`): `GlinerBatchEngine` batches concurrent
+GLiNER calls into one real batched forward pass rather than serializing them, so raising it can
+yield genuine throughput instead of the pure queueing delay `call_concurrency` above always adds --
+though with `call_concurrency` at its own default of `1`, only one call's ticks are ever in flight
+at a time regardless of `gliner_concurrency`, so this only matters once `call_concurrency` is
+raised too. `run_batch` warns, but does not clamp, if it's passed a value other than
 `config.GLINER_CONCURRENCY`.
 """
 
@@ -143,10 +146,9 @@ async def run_batch(
         raise ValueError(f"gliner_concurrency must be >= 1, got {gliner_concurrency!r}")
     if gliner_concurrency > config.GLINER_CONCURRENCY:
         _LOGGER.warning(
-            "gliner_concurrency=%d is above config.GLINER_CONCURRENCY=%d. GlinerBatchEngine "
-            "batches concurrent GLiNER calls into one real forward pass, so this may now yield "
-            "genuine throughput -- but config.GLINER_CONCURRENCY's own default hasn't yet been "
-            "re-tuned for it. Proceeding anyway.",
+            "gliner_concurrency=%d is above config.GLINER_CONCURRENCY=%d, which is sized to match "
+            "GlinerBatchEngine's own batching capacity -- going higher just means more ticks queue "
+            "for the next batch rather than any one batch growing further. Proceeding anyway.",
             gliner_concurrency,
             config.GLINER_CONCURRENCY,
         )
