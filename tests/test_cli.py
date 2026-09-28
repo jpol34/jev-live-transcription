@@ -190,3 +190,44 @@ def test_tui_forwards_enable_llm_baseline_when_passed(monkeypatch):
     cli.main(["tui", "42", "--enable-llm-baseline"])
 
     tui_run_mock.assert_called_once_with(42, db_path=None, enable_llm_baseline=True)
+
+
+def test_serve_runs_uvicorn_against_the_serving_app(monkeypatch):
+    import sys
+
+    from jev_live_transcription.serving import app as real_serving_app
+
+    uvicorn_run_mock = Mock()
+    monkeypatch.setitem(sys.modules, "uvicorn", Mock(run=uvicorn_run_mock))
+
+    exit_code = cli.main(["serve", "--host", "127.0.0.1", "--port", "9000"])
+
+    assert exit_code == 0
+    uvicorn_run_mock.assert_called_once_with(real_serving_app.app, host="127.0.0.1", port=9000)
+
+
+def test_serve_defaults_host_and_port(monkeypatch):
+    import sys
+
+    uvicorn_run_mock = Mock()
+    monkeypatch.setitem(sys.modules, "uvicorn", Mock(run=uvicorn_run_mock))
+
+    cli.main(["serve"])
+
+    _, kwargs = uvicorn_run_mock.call_args
+    assert kwargs["host"] == "0.0.0.0"
+    assert kwargs["port"] == 8000
+
+
+def test_serve_applies_batch_tuning_overrides_before_starting(monkeypatch):
+    import sys
+
+    uvicorn_run_mock = Mock()
+    monkeypatch.setitem(sys.modules, "uvicorn", Mock(run=uvicorn_run_mock))
+    monkeypatch.setattr(cli.config, "GLINER_BATCH_MAX_SIZE", 16)
+    monkeypatch.setattr(cli.config, "GLINER_BATCH_WAIT_TIMEOUT_MS", 20.0)
+
+    cli.main(["serve", "--max-batch-size", "32", "--batch-wait-timeout-ms", "5"])
+
+    assert cli.config.GLINER_BATCH_MAX_SIZE == 32
+    assert cli.config.GLINER_BATCH_WAIT_TIMEOUT_MS == 5.0
