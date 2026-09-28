@@ -1,5 +1,7 @@
 """Shared constants for the benchmark harness."""
 
+from typing import Literal
+
 # Device the GLiNER checkpoint loads onto: "auto" (resolved to "cuda" if available, else "cpu" --
 # see gliner_pipeline._resolve_device), or an explicit "cpu"/"cuda" override.
 GLINER_DEVICE = "auto"
@@ -47,14 +49,25 @@ RAM_GB = 16
 CALL_CONCURRENCY = (RAM_GB - 4) // 4  # 3
 
 # GLiNER concurrency is tuned independently of call concurrency since the model runs locally
-# rather than per-call against a remote API. `gliner_pipeline._zero_shot_inference_lock` fully
-# serializes every model call regardless of this value, so raising it only adds more concurrent
-# waiters for that one lock -- real measurement confirms this is pure queueing overhead, not a
-# throughput win: mean latency rose from 23.2ms (concurrency=1) to 50.5ms (concurrency=4), p95 to
-# 86ms (scripts/measure_gliner_concurrency.py, 20-call subset under genuine cross-call contention).
-# Stays at 1 until the pipeline actually batches concurrent requests into one model call, which
-# would remove the lock's serialization instead of just queueing behind it.
+# rather than per-call against a remote API. GlinerBatchEngine batches concurrent ticks into one
+# shared model.inference() call instead of serializing them, so raising this value can yield a real
+# throughput benefit rather than pure queueing overhead. Placeholder until re-tuned from real
+# batched measurement.
 GLINER_CONCURRENCY = 1
+
+# Serving mode for gliner_pipeline's extraction path: "inline" wraps the local model singleton
+# directly in this process (no network hop, but still gets real batching for ticks that land
+# concurrently within one process); "http" posts to GLINER_SERVICE_URL instead, for when a
+# separate `jlt serve` process does the actual inference. Defaults to "inline" to preserve today's
+# single-process behavior.
+GLINER_SERVING_MODE: Literal["inline", "http"] = "inline"
+GLINER_SERVICE_URL = "http://localhost:8000"
+
+# GlinerBatchEngine tuning. Placeholder defaults -- tune from real A100 pod measurement, matching
+# this project's existing discipline of deciding window size/threshold from measurement rather
+# than guessing.
+GLINER_BATCH_MAX_SIZE = 16
+GLINER_BATCH_WAIT_TIMEOUT_MS = 20.0
 
 # Rough cost-per-million-token estimates, USD. These are NOT authoritative —
 # GPT-5.1 pricing is from public list pricing and may drift, and the jev
