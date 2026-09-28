@@ -164,9 +164,9 @@ async def test_run_load_test_excludes_failed_request_latency_from_percentiles():
 
 async def test_run_load_test_configures_connector_limit_to_match_concurrency(monkeypatch):
     # aiohttp.TCPConnector's default limit (100) would silently bottleneck any --concurrency above
-    # that with client-side connection-pool contention, not server load -- confirmed live: a real
-    # A100 run at concurrency=200 with no explicit connector limit produced a p99 of ~25 seconds
-    # against a clean p95 of ~526ms, a load-tester artifact, not real server behavior.
+    # that with client-side connection-pool contention instead of measuring the server -- each
+    # closed-loop worker holds at most one connection at a time, so the limit must scale with
+    # --concurrency rather than stay at the library default.
     import aiohttp
 
     captured = {}
