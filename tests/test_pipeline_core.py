@@ -768,6 +768,36 @@ async def test_concurrent_gliner_ticks_share_one_batched_inference_call_through_
     assert any(len(batch_texts) == 2 for batch_texts in fake_model.calls), fake_model.calls
 
 
+# --- _gliner_only_candidate_spans: offset rebasing -------------------------------------------
+
+
+def test_gliner_only_candidate_spans_rebases_duplicate_text_to_distinct_occurrences():
+    # Two spans sharing identical text must rebase onto their own distinct occurrence in
+    # `context`, not both collapse onto the first `str.find` match.
+    context = "Caller: it's 555-1111, no wait, it's 555-1111 again."
+    first_start = context.index("555-1111")
+    second_start = context.index("555-1111", first_start + 1)
+    assert first_start != second_start  # sanity: the fixture actually has two occurrences
+
+    field_spans = [
+        {"text": "555-1111", "score": 0.5},
+        {"text": "555-1111", "score": 0.9},
+    ]
+    rebased = pipeline_core._gliner_only_candidate_spans(context, field_spans)
+
+    assert rebased[0]["start"] == first_start
+    assert rebased[1]["start"] == second_start
+    assert rebased[0]["start"] != rebased[1]["start"]
+
+
+def test_gliner_only_candidate_spans_missing_text_stays_unbounded():
+    rebased = pipeline_core._gliner_only_candidate_spans(
+        "Caller: hi.", [{"text": "not present", "score": 0.5}]
+    )
+    assert rebased[0]["start"] is None
+    assert rebased[0]["end"] is None
+
+
 # --- _run_gliner_only_step: row/persist shape ----------------------------------------------
 
 
@@ -872,6 +902,48 @@ async def test_run_gliner_only_step_none_of_these_clears_prior_commit():
     assert len(field_rows) == 1
     assert field_rows[0]["candidate_value"] is None
     assert field_rows[0]["is_committed"] == 0
+
+
+@pytest.mark.asyncio
+async def test_run_gliner_only_step_one_field_error_does_not_discard_another_fields_result():
+    # One field's resolve_field raising must not discard another, already-resolved field's result
+    # for the same tick -- each field's call is isolated, unlike a single shared try/except around
+    # the whole loop.
+    store = FakeStore()
+    candidates = {
+        "caller_name": [{"text": "Tim", "score": 0.9, "start": 0, "end": 3}],
+        "phone_number": [{"text": "555-1111", "score": 0.9, "start": 10, "end": 18}],
+    }
+
+    def resolve_field(pipeline_call_id, field_name, resolver_spans, context):
+        if field_name == "phone_number":
+            raise RuntimeError("boom")
+        return _gliner_only_result(field_name="caller_name", candidate="Tim", confidence=0.9)
+
+    fake_resolver = Mock()
+    fake_resolver.resolve_field = Mock(side_effect=resolve_field)
+
+    await pipeline_core._run_gliner_only_step(
+        store,
+        call_id=1,
+        pipeline_call_id="1",
+        tick_id=1,
+        tick_number=1,
+        snapshot="Agent: hi. Caller: it's Tim, 555-1111.",
+        candidates=candidates,
+        gliner_only_resolver=fake_resolver,
+        committed={},
+    )
+
+    field_rows = [fe for fe in store.field_extractions if fe["pipeline"] == "gliner_only"]
+    assert len(field_rows) == 1
+    assert field_rows[0]["field_name"] == "caller_name"
+    assert field_rows[0]["candidate_value"] == "Tim"
+
+    gliner_only_runs = [run for run in store.pipeline_runs if run["pipeline"] == "gliner_only"]
+    assert len(gliner_only_runs) == 1
+    assert "phone_number" in gliner_only_runs[0]["error"]
+    assert "boom" in gliner_only_runs[0]["error"]
 
 
 # --- run_call: enable_gliner_only / enable_jev gating ---------------------------------------

@@ -36,7 +36,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import config, corpus, gliner_pipeline, llm_baseline
-from .gliner_only_resolver import GlinerOnlyResolver
+from .gliner_only_resolver import GlinerOnlyResolution, GlinerOnlyResolver
 from .jev_pipeline import JevFieldResolver
 from .pacer import CallPacer, iter_batch_ticks, iter_realtime_ticks
 from . import db as db_module
@@ -152,11 +152,26 @@ def _gliner_only_candidate_spans(context: str, field_spans: list[dict]) -> list[
     (`_self_correction_target`'s `context_window.find(display, cue_end)`). A span whose text
     isn't found in `context` keeps `start`/`end` as `None`, which every offset-consuming caller
     inside `gliner_only_resolver` already treats as "position unknown" and skips.
+
+    A per-text search cursor tracks each `str.find` past its own previous match, so two spans
+    sharing identical text (a field with the same value reported twice this tick) rebase onto
+    their own distinct occurrence in `context` instead of both collapsing onto the first one's
+    offset -- which would misreport the second span's real position to any offset-consuming
+    caller, e.g. `_self_correction_target`'s "closest span after the cue" ranking.
     """
     rebased = []
+    search_from: dict[str, int] = {}
     for span in field_spans:
         text = span.get("text")
-        start = context.find(text) if text else -1
+        start = -1
+        if text:
+            start = context.find(text, search_from.get(text, 0))
+            if start == -1:
+                # Exhausted every remaining occurrence for this text -- fall back to the first
+                # one rather than leaving this span unbounded.
+                start = context.find(text)
+            if start != -1:
+                search_from[text] = start + 1
         rebased.append(
             {
                 "text": text,
@@ -356,11 +371,16 @@ async def _run_jev_resolution_step(
     candidates: dict[str, list[dict]],
     resolver: JevFieldResolver,
     committed: _CommittedState,
+    sentence_spans: list[tuple[int, int]] | None = None,
 ) -> None:
-    """Resolve `candidates` (already extracted by `_run_gliner_extraction_step`) through jev."""
-    # Computed once per tick and shared across every field's context window below, instead of
-    # every field re-tokenizing the same (potentially long, ever-growing) snapshot from scratch.
-    sentence_spans = _sentence_spans(snapshot)
+    """Resolve `candidates` (already extracted by `_run_gliner_extraction_step`) through jev.
+
+    `sentence_spans`, when given, is `_sentence_spans(snapshot)` computed once by the caller and
+    shared with a concurrently-run `_run_gliner_only_step` for the same tick, instead of each step
+    re-tokenizing the same (potentially long, ever-growing) snapshot from scratch. Computed here
+    when omitted, e.g. by a caller exercising this step on its own.
+    """
+    sentence_spans = sentence_spans if sentence_spans is not None else _sentence_spans(snapshot)
 
     resolve_tasks = []
     resolve_field_names = []
@@ -455,6 +475,7 @@ async def _run_gliner_only_step(
     candidates: dict[str, list[dict]],
     gliner_only_resolver: GlinerOnlyResolver,
     committed: _CommittedState,
+    sentence_spans: list[tuple[int, int]] | None = None,
 ) -> None:
     """Resolve `candidates` (already extracted by `_run_gliner_extraction_step`) through the fully
     local `GlinerOnlyResolver` commit policy.
@@ -462,34 +483,37 @@ async def _run_gliner_only_step(
     Mirrors `_run_llm_step`'s shape -- one `pipeline_runs` row per tick, then a per-field persist
     loop -- rather than jev-resolution's per-field `pipeline_runs` rows, since
     `GlinerOnlyResolver.resolve_field` is synchronous local computation, not a gathered set of
-    per-field network calls.
+    per-field network calls. Unlike the single external call `_run_llm_step` wraps, each field's
+    `resolve_field` call here is its own local computation that can fail independently, so each is
+    isolated in its own try/except -- one field raising must not discard another field's
+    already-resolved result for the same tick. Every field's error is still captured as data
+    rather than raised, joined into the one row's `error` column alongside whatever fields did
+    succeed.
+
+    `sentence_spans`, when given, is `_sentence_spans(snapshot)` computed once by the caller and
+    shared with a concurrently-run `_run_jev_resolution_step` for the same tick, instead of each
+    step re-tokenizing the same (potentially long, ever-growing) snapshot from scratch. Computed
+    here when omitted, e.g. by a caller exercising this step on its own.
     """
-    sentence_spans = _sentence_spans(snapshot)
+    sentence_spans = sentence_spans if sentence_spans is not None else _sentence_spans(snapshot)
     start = time.monotonic()
-    try:
-        results: dict[str, object] = {}
-        for field_name, field_spans in candidates.items():
-            if not any(span.get("text") for span in field_spans):
-                continue
-            context = _field_context_window(snapshot, field_spans, spans=sentence_spans)
-            resolver_spans = _gliner_only_candidate_spans(context, field_spans)
+    results: dict[str, GlinerOnlyResolution] = {}
+    errors: dict[str, str] = {}
+    for field_name, field_spans in candidates.items():
+        if not any(span.get("text") for span in field_spans):
+            continue
+        context = _field_context_window(snapshot, field_spans, spans=sentence_spans)
+        resolver_spans = _gliner_only_candidate_spans(context, field_spans)
+        try:
             result = gliner_only_resolver.resolve_field(
                 pipeline_call_id, field_name, resolver_spans, context
             )
-            if result is not None:
-                results[field_name] = result
-    except Exception as exc:  # noqa: BLE001 -- resolver failures are captured as data, not raised
-        latency_ms = (time.monotonic() - start) * 1000
-        await _enqueue_pipeline_run(
-            store,
-            tick_id=tick_id,
-            call_id=call_id,
-            pipeline=GLINER_ONLY_PIPELINE,
-            stage="gliner_only_commit",
-            latency_ms=latency_ms,
-            error=str(exc),
-        )
-        return
+        except Exception as exc:  # noqa: BLE001 -- captured as data, not raised; isolated per
+            # field so one field's failure never discards another field's already-resolved result.
+            errors[field_name] = str(exc)
+            continue
+        if result is not None:
+            results[field_name] = result
     latency_ms = (time.monotonic() - start) * 1000
 
     run_id = await _enqueue_pipeline_run(
@@ -511,7 +535,12 @@ async def _run_gliner_only_step(
                 }
                 for field_name, result in results.items()
             }
-        ),
+        )
+        if results
+        else None,
+        error="; ".join(f"{field_name}: {msg}" for field_name, msg in errors.items())
+        if errors
+        else None,
     )
 
     persist_tasks = []
@@ -745,6 +774,12 @@ async def run_call(
                     )
                     steps = []
                     if candidates is not None:
+                        # Computed at most once per tick and shared by both resolution steps
+                        # below (they run concurrently when both are enabled), instead of each
+                        # re-tokenizing the same (potentially long, ever-growing) snapshot.
+                        sentence_spans = (
+                            _sentence_spans(snapshot) if (enable_jev or enable_gliner_only) else None
+                        )
                         if enable_jev:
                             steps.append(
                                 _run_jev_resolution_step(
@@ -757,6 +792,7 @@ async def run_call(
                                     candidates=candidates,
                                     resolver=resolver,
                                     committed=committed,
+                                    sentence_spans=sentence_spans,
                                 )
                             )
                         if enable_gliner_only:
@@ -771,6 +807,7 @@ async def run_call(
                                     candidates=candidates,
                                     gliner_only_resolver=gliner_only_resolver,
                                     committed=committed,
+                                    sentence_spans=sentence_spans,
                                 )
                             )
                     if enable_llm_baseline and tick_number % config.LLM_CADENCE_TICKS == 0:
