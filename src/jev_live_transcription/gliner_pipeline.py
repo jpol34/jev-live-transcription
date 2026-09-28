@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import threading
 import time
+from typing import Literal
 
 import httpx
 import torch
@@ -39,6 +40,29 @@ ZERO_SHOT_FIELD_LABELS: dict[str, str] = {
     "move_in_date": "move-in date or lease date",
     "price_quoted": "quoted rent price or dollar amount",
     "budget_amount": "budget or price range the caller can afford",
+}
+
+# Generalization mechanism for downstream, per-field behavior (thresholds, jev's commit path, the
+# determination classifier): each field is classified once here rather than special-cased by name
+# elsewhere.
+#   - "span": a single free-text span (a name, number, date, or amount).
+#   - "list_span": zero or more free-text spans that should all be kept (e.g. multiple amenities).
+#   - "determination": a yes/no/unclear judgment rather than an extracted span.
+#   - "multi_fact": a compound description that may bundle more than one distinct fact.
+FieldTaxonomy = Literal["span", "list_span", "determination", "multi_fact"]
+
+FIELD_TAXONOMY: dict[str, FieldTaxonomy] = {
+    "caller_name": "span",
+    "email": "span",
+    "phone_number": "span",
+    "unit_number": "span",
+    "move_in_date": "span",
+    "price_quoted": "span",
+    "budget_amount": "span",
+    "amenities_requested": "list_span",
+    "pet_info": "list_span",
+    "permission_to_enter": "determination",
+    "work_order_issue": "multi_fact",
 }
 
 # Identity mapping: since `ZERO_SHOT_FIELD_LABELS` is passed to GLiNER as a label-description dict,
