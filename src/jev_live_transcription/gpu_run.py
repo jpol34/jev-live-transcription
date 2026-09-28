@@ -362,8 +362,14 @@ def run_gpu(
         exit_code = _wait_for_completion(ssh_direct, ssh_key)
         print(f"Remote jlt batch finished with exit code {exit_code}")
 
-        expected_calls = (subset if subset is not None else len(corpus.load_all())) if exit_code == 0 else None
-        _retrieve_db(ssh_direct, ssh_key, db_path, expected_calls)
+        # `cli.py`'s own `_run_batch` slices `call_ids[:subset]` -- a plain Python slice, which
+        # silently caps to the corpus size rather than erroring when `subset` exceeds it. The
+        # expected count here must apply the same cap, or a `--subset` larger than the corpus
+        # (e.g. "run everything" expressed as a large number) would flag a perfectly correct run
+        # as an incomplete/corrupted DB.
+        n_corpus_calls = len(corpus.load_all())
+        expected_calls = min(subset, n_corpus_calls) if subset is not None else n_corpus_calls
+        _retrieve_db(ssh_direct, ssh_key, db_path, expected_calls if exit_code == 0 else None)
         print(f"Capture DB retrieved to {db_path}")
 
         return exit_code

@@ -104,6 +104,30 @@ def test_run_gpu_happy_path_terminates_pod_and_returns_remote_exit_code(monkeypa
     gpu_run.hangar.pod_action.assert_called_once_with("pod-123", "terminate")
 
 
+def test_run_gpu_subset_larger_than_corpus_does_not_fail_verification(monkeypatch, tmp_path):
+    # cli.py's own `_run_batch` slices `call_ids[:subset]`, which silently caps to the corpus size
+    # rather than erroring -- a `--subset` larger than the corpus (e.g. "run everything" expressed
+    # as a large number) completes correctly with fewer calls than `subset` asked for.
+    # `_patch_ssh_flow`'s fake scp always writes the real corpus's full call count, matching what
+    # the remote side would actually produce here.
+    _patch_secrets(monkeypatch)
+    _patch_hangar(monkeypatch)
+    _patch_ssh_flow(monkeypatch, exit_code=0)
+
+    result = gpu_run.run_gpu(
+        subset=1_000_000,
+        db_path=tmp_path / "out.sqlite3",
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+        pod_state_path=tmp_path / "state.json",
+        ssh_key=_fake_ssh_key(tmp_path),
+        keep_pod=False,
+    )
+
+    assert result == 0
+
+
 def test_run_gpu_terminates_pod_even_when_preflight_fails(monkeypatch, tmp_path):
     _patch_secrets(monkeypatch)
     _patch_hangar(monkeypatch)
