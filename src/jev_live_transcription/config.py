@@ -34,14 +34,23 @@ JEV_RECONFIRM_SETTLE_TICKS = 2
 # decline sharply with more context, outweighing smaller gains elsewhere.
 GLINER_ZERO_SHOT_WINDOW_CHARS = 200
 
-# Minimum confidence the GLiNER model requires to report a candidate span, on
-# GLiNER's 0-1 scale (library default is 0.5). Set below that default because nothing downstream
+# Floor confidence passed to the GLiNER model call itself, on GLiNER's 0-1 scale (library default
+# is 0.5). Deliberately permissive: the real per-field cutoff is applied post-hoc in
+# `gliner_pipeline._postprocess_entities` via `PER_FIELD_THRESHOLDS`/`GLINER_DEFAULT_FIELD_THRESHOLD`
+# below, since fields differ in how confidently GLiNER scores their correct span (e.g.
+# `price_quoted`'s correct candidate typically scores 0.05-0.30). This floor only needs to sit
+# below the lowest per-field threshold in use so no field's candidates get cut before that
+# per-field filter ever sees them.
+GLINER_ZERO_SHOT_THRESHOLD = 0.05
+
+# Default post-hoc confidence cutoff (`gliner_pipeline._postprocess_entities`) for any field with
+# no entry in `gliner_pipeline.PER_FIELD_THRESHOLDS`. 0.30 is the same value Microsoft's own
+# Presidio project uses in its official GLiNER-based PII recognizer, which has the same
+# no-verification-step shape as this pipeline -- kept as the default since nothing downstream
 # double-checks a candidate's confidence before jev resolution sees it: a field GLiNER never
 # surfaces at all is unrecoverable, while a low-confidence false positive is just one more
-# candidate for jev to weigh and reject. 0.30 is the same value Microsoft's own Presidio project
-# uses in its official GLiNER-based PII recognizer, which has the same no-verification-step shape
-# as this pipeline.
-GLINER_ZERO_SHOT_THRESHOLD = 0.30
+# candidate for jev to weigh and reject.
+GLINER_DEFAULT_FIELD_THRESHOLD = 0.30
 
 # This machine's installed RAM, used to size call-level concurrency: reserve
 # 4GB headroom for the OS/other sessions and budget ~4GB per concurrent call.

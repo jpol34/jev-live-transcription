@@ -38,8 +38,8 @@ ZERO_SHOT_FIELD_LABELS: dict[str, str] = {
     "permission_to_enter": "statement about permission to enter the unit",
     "work_order_issue": "maintenance or work order issue description",
     "move_in_date": "move-in date or lease date",
-    "price_quoted": "quoted rent price or dollar amount",
-    "budget_amount": "budget or price range the caller can afford",
+    "price_quoted": "rent price the leasing agent quotes to the caller",
+    "budget_amount": "dollar amount the caller can afford to spend on rent",
 }
 
 # Generalization mechanism for downstream, per-field behavior (thresholds, jev's commit path, the
@@ -62,8 +62,46 @@ FIELD_TAXONOMY: dict[str, FieldTaxonomy] = {
     "amenities_requested": "list_span",
     "pet_info": "list_span",
     "permission_to_enter": "determination",
-    "work_order_issue": "multi_fact",
+    # A compound-description commit-join path (bundling two distinct issues raised in separate
+    # turns, e.g. a leak plus a later noise complaint) would only ever apply to ~3-5 calls out of
+    # the corpus's 46 work_order_issue calls -- too thin a footprint to justify dedicated resolver
+    # machinery, so this field is treated as a single span with that as a documented, accepted
+    # recall ceiling rather than a target for multi_fact handling.
+    "work_order_issue": "span",
 }
+
+# Post-hoc confidence cutoff overrides, applied per-field in `_postprocess_entities` after GLiNER is
+# called once at `config.GLINER_ZERO_SHOT_THRESHOLD`'s permissive floor across all labels. A field
+# with no entry here falls back to `config.GLINER_DEFAULT_FIELD_THRESHOLD`. This is orthogonal to
+# `FIELD_TAXONOMY` above -- taxonomy classifies a field's *shape* (span vs. list vs. determination),
+# while this dict calibrates *confidence*, which varies by field for reasons unrelated to shape
+# (e.g. two same-shape "span" fields can still differ widely in how confidently GLiNER scores their
+# correct answer). Values below are tuned empirically against `scripts/score_recall.py` (see
+# `benchmarks/score_recall/baseline.json` for the pre-tuning snapshot they're diffed against), not
+# guessed:
+#   - `price_quoted`: GLiNER finds the correct span in the large majority of calls, but its score
+#     sits in the 0.05-0.30 band almost every time -- the default 0.30 cutoff was rejecting a
+#     correctly-detected span, not a wrong one.
+#   - `budget_amount`: shares a label-collision failure mode with `price_quoted` (both describe a
+#     dollar amount spoken near each other in the same turn) that also depresses its score below the
+#     default cutoff; lowered alongside the label-description rewording above.
+#
+# Known limitation this threshold change doesn't address: GLiNER reports a spoken price *range*
+# ("$1,200 to $1,400") as two separate single-value spans rather than one joined span, so neither
+# candidate ever textually equals a range-valued ground truth even once its score clears the
+# lowered floor. Fixing that would need a resolver-level join step, out of scope here.
+PER_FIELD_THRESHOLDS: dict[str, float] = {
+    "price_quoted": 0.12,
+    "budget_amount": 0.15,
+}
+
+
+def _field_threshold(field: str) -> float:
+    """Return the post-hoc confidence cutoff for `field`: its `PER_FIELD_THRESHOLDS` override if one
+    exists, else `config.GLINER_DEFAULT_FIELD_THRESHOLD`.
+    """
+    return PER_FIELD_THRESHOLDS.get(field, config.GLINER_DEFAULT_FIELD_THRESHOLD)
+
 
 # Identity mapping: since `ZERO_SHOT_FIELD_LABELS` is passed to GLiNER as a label-description dict,
 # `entity["label"]` already comes back as the field name itself. Kept as an explicit dict, rather
@@ -110,10 +148,14 @@ def _get_zero_shot_model() -> GLiNER:
 def _postprocess_entities(
     entities: list[dict], window_start: int, label_to_field: dict[str, str]
 ) -> dict[str, list[dict]]:
-    """Group raw GLiNER entity dicts into `{field: [candidate, ...]}` buckets and translate their
-    spans (reported relative to the windowed slice actually fed to the model) back to
-    full-snapshot character offsets, since every downstream consumer (jev's context window) indexes
-    into the full snapshot, not the windowed slice.
+    """Group raw GLiNER entity dicts into `{field: [candidate, ...]}` buckets, translate their spans
+    (reported relative to the windowed slice actually fed to the model) back to full-snapshot
+    character offsets, and drop any candidate below its field's confidence cutoff
+    (`_field_threshold`).
+
+    GLiNER itself is called at `config.GLINER_ZERO_SHOT_THRESHOLD`'s permissive floor across all
+    labels (see that constant), so this per-field filter -- not the model call -- is what actually
+    enforces each field's real cutoff.
 
     Shared by both `GLINER_SERVING_MODE` paths (inline batch engine, HTTP service) -- neither the
     engine's `submit()` nor the serving app's `/extract` response does this translation itself,
@@ -124,12 +166,15 @@ def _postprocess_entities(
         field = label_to_field.get(entity.get("label"))
         if field is None:
             continue
+        score = entity.get("score")
+        if score is None or score < _field_threshold(field):
+            continue
         start = entity.get("start")
         end = entity.get("end")
         candidates[field].append(
             {
                 "text": entity.get("text"),
-                "score": entity.get("score"),
+                "score": score,
                 "start": start + window_start if start is not None else None,
                 "end": end + window_start if end is not None else None,
             }

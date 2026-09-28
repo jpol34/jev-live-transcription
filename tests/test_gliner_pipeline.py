@@ -249,6 +249,51 @@ def test_offsets_unchanged_when_snapshot_shorter_than_window(monkeypatch):
     assert result["unit_number"] == [{"text": "unit 204", "score": 0.8, "start": 18, "end": 26}]
 
 
+def test_postprocess_entities_default_threshold_still_applies_to_unaffected_fields():
+    # A field with no PER_FIELD_THRESHOLDS override behaves exactly like the old single global
+    # threshold did: a low-confidence candidate for it is still filtered out.
+    entities = [{"start": 0, "end": 4, "text": "Jane", "label": "caller_name", "score": 0.10}]
+
+    result = gliner_pipeline._postprocess_entities(
+        entities, 0, gliner_pipeline._ZERO_SHOT_LABEL_TO_FIELD
+    )
+
+    assert result["caller_name"] == []
+
+
+def test_postprocess_entities_rescues_low_score_candidate_for_overridden_field():
+    # price_quoted's correct span typically scores 0.05-0.30 (see PER_FIELD_THRESHOLDS' comment) --
+    # a candidate at 0.15 would have been incorrectly dropped under the old single global 0.30
+    # threshold, but clears price_quoted's lower per-field override and is correctly kept.
+    entities = [{"start": 0, "end": 6, "text": "$1,900", "label": "price_quoted", "score": 0.15}]
+
+    result = gliner_pipeline._postprocess_entities(
+        entities, 0, gliner_pipeline._ZERO_SHOT_LABEL_TO_FIELD
+    )
+
+    assert result["price_quoted"] == [{"text": "$1,900", "score": 0.15, "start": 0, "end": 6}]
+
+
+def test_postprocess_entities_filters_out_candidate_below_field_override():
+    # A price_quoted candidate scoring below even its own lowered per-field threshold is still
+    # correctly dropped -- the override isn't a blanket "let everything through".
+    entities = [{"start": 0, "end": 5, "text": "noise", "label": "price_quoted", "score": 0.03}]
+
+    result = gliner_pipeline._postprocess_entities(
+        entities, 0, gliner_pipeline._ZERO_SHOT_LABEL_TO_FIELD
+    )
+
+    assert result["price_quoted"] == []
+
+
+def test_field_threshold_falls_back_to_default_for_unlisted_fields():
+    assert gliner_pipeline._field_threshold("caller_name") == config.GLINER_DEFAULT_FIELD_THRESHOLD
+    assert (
+        gliner_pipeline._field_threshold("price_quoted")
+        == gliner_pipeline.PER_FIELD_THRESHOLDS["price_quoted"]
+    )
+
+
 def test_model_receives_configured_threshold_and_label_descriptions(monkeypatch):
     model = _install_fake(monkeypatch, responses=[[]])
 
