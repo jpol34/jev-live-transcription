@@ -13,6 +13,7 @@ from jev_live_transcription.jev_pipeline import (
     JevResolutionError,
     field_description,
     normalize_candidate,
+    normalize_email_span,
 )
 
 
@@ -57,6 +58,59 @@ def test_normalize_other_field_trimmed_text():
     assert normalize_candidate("unit_number", "  B-207 ") == "B-207"
 
 
+def test_normalize_email_span_letter_by_letter_hyphenated():
+    assert (
+        normalize_email_span("e-t-h-a-n dot r-o-b-e-r-t-s at mail dot com")
+        == "ethan.roberts@mail.com"
+    )
+
+
+def test_normalize_email_span_letter_by_letter_space_separated():
+    assert (
+        normalize_email_span("j o h n dot s m i t h at y a h o o dot c o m")
+        == "john.smith@yahoo.com"
+    )
+
+
+def test_normalize_email_span_word_at_word_dot_word():
+    assert normalize_email_span("jsmith at gmail dot com") == "jsmith@gmail.com"
+
+
+def test_normalize_email_span_mixed_single_initial_and_words():
+    assert normalize_email_span("j dot smith at yahoo dot com") == "j.smith@yahoo.com"
+
+
+def test_normalize_email_span_already_literal_is_noop_passthrough():
+    assert normalize_email_span("ethan.roberts@mail.com") == "ethan.roberts@mail.com"
+    # Idempotent: normalizing an already-normalized value must not double-transform it.
+    once = normalize_email_span("e-t-h-a-n dot r-o-b-e-r-t-s at mail dot com")
+    assert normalize_email_span(once) == once
+
+
+def test_normalize_email_span_preserves_real_hyphen_in_address():
+    # Only a hyphen-joined run of single-character segments ("e-t-h-a-n") is a letter-spelling
+    # separator; a real hyphen that's part of the address itself must survive.
+    assert normalize_email_span("mary-jane at gmail dot com") == "mary-jane@gmail.com"
+    assert normalize_email_span("jordan at big-corp dot com") == "jordan@big-corp.com"
+
+
+def test_normalize_email_span_literal_case_is_lowercased_for_consistency():
+    # The same address must normalize to the same literal string whether it arrives already
+    # typed (mixed case) or spoken letter-by-letter (always lowercased by the tokenizing path) --
+    # otherwise the two phrasings would commit as different strings.
+    assert normalize_email_span("Ethan.Roberts@Mail.com") == "ethan.roberts@mail.com"
+
+
+def test_normalize_email_span_literal_with_surrounding_whitespace_and_punctuation():
+    assert normalize_email_span("  ethan.roberts@mail.com. ") == "ethan.roberts@mail.com"
+
+
+def test_normalize_email_span_non_email_text_falls_back_unchanged():
+    # Not actually an email span (no "at"/"dot" structure) -- returned unchanged rather than
+    # mangled into something address-shaped.
+    assert normalize_email_span("just some other text") == "just some other text"
+
+
 def test_field_description_known_and_fallback():
     assert field_description("phone_number") == "phone number"
     assert field_description("weird_new_field") == "weird new field"
@@ -95,6 +149,24 @@ async def test_single_candidate_calls_noul():
     system_one.assert_awaited_once()
     _, kwargs = system_one.call_args
     assert "Lindsey Perkins" in kwargs["questions"]["field"].instructions
+
+
+@pytest.mark.asyncio
+async def test_single_email_candidate_is_normalized_before_reaching_jev():
+    system_one = AsyncMock(return_value=_noul_response(0.9))
+    resolver = _resolver(system_one)
+
+    result = await resolver.resolve_field(
+        call_id=1,
+        field_name="email",
+        candidates=["e-t-h-a-n dot r-o-b-e-r-t-s at mail dot com"],
+        context_window="ctx",
+    )
+
+    assert result is not None
+    assert result.candidate == "ethan.roberts@mail.com"
+    _, kwargs = system_one.call_args
+    assert "ethan.roberts@mail.com" in kwargs["questions"]["field"].instructions
 
 
 @pytest.mark.asyncio

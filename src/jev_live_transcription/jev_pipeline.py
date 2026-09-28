@@ -69,10 +69,83 @@ _DIGITS_RE = re.compile(r"\D+")
 
 _NONE_OF_THESE = "none_of_these"
 
+# A literal `user@domain.tld` address -- no whitespace, exactly one "@", at least one "." in the
+# domain part. Used both to short-circuit already-canonical spans (no-op passthrough) and to
+# validate a spoken-form span was normalized into something address-shaped before trusting it.
+_LITERAL_EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+
+# Three token shapes, tried in this order so a genuine letter-spelling run (every hyphen-joined
+# segment exactly one character, e.g. "e-t-h-a-n") is distinguished from a real hyphenated word
+# in the address itself (e.g. "mary-jane", "big-corp") -- the former collapses to one word with
+# the hyphens dropped, the latter is kept intact, hyphens and all.
+_EMAIL_TOKEN_RE = re.compile(
+    r"(?P<spelled>[a-z0-9](?:-[a-z0-9])+)"
+    r"|(?P<hyphenword>[a-z0-9]+(?:-[a-z0-9]+)+)"
+    r"|(?P<word>[a-z0-9]+)"
+)
+
+_EMAIL_SYMBOL_WORDS = {"at": "@", "dot": "."}
+
 
 def field_description(field_name: str) -> str:
     """Human-readable description of a field for use in jev question text."""
     return _FIELD_DESCRIPTIONS.get(field_name, field_name.replace("_", " "))
+
+
+def normalize_email_span(value: str) -> str:
+    """Collapse a spoken-form `email` span into canonical `user@domain.com` form.
+
+    Callers speak an email address as words rather than reading a literal string, e.g. "It's
+    ethan dot roberts, let me spell that, e-t-h-a-n dot r-o-b-e-r-t-s at mail dot com" -- GLiNER
+    can detect the full span with good confidence, but the raw text can never string-match a
+    ground-truth `user@domain.com` value without this normalization.
+
+    Handles both hyphen-joined ("e-t-h-a-n") and space-separated ("e t h a n") letter-by-letter
+    spelling by collapsing any run of single-character tokens into one word, then maps the "at"/
+    "dot" words to `@`/`.`. A real hyphen that's part of the address itself (e.g. "mary-jane at
+    gmail dot com") is preserved rather than dropped, since only a hyphen-joined run of
+    single-character segments is a letter-spelling separator.
+
+    Already-canonical text (a literal address with no whitespace) is lowercased and returned --
+    this must be idempotent, since the same candidate value can be folded in again on a later
+    tick after already being normalized once. Lowercasing both paths keeps the same address from
+    committing as two different literal strings depending on whether the caller read it out
+    letter-by-letter or the address was typed/read normally.
+
+    Falls back to returning `value` unchanged if the result still doesn't look like an email
+    address, rather than emitting a mangled string for a span that wasn't actually spoken email.
+    """
+    stripped = value.strip().strip(".,;:!?\"'")
+    if not stripped:
+        return value
+    if _LITERAL_EMAIL_RE.match(stripped):
+        return stripped.lower()
+
+    collapsed: list[str] = []
+    letter_run: list[str] = []
+    for match in _EMAIL_TOKEN_RE.finditer(stripped.lower()):
+        spelled = match.group("spelled")
+        if spelled is not None:
+            if letter_run:
+                collapsed.append("".join(letter_run))
+                letter_run = []
+            collapsed.append(spelled.replace("-", ""))
+            continue
+        token = match.group("hyphenword") or match.group("word")
+        if len(token) == 1:
+            letter_run.append(token)
+            continue
+        if letter_run:
+            collapsed.append("".join(letter_run))
+            letter_run = []
+        collapsed.append(token)
+    if letter_run:
+        collapsed.append("".join(letter_run))
+    if not collapsed:
+        return value
+
+    candidate = "".join(_EMAIL_SYMBOL_WORDS.get(token, token) for token in collapsed)
+    return candidate if _LITERAL_EMAIL_RE.match(candidate) else value
 
 
 def normalize_candidate(field_name: str, value: str) -> str:
@@ -220,6 +293,8 @@ class JevFieldResolver:
                 value = raw.strip()
                 if not value:
                     continue
+                if field_name == "email":
+                    value = normalize_email_span(value)
                 normalized = normalize_candidate(field_name, value)
                 if not normalized:
                     continue
