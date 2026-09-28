@@ -40,6 +40,69 @@ def test_extract_candidates_covers_all_eleven_fields(monkeypatch):
     assert all(spans == [] for spans in result.values())
 
 
+def test_determination_field_gets_a_candidate_even_with_zero_gliner_entities(monkeypatch):
+    # The no-GLiNER-signal fallback path: GLiNER returns nothing at all this tick (its own
+    # zero-shot span extraction has no signal for `permission_to_enter`, per the module's
+    # rationale for this classifier), yet the locally classified determination still surfaces as
+    # a candidate -- proof the classifier isn't gated on GLiNER locating a span first.
+    _install_fake(monkeypatch, responses=[[]])
+    snapshot = "Caller: I guess it's fine if I'm not there. Just, uh, fix the leak, please."
+
+    result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-determination"))
+
+    assert result["permission_to_enter"] == [
+        {"text": "yes", "score": None, "start": None, "end": None}
+    ]
+
+
+def test_determination_field_candidate_combines_with_gliner_entities(monkeypatch):
+    # GLiNER's own output for a determination field, when it has any, is additive -- not
+    # overwritten by the classifier's candidate.
+    model = _install_fake(
+        monkeypatch,
+        responses=[
+            [
+                {
+                    "start": 0,
+                    "end": 3,
+                    "text": "yes",
+                    "label": "permission_to_enter",
+                    "score": 0.4,
+                }
+            ]
+        ],
+    )
+    snapshot = "Caller: I guess it's fine if I'm not there. Just, uh, fix the leak, please."
+
+    result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-both"))
+
+    assert {"text": "yes", "score": 0.4, "start": 0, "end": 3} in result["permission_to_enter"]
+    assert {"text": "yes", "score": None, "start": None, "end": None} in result[
+        "permission_to_enter"
+    ]
+    assert model.calls[0]["texts"][0] == snapshot[-config.GLINER_ZERO_SHOT_WINDOW_CHARS :]
+
+
+def test_determination_field_uncertain_window_adds_no_candidate(monkeypatch):
+    _install_fake(monkeypatch, responses=[[]])
+    snapshot = "Caller: My name is Jane and my unit number is 204."
+
+    result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-uncertain"))
+
+    assert result["permission_to_enter"] == []
+
+
+def test_non_determination_fields_never_get_a_classifier_candidate(monkeypatch):
+    _install_fake(monkeypatch, responses=[[]])
+    snapshot = "Caller: I guess it's fine if I'm not there. Just, uh, fix the leak, please."
+
+    result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-scope"))
+
+    for field, taxonomy in gliner_pipeline.FIELD_TAXONOMY.items():
+        if taxonomy != "determination":
+            assert result[field] == []
+
+
 def test_field_taxonomy_covers_every_zero_shot_field_exactly_once():
     labeled_fields = set(gliner_pipeline.ZERO_SHOT_FIELD_LABELS)
     taxonomy_fields = list(gliner_pipeline.FIELD_TAXONOMY)

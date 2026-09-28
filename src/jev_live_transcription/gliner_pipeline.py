@@ -17,7 +17,7 @@ import httpx
 import torch
 from gliner import GLiNER
 
-from . import config
+from . import config, determination_classifier
 from .gliner_batch_engine import GlinerBatchEngine, get_or_create_engine
 
 _LOGGER = logging.getLogger(__name__)
@@ -137,6 +137,28 @@ def _postprocess_entities(
     return candidates
 
 
+def _apply_determination_classifier(candidates: dict[str, list[dict]], window_text: str) -> None:
+    """Add a locally classified yes/no candidate for every taxonomy-tagged `"determination"`
+    field, independent of whatever GLiNER itself found for that field this tick.
+
+    GLiNER surfaces no span-level signal at all for a determination field like
+    `permission_to_enter` (see `determination_classifier`'s module docstring), so this always
+    runs against the same window GLiNER just saw rather than gating on `candidates[field]`
+    already having an entry. `"uncertain"` classifications add nothing -- jev's resolver only
+    accumulates candidates it's actually seen, and an "uncertain" tick has nothing new to offer.
+    The synthetic candidate has no span offsets (`start`/`end` are `None`): its "location" is the
+    classifier's judgment over the whole window, not a specific substring of it, and downstream
+    context-window slicing already falls back to the full window for an offset-less candidate.
+    """
+    for field, taxonomy in FIELD_TAXONOMY.items():
+        if taxonomy != "determination":
+            continue
+        determination = determination_classifier.classify(field, window_text)
+        if determination == "uncertain":
+            continue
+        candidates[field].append({"text": determination, "score": None, "start": None, "end": None})
+
+
 def _zero_shot_window(transcript_snapshot: str) -> tuple[str, int]:
     """Return the trailing slice of `transcript_snapshot` fed to the model this tick -- up to
     `config.GLINER_ZERO_SHOT_WINDOW_CHARS` characters -- along with that slice's start offset
@@ -228,6 +250,7 @@ async def extract_candidates_timed(
     entities = await _infer_entities(window_text)
     latency_ms = (time.monotonic() - start) * 1000
     candidates = _postprocess_entities(entities, window_start, _ZERO_SHOT_LABEL_TO_FIELD)
+    _apply_determination_classifier(candidates, window_text)
     return candidates, latency_ms
 
 

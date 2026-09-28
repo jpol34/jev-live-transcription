@@ -8,9 +8,12 @@ import pytest
 from typesafe_sdk import TypeSafeAPITimeoutError, TypeSafeAuthenticationError, TypeSafeRateLimitError
 
 from jev_live_transcription import config
+from jev_live_transcription.gliner_pipeline import FIELD_TAXONOMY
 from jev_live_transcription.jev_pipeline import (
     JevFieldResolver,
     JevResolutionError,
+    _choice_instructions,
+    _noul_instructions,
     field_description,
     normalize_candidate,
     normalize_email_span,
@@ -116,6 +119,59 @@ def test_field_description_known_and_fallback():
     assert field_description("weird_new_field") == "weird new field"
 
 
+# --- taxonomy-gated Noul question template ---------------------------------------------------
+
+
+def test_noul_instructions_span_field_uses_generic_is_x_correct_phrasing():
+    instructions = _noul_instructions("caller_name", "Lindsey Perkins")
+
+    assert "Lindsey Perkins" in instructions
+    assert "is 'Lindsey Perkins' the caller's correct name?" in instructions
+
+
+def test_noul_instructions_determination_field_asks_direct_yes_no_question():
+    instructions = _noul_instructions("permission_to_enter", "yes")
+
+    assert "did the caller give permission to enter the unit" in instructions
+    assert "'yes'" in instructions
+    # Not the generic span phrasing -- a determination isn't "the caller's correct X".
+    assert "the caller's correct" not in instructions
+
+
+def test_noul_instructions_determination_field_falls_back_without_explicit_question():
+    # A hypothetical future "determination"-taxonomy field with no entry in
+    # `_DETERMINATION_QUESTIONS` yet still gets a taxonomy-gated (not generic span) template,
+    # built from its own field description.
+    original = dict(FIELD_TAXONOMY)
+    FIELD_TAXONOMY["future_determination_field"] = "determination"
+    try:
+        instructions = _noul_instructions("future_determination_field", "yes")
+    finally:
+        FIELD_TAXONOMY.clear()
+        FIELD_TAXONOMY.update(original)
+
+    assert "future determination field" in instructions
+    assert "the caller's correct" not in instructions
+
+
+# --- taxonomy-gated Choice question template -------------------------------------------------
+
+
+def test_choice_instructions_span_field_uses_generic_which_of_these_phrasing():
+    instructions = _choice_instructions("phone_number")
+
+    assert "which of these is the caller's correct phone number?" in instructions
+
+
+def test_choice_instructions_determination_field_asks_direct_yes_no_question():
+    instructions = _choice_instructions("permission_to_enter")
+
+    assert "did the caller give permission to enter the unit" in instructions
+    # Not the generic "which of these" phrasing -- malformed for a yes/no determination field.
+    assert "which of these" not in instructions
+    assert "the caller's correct" not in instructions
+
+
 # --- resolution decision logic -------------------------------------------------------------------
 
 
@@ -167,6 +223,24 @@ async def test_single_email_candidate_is_normalized_before_reaching_jev():
     assert result.candidate == "ethan.roberts@mail.com"
     _, kwargs = system_one.call_args
     assert "ethan.roberts@mail.com" in kwargs["questions"]["field"].instructions
+
+
+@pytest.mark.asyncio
+async def test_single_candidate_determination_field_uses_direct_question():
+    system_one = AsyncMock(return_value=_noul_response(0.9))
+    resolver = _resolver(system_one)
+
+    result = await resolver.resolve_field(
+        call_id=1, field_name="permission_to_enter", candidates=["yes"], context_window="ctx"
+    )
+
+    assert result is not None
+    assert result.candidate == "yes"
+    assert result.is_committed is True
+    _, kwargs = system_one.call_args
+    instructions = kwargs["questions"]["field"].instructions
+    assert "did the caller give permission to enter the unit" in instructions
+    assert "the caller's correct" not in instructions
 
 
 @pytest.mark.asyncio
@@ -249,6 +323,31 @@ async def test_two_distinct_candidates_calls_choice_with_none_of_these():
     _, kwargs = system_one.call_args
     criteria = kwargs["questions"]["field"].criteria
     assert set(criteria.keys()) == {"555-3212", "555-4321", "none_of_these"}
+
+
+@pytest.mark.asyncio
+async def test_two_distinct_determination_candidates_uses_direct_question_in_choice():
+    # A determination field can legitimately flip between "yes" and "no" across ticks (e.g. the
+    # caller changes their answer), landing on the Choice path -- which must get the same direct
+    # yes/no phrasing as the Noul path, not the generic "which of these" template.
+    system_one = AsyncMock(return_value=_choice_response("yes", 0.85))
+    resolver = _resolver(system_one)
+
+    result = await resolver.resolve_field(
+        call_id=1,
+        field_name="permission_to_enter",
+        candidates=["no", "yes"],
+        context_window="ctx",
+    )
+
+    assert result is not None
+    assert result.question_type == "choice"
+    _, kwargs = system_one.call_args
+    instructions = kwargs["questions"]["field"].instructions
+    assert "did the caller give permission to enter the unit" in instructions
+    assert "which of these" not in instructions
+    criteria = kwargs["questions"]["field"].criteria
+    assert set(criteria.keys()) == {"no", "yes", "none_of_these"}
 
 
 @pytest.mark.asyncio
