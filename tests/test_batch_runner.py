@@ -178,8 +178,8 @@ async def test_run_batch_gliner_semaphore_limits_concurrent_gliner_work(monkeypa
     ):
         nonlocal concurrent_gliner, max_concurrent_gliner
         seen_semaphores.add(id(gliner_semaphore))
-        # Simulates what pipeline_core._run_gliner_jev_step actually does: acquire the shared
-        # semaphore around each simulated GLiNER inference.
+        # Simulates what pipeline_core._run_gliner_extraction_step actually does: acquire the
+        # shared semaphore around each simulated GLiNER inference.
         async with gliner_semaphore:
             async with lock:
                 concurrent_gliner += 1

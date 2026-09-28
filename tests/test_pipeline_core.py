@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from jev_live_transcription import pipeline_core
+from jev_live_transcription.gliner_only_resolver import GlinerOnlyResolution
 from jev_live_transcription.jev_pipeline import JevFieldResolver, JevResolution
 
 
@@ -710,7 +711,7 @@ async def test_run_call_gliner_failure_is_captured_as_error_row_not_raised(monke
     fake_resolver.resolve_field.assert_not_called()
 
 
-# --- _run_gliner_jev_step: gliner_semaphore + GlinerBatchEngine interaction ----------------------
+# --- _run_gliner_extraction_step: gliner_semaphore + GlinerBatchEngine interaction --------------
 
 
 class _FakeGlinerModel:
@@ -753,18 +754,286 @@ async def test_concurrent_gliner_ticks_share_one_batched_inference_call_through_
     gliner_semaphore = asyncio.Semaphore(config.GLINER_CONCURRENCY)
 
     async def run_one(call_id: int, pipeline_call_id: str) -> None:
-        await pipeline_core._run_gliner_jev_step(
+        await pipeline_core._run_gliner_extraction_step(
             store,
             call_id=call_id,
             pipeline_call_id=pipeline_call_id,
             tick_id=call_id,
-            tick_number=1,
             snapshot="transcript text with nothing GLiNER will match",
-            resolver=Mock(),
-            committed={},
             gliner_semaphore=gliner_semaphore,
         )
 
     await asyncio.gather(run_one(1, "call-a"), run_one(2, "call-b"))
 
     assert any(len(batch_texts) == 2 for batch_texts in fake_model.calls), fake_model.calls
+
+
+# --- _run_gliner_only_step: row/persist shape ----------------------------------------------
+
+
+def _gliner_only_result(
+    field_name="phone_number",
+    candidate="555-1111",
+    confidence=0.9,
+    is_committed=True,
+    is_none_of_these=False,
+    distinct_candidates=("555-1111",),
+    decision_reason="single_above_floor",
+):
+    return GlinerOnlyResolution(
+        call_id="1",
+        field_name=field_name,
+        candidate=candidate,
+        confidence=confidence,
+        is_committed=is_committed,
+        is_none_of_these=is_none_of_these,
+        distinct_candidates=distinct_candidates,
+        decision_reason=decision_reason,
+    )
+
+
+@pytest.mark.asyncio
+async def test_run_gliner_only_step_writes_one_run_row_and_persists_each_field():
+    store = FakeStore()
+    candidates = {"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]}
+    fake_resolver = Mock()
+    fake_resolver.resolve_field = Mock(return_value=_gliner_only_result())
+
+    await pipeline_core._run_gliner_only_step(
+        store,
+        call_id=1,
+        pipeline_call_id="1",
+        tick_id=1,
+        tick_number=1,
+        snapshot="Caller: my number is 555-1111.",
+        candidates=candidates,
+        gliner_only_resolver=fake_resolver,
+        committed={},
+    )
+
+    # One pipeline_runs row for the whole tick's gliner_only commit pass, not one per field.
+    gliner_only_runs = [run for run in store.pipeline_runs if run["pipeline"] == "gliner_only"]
+    assert len(gliner_only_runs) == 1
+    assert gliner_only_runs[0]["stage"] == "gliner_only_commit"
+    assert gliner_only_runs[0]["error"] is None
+
+    field_rows = [fe for fe in store.field_extractions if fe["pipeline"] == "gliner_only"]
+    assert len(field_rows) == 1
+    assert field_rows[0]["field_name"] == "phone_number"
+    assert field_rows[0]["candidate_value"] == "555-1111"
+    assert field_rows[0]["confidence"] == 0.9
+    assert field_rows[0]["is_committed"] == 1
+    assert field_rows[0]["run_id"] == gliner_only_runs[0]["run_id"]
+
+    # The resolver is handed candidate spans rebased onto its own context window, not the
+    # snapshot-relative offsets `candidates` carries.
+    call_args = fake_resolver.resolve_field.call_args.args
+    resolver_spans, context_window_arg = call_args[2], call_args[3]
+    assert resolver_spans[0]["text"] == "555-1111"
+    assert context_window_arg[resolver_spans[0]["start"] : resolver_spans[0]["end"]] == "555-1111"
+
+
+@pytest.mark.asyncio
+async def test_run_gliner_only_step_none_of_these_clears_prior_commit():
+    store = FakeStore()
+    candidates = {
+        "phone_number": [
+            {"text": "555-1111", "score": 0.9, "start": 0, "end": 8},
+            {"text": "555-2222", "score": 0.6, "start": 20, "end": 28},
+        ]
+    }
+    committed = {("gliner_only", "phone_number"): ("555-1111", 0.9)}
+    fake_resolver = Mock()
+    fake_resolver.resolve_field = Mock(
+        return_value=_gliner_only_result(
+            candidate="none_of_these",
+            confidence=0.5,
+            is_committed=True,
+            is_none_of_these=True,
+            distinct_candidates=("555-1111", "555-2222"),
+            decision_reason="margin_too_close",
+        )
+    )
+
+    await pipeline_core._run_gliner_only_step(
+        store,
+        call_id=1,
+        pipeline_call_id="1",
+        tick_id=1,
+        tick_number=2,
+        snapshot="Caller: actually neither of those is right.",
+        candidates=candidates,
+        gliner_only_resolver=fake_resolver,
+        committed=committed,
+    )
+
+    assert ("gliner_only", "phone_number") not in committed
+    field_rows = [fe for fe in store.field_extractions if fe["pipeline"] == "gliner_only"]
+    assert len(field_rows) == 1
+    assert field_rows[0]["candidate_value"] is None
+    assert field_rows[0]["is_committed"] == 0
+
+
+# --- run_call: enable_gliner_only / enable_jev gating ---------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_run_call_enable_jev_false_skips_constructing_jev_resolver_entirely(monkeypatch):
+    # The zero-jev-calls combination: enable_jev=False must not even construct a JevFieldResolver,
+    # not merely skip calling it -- while enable_gliner_only=True still runs and persists.
+    monkeypatch.setattr(
+        pipeline_core, "iter_batch_ticks", lambda call_pacer: iter([(0, "", 0), (1, "a", 1)])
+    )
+    monkeypatch.setattr(
+        pipeline_core.gliner_pipeline,
+        "extract_candidates_timed",
+        AsyncMock(
+            return_value=(
+                {"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]},
+                1.0,
+            )
+        ),
+    )
+    monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
+    monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", Mock())
+    jev_resolver_ctor = Mock()
+    monkeypatch.setattr(pipeline_core, "JevFieldResolver", jev_resolver_ctor)
+
+    fake_gliner_only_resolver = Mock()
+    fake_gliner_only_resolver.resolve_field = Mock(return_value=_gliner_only_result())
+
+    store = FakeStore()
+    await pipeline_core.run_call(
+        1,
+        store,
+        calls=_calls_fixture(),
+        enable_jev=False,
+        enable_gliner_only=True,
+        gliner_only_resolver=fake_gliner_only_resolver,
+    )
+
+    jev_resolver_ctor.assert_not_called()
+    assert not any(run["stage"] == "jev" for run in store.pipeline_runs)
+    assert any(run["pipeline"] == "gliner_only" for run in store.pipeline_runs)
+    fake_gliner_only_resolver.resolve_field.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_run_call_both_resolution_arms_run_off_the_same_extraction(monkeypatch):
+    monkeypatch.setattr(
+        pipeline_core, "iter_batch_ticks", lambda call_pacer: iter([(0, "", 0), (1, "a", 1)])
+    )
+    monkeypatch.setattr(
+        pipeline_core.gliner_pipeline,
+        "extract_candidates_timed",
+        AsyncMock(
+            return_value=(
+                {"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]},
+                1.0,
+            )
+        ),
+    )
+    monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
+    monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", Mock())
+
+    resolve_field_mock = AsyncMock(
+        return_value=JevResolution(
+            call_id="1", field_name="phone_number", question_type="noul", candidate="555-1111",
+            confidence=0.9, is_committed=True, is_none_of_these=False,
+            distinct_candidates=("555-1111",), input_tokens=10, output_tokens=2,
+        )
+    )
+    monkeypatch.setattr(pipeline_core, "JevFieldResolver", lambda: FakeResolver(resolve_field_mock))
+
+    fake_gliner_only_resolver = Mock()
+    fake_gliner_only_resolver.resolve_field = Mock(return_value=_gliner_only_result())
+
+    store = FakeStore()
+    await pipeline_core.run_call(
+        1,
+        store,
+        calls=_calls_fixture(),
+        enable_gliner_only=True,
+        gliner_only_resolver=fake_gliner_only_resolver,
+    )
+
+    # Both arms resolved off the extraction from the same tick.
+    resolve_field_mock.assert_awaited_once()
+    fake_gliner_only_resolver.resolve_field.assert_called_once()
+    assert any(run["pipeline"] == "gliner_jev" and run["stage"] == "jev" for run in store.pipeline_runs)
+    assert any(run["pipeline"] == "gliner_only" for run in store.pipeline_runs)
+    # The gliner_standard row is written once, shared by both arms -- not duplicated.
+    standard_rows = [run for run in store.pipeline_runs if run["stage"] == "gliner_standard"]
+    assert len(standard_rows) == 1
+
+
+@pytest.mark.asyncio
+async def test_run_call_gliner_only_disabled_by_default(monkeypatch):
+    monkeypatch.setattr(
+        pipeline_core, "iter_batch_ticks", lambda call_pacer: iter([(0, "", 0), (1, "a", 1)])
+    )
+    monkeypatch.setattr(
+        pipeline_core.gliner_pipeline,
+        "extract_candidates_timed",
+        AsyncMock(
+            return_value=(
+                {"phone_number": [{"text": "555-1111", "score": 0.9, "start": 0, "end": 8}]},
+                1.0,
+            )
+        ),
+    )
+    monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
+    monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", Mock())
+    fake_resolver = FakeResolver(
+        AsyncMock(
+            return_value=JevResolution(
+                call_id="1", field_name="phone_number", question_type="noul", candidate="555-1111",
+                confidence=0.9, is_committed=True, is_none_of_these=False,
+                distinct_candidates=("555-1111",), input_tokens=10, output_tokens=2,
+            )
+        )
+    )
+    monkeypatch.setattr(pipeline_core, "JevFieldResolver", lambda: fake_resolver)
+
+    store = FakeStore()
+    await pipeline_core.run_call(1, store, calls=_calls_fixture())  # both flags default
+
+    assert not any(run["pipeline"] == "gliner_only" for run in store.pipeline_runs)
+
+
+# --- run_call: GLiNER extraction failure short-circuits both resolution steps -----------------
+
+
+@pytest.mark.asyncio
+async def test_run_call_extraction_failure_short_circuits_both_resolution_steps(monkeypatch):
+    monkeypatch.setattr(
+        pipeline_core, "iter_batch_ticks", lambda call_pacer: iter([(0, "", 0), (1, "x", 1)])
+    )
+    monkeypatch.setattr(
+        pipeline_core.gliner_pipeline,
+        "extract_candidates_timed",
+        AsyncMock(side_effect=RuntimeError("boom")),
+    )
+    monkeypatch.setattr(pipeline_core.gliner_pipeline, "reset_call", Mock())
+    monkeypatch.setattr(pipeline_core.llm_baseline, "reset_call", Mock())
+    fake_resolver = FakeResolver(AsyncMock())
+    monkeypatch.setattr(pipeline_core, "JevFieldResolver", lambda: fake_resolver)
+    fake_gliner_only_resolver = Mock()
+    fake_gliner_only_resolver.resolve_field = Mock()
+
+    store = FakeStore()
+    await pipeline_core.run_call(
+        1,
+        store,
+        calls=_calls_fixture(),
+        enable_gliner_only=True,
+        gliner_only_resolver=fake_gliner_only_resolver,
+    )  # must not raise
+
+    fake_resolver.resolve_field.assert_not_called()
+    fake_gliner_only_resolver.resolve_field.assert_not_called()
+    errored = [run for run in store.pipeline_runs if run["error"]]
+    assert len(errored) == 1
+    assert errored[0]["stage"] == "gliner_standard"
+    assert not any(run["pipeline"] == "gliner_only" for run in store.pipeline_runs)
+    assert not any(run["stage"] == "jev" for run in store.pipeline_runs)
