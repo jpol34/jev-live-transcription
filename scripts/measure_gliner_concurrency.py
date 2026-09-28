@@ -13,9 +13,10 @@ are exactly as `batch_runner`'s docstring warns -- inflated by queueing delay a 
 wouldn't see -- but that inflation, and whether raising `gliner_concurrency` reduces it, is the
 thing being measured here, not a benchmark-data contamination to avoid.
 
-This script only measures -- whether to actually raise `config.GLINER_CONCURRENCY` from its
-default is a separate, deliberate step made from this printed data, per the plan's decision to
-decide concurrency empirically rather than assume it.
+`config.GLINER_CONCURRENCY` is set to match `GlinerBatchEngine`'s own batching capacity (see its
+comment in `config.py`) -- this script's own recorded numbers predate that engine and reflect a
+different extraction strategy (fully lock-serialized, no batching), so they're not valid evidence
+for tuning it further. Re-run this script against the current extraction path first.
 
 Usage:
     uv run python scripts/measure_gliner_concurrency.py [--subset N] [--concurrencies 1,2,4]

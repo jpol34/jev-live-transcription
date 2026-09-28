@@ -43,6 +43,21 @@ def test_batch_defaults_enable_llm_baseline_to_false(monkeypatch, tmp_path):
     assert kwargs["enable_llm_baseline"] is False
 
 
+def test_batch_defaults_gliner_concurrency_to_config_value_not_one(monkeypatch, tmp_path):
+    # Regression test: --gliner-concurrency's argparse default must track config.GLINER_CONCURRENCY
+    # rather than a hardcoded 1, or `jlt batch` with no flags silently overrides run_batch's own
+    # config.GLINER_CONCURRENCY-based default back down to 1, defeating GlinerBatchEngine entirely.
+    _patch_common(monkeypatch)
+    run_batch_mock = AsyncMock(return_value=batch_runner.BatchResult())
+    monkeypatch.setattr(cli.batch_runner, "run_batch", run_batch_mock)
+
+    db_path = tmp_path / "out.sqlite3"
+    cli.main(["batch", "--db-path", str(db_path)])
+
+    _, kwargs = run_batch_mock.await_args
+    assert kwargs["gliner_concurrency"] == cli.config.GLINER_CONCURRENCY
+
+
 def test_batch_only_loads_openai_key_when_llm_baseline_enabled(monkeypatch, tmp_path):
     _patch_common(monkeypatch)
     monkeypatch.setattr(
@@ -156,7 +171,7 @@ def test_gpu_run_defaults(monkeypatch, tmp_path):
     _, kwargs = run_gpu_mock.call_args
     assert kwargs["subset"] is None
     assert kwargs["call_concurrency"] == 1
-    assert kwargs["gliner_concurrency"] == 1
+    assert kwargs["gliner_concurrency"] == cli.config.GLINER_CONCURRENCY
     assert kwargs["enable_llm_baseline"] is False
     assert kwargs["ssh_key"] == "/path/to/key"
     assert kwargs["keep_pod"] is False

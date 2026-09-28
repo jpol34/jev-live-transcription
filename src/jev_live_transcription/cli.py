@@ -76,13 +76,14 @@ def _build_parser() -> argparse.ArgumentParser:
     batch_parser.add_argument(
         "--gliner-concurrency",
         type=int,
-        default=1,
+        default=config.GLINER_CONCURRENCY,
         help=(
-            "Max concurrent GLiNER inferences across all calls (default: 1). GlinerBatchEngine "
-            f"batches concurrent calls into one real forward pass (see config.GLINER_CONCURRENCY, "
-            f"currently {config.GLINER_CONCURRENCY}), so raising this can yield genuine throughput "
-            "rather than pure queueing delay -- though the configured default hasn't yet been "
-            "re-tuned for it."
+            f"Max concurrent GLiNER inferences across all calls (default: "
+            f"{config.GLINER_CONCURRENCY}, matching GlinerBatchEngine's own batching capacity). "
+            "GlinerBatchEngine batches concurrent calls into one real forward pass rather than "
+            "serializing them, so raising this can yield genuine throughput -- but only alongside "
+            "--call-concurrency above 1, since a single sequential call never has concurrent "
+            "GLiNER ticks to batch."
         ),
     )
     batch_parser.add_argument(
@@ -113,7 +114,9 @@ def _build_parser() -> argparse.ArgumentParser:
         help=f"Local path to copy the pod's capture DB back to (default: {DEFAULT_DB_PATH}).",
     )
     gpu_run_parser.add_argument("--call-concurrency", type=int, default=1)
-    gpu_run_parser.add_argument("--gliner-concurrency", type=int, default=1)
+    gpu_run_parser.add_argument(
+        "--gliner-concurrency", type=int, default=config.GLINER_CONCURRENCY
+    )
     gpu_run_parser.add_argument(
         "--enable-llm-baseline",
         action="store_true",
