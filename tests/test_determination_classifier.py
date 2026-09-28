@@ -75,3 +75,39 @@ def test_contradictory_signals_are_uncertain():
 def test_classify_is_case_insensitive():
     window = "CALLER: GO AHEAD AND ENTER, NO PROBLEM."
     assert determination_classifier.classify("permission_to_enter", window) == "yes"
+
+
+def test_high_confidence_direct_match():
+    window = "Caller: They have permission to enter, that's fine."
+    result = determination_classifier.classify_with_confidence("permission_to_enter", window)
+    assert result.value == "yes"
+    assert result.confidence == 0.90
+    assert result.matched_pattern is not None
+
+
+def test_hedge_word_penalty_lowers_confidence_without_changing_value():
+    direct = determination_classifier.classify_with_confidence(
+        "permission_to_enter", "Caller: Go ahead and enter, that's fine."
+    )
+    hedged = determination_classifier.classify_with_confidence(
+        "permission_to_enter", "Caller: I think, maybe, go ahead and enter."
+    )
+    assert direct.value == "yes"
+    assert hedged.value == "yes"
+    assert hedged.confidence < direct.confidence
+    assert hedged.confidence > 0.0
+
+
+def test_uncertain_gives_zero_confidence():
+    window = "Caller: My name is Jane and my unit number is 204."
+    result = determination_classifier.classify_with_confidence("permission_to_enter", window)
+    assert result.value == "uncertain"
+    assert result.confidence == 0.0
+    assert result.matched_pattern is None
+
+
+def test_classify_delegates_to_classify_with_confidence():
+    window = "Caller: I guess it's fine if I'm not there. Just, uh, fix the leak, please."
+    delegated = determination_classifier.classify("permission_to_enter", window)
+    direct = determination_classifier.classify_with_confidence("permission_to_enter", window)
+    assert delegated == direct.value == "yes"

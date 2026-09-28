@@ -198,10 +198,12 @@ def _apply_determination_classifier(candidates: dict[str, list[dict]], window_te
     for field, taxonomy in FIELD_TAXONOMY.items():
         if taxonomy != "determination":
             continue
-        determination = determination_classifier.classify(field, window_text)
-        if determination == "uncertain":
+        result = determination_classifier.classify_with_confidence(field, window_text)
+        if result.value == "uncertain":
             continue
-        candidates[field].append({"text": determination, "score": None, "start": None, "end": None})
+        candidates[field].append(
+            {"text": result.value, "score": result.confidence, "start": None, "end": None}
+        )
 
 
 def _zero_shot_window(transcript_snapshot: str) -> tuple[str, int]:
