@@ -216,6 +216,19 @@ def _write_results(results_path: Path, results: list[dict]) -> None:
     results_path.write_text(json.dumps(results, indent=2))
 
 
+def _record_and_report(results: list[dict], entry_extra: dict, stats: dict, results_path: Path) -> None:
+    """Appends one sweep point's result, rewrites `results_path`, and prints its summary line --
+    shared by `_run_bench` and `_run_tune` so both sweeps stay crash-safe (results persisted after
+    every point) and report results the same way.
+    """
+    results.append({**entry_extra, **stats})
+    _write_results(results_path, results)
+    print(
+        f"  -> p50={_fmt(stats['p50_ms'])}ms p95={_fmt(stats['p95_ms'])}ms "
+        f"throughput={_fmt(stats['throughput_req_s'])}req/s"
+    )
+
+
 def _run_bench(
     ssh_direct: dict,
     ssh_key: str,
@@ -242,19 +255,13 @@ def _run_bench(
                 duration_s=duration_s,
                 context=f" at concurrency={concurrency}",
             )
-            entry = {
+            entry_extra = {
                 "concurrency": concurrency,
                 "duration_s": duration_s,
                 "max_batch_size": max_batch_size,
                 "batch_wait_timeout_ms": batch_wait_timeout_ms,
-                **stats,
             }
-            results.append(entry)
-            _write_results(results_path, results)
-            print(
-                f"  -> p50={_fmt(stats['p50_ms'])}ms p95={_fmt(stats['p95_ms'])}ms "
-                f"throughput={_fmt(stats['throughput_req_s'])}req/s"
-            )
+            _record_and_report(results, entry_extra, stats, results_path)
     finally:
         _stop_server(ssh_direct, ssh_key)
     print(f"Bench complete -- wrote {len(results)} result(s) to {results_path}")
@@ -302,22 +309,22 @@ def _run_tune(
         )
         try:
             print(f"  running load test at concurrency={concurrency}, duration={duration_s}s...")
-            stats = _run_load_test_once(ssh_direct, ssh_key, concurrency=concurrency, duration_s=duration_s)
+            stats = _run_load_test_once(
+                ssh_direct,
+                ssh_key,
+                concurrency=concurrency,
+                duration_s=duration_s,
+                context=f" for config max_batch_size={max_batch_size} batch_wait_timeout_ms={batch_wait_timeout_ms}",
+            )
         finally:
             _stop_server(ssh_direct, ssh_key)
-        entry = {
+        entry_extra = {
             "concurrency": concurrency,
             "duration_s": duration_s,
             "max_batch_size": max_batch_size,
             "batch_wait_timeout_ms": batch_wait_timeout_ms,
-            **stats,
         }
-        results.append(entry)
-        _write_results(results_path, results)
-        print(
-            f"  -> p50={_fmt(stats['p50_ms'])}ms p95={_fmt(stats['p95_ms'])}ms "
-            f"throughput={_fmt(stats['throughput_req_s'])}req/s"
-        )
+        _record_and_report(results, entry_extra, stats, results_path)
     print(f"Tune sweep complete -- wrote {len(results)} result(s) to {results_path}")
 
 
@@ -427,8 +434,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--results-path",
         type=Path,
-        default=Path("benchmarks/gliner_batch_service/results.json"),
-        help="Local path to write results.json to (bench mode only).",
+        default=None,
+        help=(
+            "Local path to write results to (bench and tune modes). Defaults to "
+            "benchmarks/gliner_batch_service/results.json for bench mode or tuning_sweep.json for "
+            "tune mode, so running both modes with no override doesn't overwrite one sweep's "
+            "results with the other's."
+        ),
     )
     parser.add_argument(
         "--keep-pod", action="store_true", default=False, help="Don't terminate the pod on exit (debugging only -- the pod keeps billing)."
@@ -453,6 +465,12 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     args = parser.parse_args(argv)
+    if args.results_path is None:
+        args.results_path = (
+            Path("benchmarks/gliner_batch_service/tuning_sweep.json")
+            if args.mode == "tune"
+            else Path("benchmarks/gliner_batch_service/results.json")
+        )
     concurrencies = [int(c.strip()) for c in args.concurrencies.split(",") if c.strip()]
     if not concurrencies or any(c < 1 for c in concurrencies):
         parser.error(f"--concurrencies must be a comma-separated list of positive integers, got {args.concurrencies!r}")
