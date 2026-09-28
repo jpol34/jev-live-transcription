@@ -739,6 +739,14 @@ async def test_concurrent_gliner_ticks_share_one_batched_inference_call_through_
 
     fake_model = _FakeGlinerModel()
     monkeypatch.setattr(gliner_pipeline, "_zero_shot_model", fake_model)
+    # Both ticks are enqueued before GlinerBatchEngine's worker ever gets a turn (asyncio.gather
+    # schedules both tasks before either yields past its own final await), so batching here doesn't
+    # actually depend on wall-clock timing in practice -- but GLINER_BATCH_WAIT_TIMEOUT_MS's default
+    # (20ms) is tight enough that a slow/contended runner's scheduling overhead alone could
+    # plausibly exceed it, since the collector's final (failed) attempt to find a third item always
+    # waits out the full window before dispatching. A wider window trades a bit of test wall-clock
+    # time for removing that flakiness risk.
+    monkeypatch.setattr(config, "GLINER_BATCH_WAIT_TIMEOUT_MS", 500.0)
 
     store = FakeStore()
     gliner_semaphore = asyncio.Semaphore(config.GLINER_CONCURRENCY)
