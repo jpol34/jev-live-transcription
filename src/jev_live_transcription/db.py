@@ -249,10 +249,21 @@ class CaptureStore:
             # automatically as the last connection closes, but a tool that copies just the main
             # file elsewhere (e.g. `gpu_run._retrieve_db`'s scp, which never touches `-wal`/`-shm`)
             # cannot rely on that timing. An explicit checkpoint here, before the connection ever
-            # closes, guarantees the main file alone is always complete and self-contained for
-            # whatever reads it next.
+            # closes, guarantees the main file alone is complete and self-contained for whatever
+            # reads it next -- unless SQLite reports `busy` (some other connection holds a read
+            # transaction open, blocking a full TRUNCATE), which doesn't raise on its own and so
+            # is checked explicitly and logged, since a busy checkpoint means the guarantee this
+            # is here for silently didn't hold.
             try:
-                conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+                busy, _log_frames, _checkpointed_frames = conn.execute(
+                    "PRAGMA wal_checkpoint(TRUNCATE)"
+                ).fetchone()
+                if busy:
+                    _LOGGER.warning(
+                        "final WAL checkpoint reported busy -- another connection may still be "
+                        "reading %s; the main file alone may not be complete",
+                        self.db_path,
+                    )
             except sqlite3.Error:
                 _LOGGER.exception("final WAL checkpoint failed; closing anyway")
             conn.close()

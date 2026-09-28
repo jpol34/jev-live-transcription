@@ -44,14 +44,17 @@ def _patch_hangar(monkeypatch, *, pod_id="pod-123"):
     return ready_pod
 
 
-def _patch_ssh_flow(monkeypatch, *, exit_code=0):
+_FAKE_CALL_COUNT = 7
+
+
+def _patch_ssh_flow(monkeypatch, *, exit_code=0, remote_call_count=_FAKE_CALL_COUNT):
     """Makes `_run_ssh` succeed for preflight/launch and immediately report completion.
 
-    On the `scp` step, writes a `calls` table sized to match `run_gpu`'s own `expected_calls`
-    computation (the real corpus's full size, since every caller here passes `subset=None`) --
-    `_retrieve_db` verifies row count against that on a successful (`exit_code=0`) run, so a fake
-    scp that wrote nothing would fail verification even though nothing about the run under test
-    actually went wrong.
+    On the `scp` step, writes a `calls` table sized to `remote_call_count`, and the remote-log
+    `cat` (distinct from the exit-marker `cat`) reports the same count via a fake
+    `"Running N call(s)"` line, matching what `_read_remote_expected_calls` parses from a real
+    `jlt batch` log -- `_retrieve_db` verifies the scp'd row count against that on a successful
+    (`exit_code=0`) run, so the two must agree for a test to represent a correct run.
     """
 
     def fake_run(cmd, **kwargs):
@@ -62,9 +65,10 @@ def _patch_ssh_flow(monkeypatch, *, exit_code=0):
             dest.unlink(missing_ok=True)
             conn = gpu_run.db_module.connect(dest)
             try:
-                n_calls = len(gpu_run.corpus.load_all())
                 conn.execute("CREATE TABLE calls (call_id INTEGER PRIMARY KEY)")
-                conn.executemany("INSERT INTO calls (call_id) VALUES (?)", [(i,) for i in range(n_calls)])
+                conn.executemany(
+                    "INSERT INTO calls (call_id) VALUES (?)", [(i,) for i in range(remote_call_count)]
+                )
                 conn.commit()
             finally:
                 conn.close()
@@ -77,7 +81,13 @@ def _patch_ssh_flow(monkeypatch, *, exit_code=0):
             return Mock(returncode=0, stdout="", stderr="")
         if "nohup" in joined:
             return Mock(returncode=0, stdout="LAUNCHED\n", stderr="")
-        if "cat" in joined:
+        if gpu_run._REMOTE_LOG_PATH in joined:
+            return Mock(
+                returncode=0,
+                stdout=f"Running {remote_call_count} call(s) -> /root/benchmark.sqlite3 (call_concurrency=1)\n",
+                stderr="",
+            )
+        if gpu_run._REMOTE_EXIT_MARKER in joined:
             return Mock(returncode=0, stdout=f"{exit_code}\n", stderr="")
         raise AssertionError(f"unexpected command: {joined!r}")
 
@@ -107,9 +117,9 @@ def test_run_gpu_happy_path_terminates_pod_and_returns_remote_exit_code(monkeypa
 def test_run_gpu_subset_larger_than_corpus_does_not_fail_verification(monkeypatch, tmp_path):
     # cli.py's own `_run_batch` slices `call_ids[:subset]`, which silently caps to the corpus size
     # rather than erroring -- a `--subset` larger than the corpus (e.g. "run everything" expressed
-    # as a large number) completes correctly with fewer calls than `subset` asked for.
-    # `_patch_ssh_flow`'s fake scp always writes the real corpus's full call count, matching what
-    # the remote side would actually produce here.
+    # as a large number) completes correctly with fewer calls than `subset` asked for. Verification
+    # is unaffected either way, since `expected_calls` comes from the remote run's own reported
+    # count (`_read_remote_expected_calls`), never from `subset` or a local corpus computation.
     _patch_secrets(monkeypatch)
     _patch_hangar(monkeypatch)
     _patch_ssh_flow(monkeypatch, exit_code=0)
@@ -413,6 +423,34 @@ def test_write_remote_env_raises_on_failure(monkeypatch):
 
     with pytest.raises(RuntimeError, match="failed to write remote env file"):
         gpu_run._write_remote_env(ssh_direct, None, {"FOO": "bar"})
+
+
+# --- remote-reported expected call count --------------------------------------------------------
+
+
+def test_read_remote_expected_calls_parses_the_running_line(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    log = (
+        "some preflight output\n"
+        "Running 42 call(s) -> /root/benchmark.sqlite3 (call_concurrency=1, gliner_concurrency=1, "
+        "enable_llm_baseline=False)\n"
+        "more output after\n"
+    )
+    monkeypatch.setattr(
+        gpu_run.subprocess, "run", Mock(return_value=Mock(returncode=0, stdout=log, stderr=""))
+    )
+
+    assert gpu_run._read_remote_expected_calls(ssh_direct, None) == 42
+
+
+def test_read_remote_expected_calls_raises_when_running_line_is_absent(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    monkeypatch.setattr(
+        gpu_run.subprocess, "run", Mock(return_value=Mock(returncode=0, stdout="no such line here\n", stderr=""))
+    )
+
+    with pytest.raises(RuntimeError, match="could not find jlt batch's own"):
+        gpu_run._read_remote_expected_calls(ssh_direct, None)
 
 
 # --- retrieved-DB verification ----------------------------------------------------------------

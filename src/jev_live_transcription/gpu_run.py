@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import shlex
 import sqlite3
 import subprocess
@@ -25,7 +26,7 @@ from pathlib import Path
 
 import hangar
 
-from . import config, corpus, secrets
+from . import config, secrets
 from . import db as db_module
 
 _LOGGER = logging.getLogger(__name__)
@@ -245,6 +246,39 @@ def _verify_db(db_path: Path, expected_calls: int) -> str | None:
     return None
 
 
+_REMOTE_RUNNING_LINE_RE = re.compile(r"^Running (\d+) call\(s\)", re.MULTILINE)
+
+
+def _read_remote_expected_calls(ssh_direct: dict, ssh_key: str | None) -> int:
+    """Return the call count `jlt batch` itself reported running, parsed from its own
+    `"Running N call(s) -> ..."` log line (`cli.py`'s `_run_batch`) on the pod.
+
+    Deriving this from the remote side's own report -- rather than recomputing it locally from
+    `corpus.load_all()`/`--subset` -- means it's always exactly what that run actually did,
+    regardless of whether the pod's baked-in corpus (`_IMAGE`) happens to match the local
+    checkout's `output/transcripts`/`output/metadata` at the moment `run_gpu` is invoked.
+    """
+    result = _run_ssh(ssh_direct, ssh_key, f"cat {_REMOTE_LOG_PATH}")
+    match = _REMOTE_RUNNING_LINE_RE.search(result.stdout)
+    if not match:
+        raise RuntimeError(
+            f"could not find jlt batch's own 'Running N call(s)' line in the remote log at "
+            f"{_REMOTE_LOG_PATH} -- can't verify the retrieved DB's completeness."
+        )
+    return int(match.group(1))
+
+
+def _scp_db(ssh_direct: dict, ssh_key: str | None, local_db_path: Path) -> None:
+    local_db_path.parent.mkdir(parents=True, exist_ok=True)
+    scp_args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-P", str(ssh_direct["port"])]
+    if ssh_key:
+        scp_args += ["-i", ssh_key]
+    source = f"{ssh_direct['username']}@{ssh_direct['host']}:{_REMOTE_DB_PATH}"
+    result = subprocess.run(["scp", *scp_args, source, str(local_db_path)], capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f"failed to retrieve capture DB from pod: {result.stderr}")
+
+
 def _retrieve_db(
     ssh_direct: dict, ssh_key: str | None, local_db_path: Path, expected_calls: int | None
 ) -> None:
@@ -254,36 +288,25 @@ def _retrieve_db(
     then retrieved best-effort, for debugging, on a single attempt with no verification, since a
     failed run's DB is expected to be incomplete and shouldn't be held to the same bar (or block
     retrieval entirely) the way a DB from a *successful* run should. When given, it's the number
-    of `calls` rows a successful, complete DB must have, and a mismatch is retried once before
-    raising -- see `_verify_db`.
+    of `calls` rows a successful, complete DB must have (see `_read_remote_expected_calls`), and a
+    mismatch is retried once before raising -- see `_verify_db`.
     """
-    local_db_path.parent.mkdir(parents=True, exist_ok=True)
-    scp_args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-P", str(ssh_direct["port"])]
-    if ssh_key:
-        scp_args += ["-i", ssh_key]
-    source = f"{ssh_direct['username']}@{ssh_direct['host']}:{_REMOTE_DB_PATH}"
-
-    if expected_calls is None:
-        result = subprocess.run(["scp", *scp_args, source, str(local_db_path)], capture_output=True, text=True)
-        if result.returncode != 0:
-            raise RuntimeError(f"failed to retrieve capture DB from pod: {result.stderr}")
-        return
-
-    # One retry on a verification failure: cheap insurance against a transient transfer/flush
-    # issue, distinct from a genuinely bad source DB on the pod (which would fail again).
-    for attempt in (1, 2):
-        result = subprocess.run(["scp", *scp_args, source, str(local_db_path)], capture_output=True, text=True)
-        if result.returncode != 0:
-            raise RuntimeError(f"failed to retrieve capture DB from pod: {result.stderr}")
+    attempts = 2 if expected_calls is not None else 1
+    problem: str | None = None
+    for attempt in range(1, attempts + 1):
+        _scp_db(ssh_direct, ssh_key, local_db_path)
+        if expected_calls is None:
+            return
         problem = _verify_db(local_db_path, expected_calls)
         if problem is None:
             return
         _LOGGER.warning(
-            "retrieved capture DB at %s %s (attempt %d/2)%s",
+            "retrieved capture DB at %s %s (attempt %d/%d)%s",
             local_db_path,
             problem,
             attempt,
-            "" if attempt == 1 else " -- giving up",
+            attempts,
+            "" if attempt < attempts else " -- giving up",
         )
 
     raise RuntimeError(
@@ -362,14 +385,8 @@ def run_gpu(
         exit_code = _wait_for_completion(ssh_direct, ssh_key)
         print(f"Remote jlt batch finished with exit code {exit_code}")
 
-        # `cli.py`'s own `_run_batch` slices `call_ids[:subset]` -- a plain Python slice, which
-        # silently caps to the corpus size rather than erroring when `subset` exceeds it. The
-        # expected count here must apply the same cap, or a `--subset` larger than the corpus
-        # (e.g. "run everything" expressed as a large number) would flag a perfectly correct run
-        # as an incomplete/corrupted DB.
-        n_corpus_calls = len(corpus.load_all())
-        expected_calls = min(subset, n_corpus_calls) if subset is not None else n_corpus_calls
-        _retrieve_db(ssh_direct, ssh_key, db_path, expected_calls if exit_code == 0 else None)
+        expected_calls = _read_remote_expected_calls(ssh_direct, ssh_key) if exit_code == 0 else None
+        _retrieve_db(ssh_direct, ssh_key, db_path, expected_calls)
         print(f"Capture DB retrieved to {db_path}")
 
         return exit_code
