@@ -41,11 +41,16 @@ from jev_live_transcription.gpu_run import _cuda_preflight, _read_public_key, _w
 # `load_test.py` lives alongside this file and defines the one real request shape this benchmark
 # uses (confirmed against the installed gliner[serve] package, not guessed) -- imported rather than
 # duplicated so the warmup/readiness check here exercises the exact same payload shape as the real
-# load-tested traffic in `run_matrix.py`.
+# load-tested traffic in `run_matrix.py`. `_pod_ssh` is the SSH/scp helper module shared with the
+# sibling `gliner_batch_service/pod_bench.py`, one level up.
 _THIS_DIR = Path(__file__).resolve().parent
-if str(_THIS_DIR) not in sys.path:
-    sys.path.insert(0, str(_THIS_DIR))
+for _extra_path in (_THIS_DIR, _THIS_DIR.parent):
+    if str(_extra_path) not in sys.path:
+        sys.path.insert(0, str(_extra_path))
 import load_test  # noqa: E402
+from _pod_ssh import run_ssh as _run_ssh  # noqa: E402
+from _pod_ssh import ssh_target as _ssh_target  # noqa: E402
+from _pod_ssh import wait_for_ssh_connectable as _wait_for_ssh_connectable  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,50 +65,11 @@ _REMOTE_PID_PATH = f"{_REMOTE_DIR}/gliner-serve.pid"
 _REMOTE_RESULTS_PATH = f"{_REMOTE_DIR}/results.json"
 _REMOTE_DIAGNOSIS_PATH = f"{_REMOTE_DIR}/diagnosis.json"
 
-_SSH_CONNECT_TIMEOUT_S = 300.0
-_SSH_CONNECT_POLL_S = 5.0
 # Generous: the first real request against a freshly-started replica pays a one-time torch.compile
 # warmup cost observed directly to exceed 4 minutes on this model/GPU (dynamo hit its recompile
 # limit during warmup) -- a real finding about gliner.serve's default config, not a bug to paper
 # over by shrinking this number.
 _SERVER_READY_TIMEOUT_S = 600.0
-
-
-def _ssh_target(ssh_key: str) -> list[str]:
-    # `-n` redirects the local ssh client's own stdin from /dev/null. Without it, a non-interactive
-    # `ssh host 'cmd &'` can hang past the backgrounded command finishing: the client keeps the
-    # channel open waiting on local stdin activity that never comes, regardless of the remote
-    # command's own stdout/stderr redirection.
-    return ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-n", "-i", ssh_key]
-
-
-def _run_ssh(
-    ssh_direct: dict, ssh_key: str, command: str, *, timeout_s: float = 30.0
-) -> subprocess.CompletedProcess:
-    target = f"{ssh_direct['username']}@{ssh_direct['host']}"
-    return subprocess.run(
-        ["ssh", *_ssh_target(ssh_key), "-p", str(ssh_direct["port"]), target, command],
-        capture_output=True,
-        # Explicit UTF-8 rather than `text=True`'s platform-default decoding: on Windows that
-        # default is cp1252, which crashes decoding remote output containing multi-byte UTF-8
-        # sequences (observed directly -- pip's install progress bar during `_install_deps`).
-        # `errors="replace"` keeps a decode hiccup from crashing the whole SSH call outright.
-        encoding="utf-8",
-        errors="replace",
-        timeout=timeout_s,
-    )
-
-
-def _wait_for_ssh_connectable(ssh_direct: dict, ssh_key: str) -> None:
-    deadline = time.monotonic() + _SSH_CONNECT_TIMEOUT_S
-    last_result: subprocess.CompletedProcess | None = None
-    while time.monotonic() < deadline:
-        last_result = _run_ssh(ssh_direct, ssh_key, "true", timeout_s=10.0)
-        if last_result.returncode == 0:
-            return
-        time.sleep(_SSH_CONNECT_POLL_S)
-    stderr = last_result.stderr if last_result else "(no attempt made)"
-    raise TimeoutError(f"SSH never became connectable within {_SSH_CONNECT_TIMEOUT_S}s: {stderr}")
 
 
 def _install_deps(ssh_direct: dict, ssh_key: str) -> None:
