@@ -191,6 +191,15 @@ class GlinerBatchEngine:
             self._executor = None
         self._closed = True
 
+    @property
+    def is_running(self) -> bool:
+        """True once `start()` has run and its worker task hasn't died unexpectedly -- used by
+        health checks (e.g. the serving app's `/healthz`) to distinguish a live engine from one
+        whose worker crashed silently, since a dead worker would otherwise hang every subsequent
+        `submit()` forever with no visible symptom until a caller's own timeout (if any) fires.
+        """
+        return self._worker_task is not None and not self._worker_task.done()
+
 
 _engines_by_loop: "weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, GlinerBatchEngine]" = (
     weakref.WeakKeyDictionary()

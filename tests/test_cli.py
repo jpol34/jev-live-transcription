@@ -192,18 +192,22 @@ def test_tui_forwards_enable_llm_baseline_when_passed(monkeypatch):
     tui_run_mock.assert_called_once_with(42, db_path=None, enable_llm_baseline=True)
 
 
-def test_serve_runs_uvicorn_against_the_serving_app(monkeypatch):
+def test_serve_runs_uvicorn_against_a_freshly_created_app(monkeypatch):
     import sys
 
     from jev_live_transcription.serving import app as real_serving_app
 
+    fake_app = object()
+    create_app_mock = Mock(return_value=fake_app)
+    monkeypatch.setattr(real_serving_app, "create_app", create_app_mock)
     uvicorn_run_mock = Mock()
     monkeypatch.setitem(sys.modules, "uvicorn", Mock(run=uvicorn_run_mock))
 
     exit_code = cli.main(["serve", "--host", "127.0.0.1", "--port", "9000"])
 
     assert exit_code == 0
-    uvicorn_run_mock.assert_called_once_with(real_serving_app.app, host="127.0.0.1", port=9000)
+    create_app_mock.assert_called_once_with(max_batch_size=None, batch_wait_timeout_ms=None)
+    uvicorn_run_mock.assert_called_once_with(fake_app, host="127.0.0.1", port=9000)
 
 
 def test_serve_defaults_host_and_port(monkeypatch):
@@ -219,15 +223,35 @@ def test_serve_defaults_host_and_port(monkeypatch):
     assert kwargs["port"] == 8000
 
 
-def test_serve_applies_batch_tuning_overrides_before_starting(monkeypatch):
+def test_serve_forwards_batch_tuning_overrides_to_create_app(monkeypatch):
     import sys
 
-    uvicorn_run_mock = Mock()
-    monkeypatch.setitem(sys.modules, "uvicorn", Mock(run=uvicorn_run_mock))
-    monkeypatch.setattr(cli.config, "GLINER_BATCH_MAX_SIZE", 16)
-    monkeypatch.setattr(cli.config, "GLINER_BATCH_WAIT_TIMEOUT_MS", 20.0)
+    from jev_live_transcription.serving import app as real_serving_app
+
+    create_app_mock = Mock(return_value=object())
+    monkeypatch.setattr(real_serving_app, "create_app", create_app_mock)
+    monkeypatch.setitem(sys.modules, "uvicorn", Mock(run=Mock()))
 
     cli.main(["serve", "--max-batch-size", "32", "--batch-wait-timeout-ms", "5"])
 
-    assert cli.config.GLINER_BATCH_MAX_SIZE == 32
-    assert cli.config.GLINER_BATCH_WAIT_TIMEOUT_MS == 5.0
+    create_app_mock.assert_called_once_with(max_batch_size=32, batch_wait_timeout_ms=5.0)
+
+
+def test_serve_rejects_non_positive_max_batch_size(monkeypatch):
+    import sys
+
+    monkeypatch.setitem(sys.modules, "uvicorn", Mock(run=Mock()))
+
+    exit_code = cli.main(["serve", "--max-batch-size", "0"])
+
+    assert exit_code == 2
+
+
+def test_serve_rejects_negative_batch_wait_timeout(monkeypatch):
+    import sys
+
+    monkeypatch.setitem(sys.modules, "uvicorn", Mock(run=Mock()))
+
+    exit_code = cli.main(["serve", "--batch-wait-timeout-ms", "-1"])
+
+    assert exit_code == 2

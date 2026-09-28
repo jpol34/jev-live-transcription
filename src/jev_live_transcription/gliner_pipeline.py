@@ -134,12 +134,25 @@ def _zero_shot_window(transcript_snapshot: str) -> tuple[str, int]:
     return transcript_snapshot[window_start:], window_start
 
 
-def _make_batch_engine() -> GlinerBatchEngine:
+def _make_batch_engine(
+    *, max_batch_size: int | None = None, batch_wait_timeout_ms: float | None = None
+) -> GlinerBatchEngine:
+    """Construct (but don't start) a `GlinerBatchEngine` against the shared model singleton.
+
+    `max_batch_size`/`batch_wait_timeout_ms` default to `config`'s values when omitted -- the
+    single construction path for both the inline engine cache below and the standalone HTTP
+    serving app (`serving/app.py`), so the two `GLINER_SERVING_MODE` paths can't drift apart on how
+    the engine gets built.
+    """
     return GlinerBatchEngine(
         _get_zero_shot_model(),
         ZERO_SHOT_FIELD_LABELS,
-        max_batch_size=config.GLINER_BATCH_MAX_SIZE,
-        batch_wait_timeout_ms=config.GLINER_BATCH_WAIT_TIMEOUT_MS,
+        max_batch_size=max_batch_size if max_batch_size is not None else config.GLINER_BATCH_MAX_SIZE,
+        batch_wait_timeout_ms=(
+            batch_wait_timeout_ms
+            if batch_wait_timeout_ms is not None
+            else config.GLINER_BATCH_WAIT_TIMEOUT_MS
+        ),
         threshold=config.GLINER_ZERO_SHOT_THRESHOLD,
         multi_label=True,
     )

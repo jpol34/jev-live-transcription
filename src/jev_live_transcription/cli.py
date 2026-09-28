@@ -229,16 +229,21 @@ def _run_gpu_run(args: argparse.Namespace) -> int:
 
 
 def _run_serve(args: argparse.Namespace) -> int:
+    if args.max_batch_size is not None and args.max_batch_size < 1:
+        print(f"error: --max-batch-size must be positive, got {args.max_batch_size}")
+        return 2
+    if args.batch_wait_timeout_ms is not None and args.batch_wait_timeout_ms < 0:
+        print(f"error: --batch-wait-timeout-ms must be non-negative, got {args.batch_wait_timeout_ms}")
+        return 2
+
     import uvicorn
 
     from .serving import app as serving_app
 
-    if args.max_batch_size is not None:
-        config.GLINER_BATCH_MAX_SIZE = args.max_batch_size
-    if args.batch_wait_timeout_ms is not None:
-        config.GLINER_BATCH_WAIT_TIMEOUT_MS = args.batch_wait_timeout_ms
-
-    uvicorn.run(serving_app.app, host=args.host, port=args.port)
+    app = serving_app.create_app(
+        max_batch_size=args.max_batch_size, batch_wait_timeout_ms=args.batch_wait_timeout_ms
+    )
+    uvicorn.run(app, host=args.host, port=args.port)
     return 0
 
 
