@@ -181,6 +181,8 @@ def _launch_batch_detached(
     call_concurrency: int,
     gliner_concurrency: int,
     enable_llm_baseline: bool,
+    enable_gliner_only: bool = False,
+    enable_jev: bool = True,
 ) -> None:
     batch_cmd = (
         f"jlt batch --db-path {_REMOTE_DB_PATH} "
@@ -190,6 +192,10 @@ def _launch_batch_detached(
         batch_cmd += f" --subset {subset}"
     if enable_llm_baseline:
         batch_cmd += " --enable-llm-baseline"
+    if enable_gliner_only:
+        batch_cmd += " --enable-gliner-only"
+    if not enable_jev:
+        batch_cmd += " --disable-jev"
 
     remote_command = (
         f"nohup sh -c '. {_REMOTE_ENV_PATH} && {batch_cmd}; echo $? > {_REMOTE_EXIT_MARKER}' "
@@ -325,11 +331,14 @@ def run_gpu(
     call_concurrency: int,
     gliner_concurrency: int,
     enable_llm_baseline: bool,
+    enable_gliner_only: bool = False,
+    enable_jev: bool = True,
     pod_state_path: Path,
     ssh_key: str | None,
     keep_pod: bool,
 ) -> int:
-    secrets.load_typesafe_key()
+    if enable_jev:
+        secrets.load_typesafe_key()
     if enable_llm_baseline:
         secrets.load_openai_key()
     secrets.load_runpod_key()
@@ -337,10 +346,9 @@ def run_gpu(
     hangar.init(os.environ[secrets.RUNPOD_ENV_VAR])
 
     state = _load_state(pod_state_path)
-    extra_env = {
-        "TYPESAFE_API_KEY": os.environ[secrets.TYPESAFE_ENV_VAR],
-        "PUBLIC_KEY": _read_public_key(ssh_key),
-    }
+    extra_env = {"PUBLIC_KEY": _read_public_key(ssh_key)}
+    if enable_jev:
+        extra_env["TYPESAFE_API_KEY"] = os.environ[secrets.TYPESAFE_ENV_VAR]
     if enable_llm_baseline:
         extra_env["OPENAI_API_KEY"] = os.environ[secrets.OPENAI_ENV_VAR]
 
@@ -381,6 +389,8 @@ def run_gpu(
             call_concurrency=call_concurrency,
             gliner_concurrency=gliner_concurrency,
             enable_llm_baseline=enable_llm_baseline,
+            enable_gliner_only=enable_gliner_only,
+            enable_jev=enable_jev,
         )
         print("jlt batch launched on the pod, polling for completion...")
 

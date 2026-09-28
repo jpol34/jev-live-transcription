@@ -227,6 +227,156 @@ def test_run_gpu_resumes_pod_id_from_existing_state_file(monkeypatch, tmp_path):
     assert spec.pod_id == "pod-existing"
 
 
+def test_run_gpu_skips_typesafe_key_when_jev_disabled(monkeypatch, tmp_path):
+    # --disable-jev must mean TYPESAFE_API_KEY is never loaded or validated on the GPU-run path
+    # either, or a fully local --enable-gliner-only --disable-jev run can't start without a
+    # typesafe.ai credential.
+    _patch_secrets(monkeypatch)
+    _patch_hangar(monkeypatch)
+    _patch_ssh_flow(monkeypatch)
+    load_typesafe_key_mock = Mock()
+    monkeypatch.setattr(gpu_run.secrets, "load_typesafe_key", load_typesafe_key_mock)
+
+    result = gpu_run.run_gpu(
+        subset=None,
+        db_path=tmp_path / "out.sqlite3",
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+        enable_gliner_only=True,
+        enable_jev=False,
+        pod_state_path=tmp_path / "state.json",
+        ssh_key=_fake_ssh_key(tmp_path),
+        keep_pod=False,
+    )
+
+    assert result == 0
+    load_typesafe_key_mock.assert_not_called()
+    spec = gpu_run.hangar.start_pod.call_args[0][0]
+    assert "TYPESAFE_API_KEY" not in spec.extra_env
+
+
+def test_run_gpu_loads_typesafe_key_when_jev_enabled(monkeypatch, tmp_path):
+    _patch_secrets(monkeypatch)
+    _patch_hangar(monkeypatch)
+    _patch_ssh_flow(monkeypatch)
+    load_typesafe_key_mock = Mock()
+    monkeypatch.setattr(gpu_run.secrets, "load_typesafe_key", load_typesafe_key_mock)
+
+    gpu_run.run_gpu(
+        subset=None,
+        db_path=tmp_path / "out.sqlite3",
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+        pod_state_path=tmp_path / "state.json",
+        ssh_key=_fake_ssh_key(tmp_path),
+        keep_pod=False,
+    )
+
+    load_typesafe_key_mock.assert_called_once()
+    spec = gpu_run.hangar.start_pod.call_args[0][0]
+    assert spec.extra_env["TYPESAFE_API_KEY"] == "typesafe-test-key"
+
+
+def test_run_gpu_forwards_enable_gliner_only_and_disable_jev_to_remote_batch_command(monkeypatch, tmp_path):
+    _patch_secrets(monkeypatch)
+    _patch_hangar(monkeypatch)
+    _patch_ssh_flow(monkeypatch)
+    launch_batch_detached_mock = Mock(wraps=gpu_run._launch_batch_detached)
+    monkeypatch.setattr(gpu_run, "_launch_batch_detached", launch_batch_detached_mock)
+
+    gpu_run.run_gpu(
+        subset=None,
+        db_path=tmp_path / "out.sqlite3",
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+        enable_gliner_only=True,
+        enable_jev=False,
+        pod_state_path=tmp_path / "state.json",
+        ssh_key=_fake_ssh_key(tmp_path),
+        keep_pod=False,
+    )
+
+    _, kwargs = launch_batch_detached_mock.call_args
+    assert kwargs["enable_gliner_only"] is True
+    assert kwargs["enable_jev"] is False
+
+
+def test_launch_batch_detached_includes_enable_gliner_only_flag(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    captured = {}
+
+    def fake_run(cmd, **kwargs):
+        captured["cmd"] = " ".join(cmd)
+        return Mock(returncode=0, stdout="LAUNCHED\n", stderr="")
+
+    monkeypatch.setattr(gpu_run.subprocess, "run", Mock(side_effect=fake_run))
+
+    gpu_run._launch_batch_detached(
+        ssh_direct,
+        None,
+        subset=None,
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+        enable_gliner_only=True,
+        enable_jev=True,
+    )
+
+    assert "--enable-gliner-only" in captured["cmd"]
+    assert "--disable-jev" not in captured["cmd"]
+
+
+def test_launch_batch_detached_includes_disable_jev_flag_when_jev_disabled(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    captured = {}
+
+    def fake_run(cmd, **kwargs):
+        captured["cmd"] = " ".join(cmd)
+        return Mock(returncode=0, stdout="LAUNCHED\n", stderr="")
+
+    monkeypatch.setattr(gpu_run.subprocess, "run", Mock(side_effect=fake_run))
+
+    gpu_run._launch_batch_detached(
+        ssh_direct,
+        None,
+        subset=None,
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+        enable_gliner_only=False,
+        enable_jev=False,
+    )
+
+    assert "--disable-jev" in captured["cmd"]
+    assert "--enable-gliner-only" not in captured["cmd"]
+
+
+def test_launch_batch_detached_omits_both_flags_by_default(monkeypatch):
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    captured = {}
+
+    def fake_run(cmd, **kwargs):
+        captured["cmd"] = " ".join(cmd)
+        return Mock(returncode=0, stdout="LAUNCHED\n", stderr="")
+
+    monkeypatch.setattr(gpu_run.subprocess, "run", Mock(side_effect=fake_run))
+
+    gpu_run._launch_batch_detached(
+        ssh_direct,
+        None,
+        subset=None,
+        call_concurrency=1,
+        gliner_concurrency=1,
+        enable_llm_baseline=False,
+    )
+
+    assert "--enable-gliner-only" not in captured["cmd"]
+    assert "--disable-jev" not in captured["cmd"]
+
+
 def test_run_gpu_only_forwards_openai_key_when_llm_baseline_enabled(monkeypatch, tmp_path):
     _patch_secrets(monkeypatch)
     _patch_hangar(monkeypatch)
