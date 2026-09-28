@@ -31,7 +31,15 @@ Real A100 pod (creates, benchmarks, always terminates the pod on exit):
 uv run python benchmarks/gliner_batch_service/pod_bench.py smoke --ssh-key ~/.ssh/id_ed25519
 uv run python benchmarks/gliner_batch_service/pod_bench.py bench --ssh-key ~/.ssh/id_ed25519 \
     --concurrencies 50,200 --duration-s 25
+uv run python benchmarks/gliner_batch_service/pod_bench.py tune --ssh-key ~/.ssh/id_ed25519 \
+    --concurrency 200 --configs 16:20,32:20,64:20,128:0,200:0 --duration-s 25
 ```
 
-`bench` mode writes `results.json`, rewritten after each concurrency point completes so a crash
-partway through the sweep doesn't lose already-collected data.
+`bench` mode sweeps `--concurrencies` at one fixed tuning config; `tune` mode sweeps
+`--configs` (`max_batch_size:batch_wait_timeout_ms` pairs) at one fixed `--concurrency`, restarting
+`jlt serve` between configs. Both write results to `--results-path`, rewritten after each point
+completes so a crash partway through the sweep doesn't lose already-collected data --
+`--results-path` defaults to `results.json` for `bench` and `tuning_sweep.json` for `tune`, so
+running both modes with no override doesn't overwrite one sweep's results with the other's. See
+`RESULTS.md` for the tuning sweep that picked this project's current
+`config.GLINER_BATCH_MAX_SIZE`/`GLINER_BATCH_WAIT_TIMEOUT_MS` defaults.

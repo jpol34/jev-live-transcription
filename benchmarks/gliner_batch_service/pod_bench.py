@@ -1,8 +1,9 @@
 """Stands up a RunPod A100 pod, installs this repo's own package (not a third-party stack), starts
-`jlt serve`, and runs a closed-loop load-test sweep against it across `--concurrencies` -- retrieving
-`results.json` with one entry per concurrency point, rewritten after each completes so a crash
-partway through the sweep doesn't lose already-collected data. Always terminates the pod on exit,
-success or failure.
+`jlt serve`, and runs a closed-loop load test against it -- either a concurrency sweep at one fixed
+tuning config (`bench` mode) or a batch-tuning sweep at one fixed concurrency (`tune` mode, restarts
+the server between configs). Either way, `results.json` gets one entry per point, rewritten after
+each completes so a crash partway through the sweep doesn't lose already-collected data. Always
+terminates the pod on exit, success or failure.
 
 Mirrors `benchmarks/gliner_serve/pod_bench.py`'s hangar-based lifecycle (create/resume via
 `hangar`, poll for `RUNNING` + `ssh.direct`, retry real SSH connectability rather than trusting
@@ -24,6 +25,8 @@ Two details of this base image are load-bearing and easy to drop by accident (sa
 Usage:
     python pod_bench.py smoke --ssh-key ~/.ssh/id_ed25519
     python pod_bench.py bench --ssh-key ~/.ssh/id_ed25519 --concurrencies 50,200 --duration-s 25
+    python pod_bench.py tune --ssh-key ~/.ssh/id_ed25519 --concurrency 200 \
+        --configs 16:20,32:20,64:20,16:10,32:10,64:10
 """
 
 from __future__ import annotations
@@ -213,6 +216,19 @@ def _write_results(results_path: Path, results: list[dict]) -> None:
     results_path.write_text(json.dumps(results, indent=2))
 
 
+def _record_and_report(results: list[dict], entry_extra: dict, stats: dict, results_path: Path) -> None:
+    """Appends one sweep point's result, rewrites `results_path`, and prints its summary line --
+    shared by `_run_bench` and `_run_tune` so both sweeps stay crash-safe (results persisted after
+    every point) and report results the same way.
+    """
+    results.append({**entry_extra, **stats})
+    _write_results(results_path, results)
+    print(
+        f"  -> p50={_fmt(stats['p50_ms'])}ms p95={_fmt(stats['p95_ms'])}ms "
+        f"throughput={_fmt(stats['throughput_req_s'])}req/s"
+    )
+
+
 def _run_bench(
     ssh_direct: dict,
     ssh_key: str,
@@ -232,36 +248,84 @@ def _run_bench(
     try:
         for concurrency in concurrencies:
             print(f"Running load test at concurrency={concurrency}, duration={duration_s}s...")
-            remote_command = (
-                f"cd {_REMOTE_DIR} && python load_test.py --concurrency {concurrency} "
-                f"--duration-s {duration_s} --url http://localhost:{_SERVE_PORT} "
-                f"--fixture-path {_REMOTE_FIXTURE_PATH} "
-                f"--request-timeout-s {_LOAD_TEST_REQUEST_TIMEOUT_S}"
+            stats = _run_load_test_once(
+                ssh_direct,
+                ssh_key,
+                concurrency=concurrency,
+                duration_s=duration_s,
+                context=f" at concurrency={concurrency}",
             )
-            run_result = _run_ssh(
-                ssh_direct, ssh_key, remote_command, timeout_s=duration_s + _LOAD_TEST_SSH_MARGIN_S
-            )
-            if run_result.returncode != 0:
-                raise RuntimeError(
-                    f"load_test.py failed at concurrency={concurrency}: {run_result.stderr}"
-                )
-            stats = json.loads(run_result.stdout.strip().splitlines()[-1])
-            entry = {
+            entry_extra = {
                 "concurrency": concurrency,
                 "duration_s": duration_s,
                 "max_batch_size": max_batch_size,
                 "batch_wait_timeout_ms": batch_wait_timeout_ms,
-                **stats,
             }
-            results.append(entry)
-            _write_results(results_path, results)
-            print(
-                f"  -> p50={_fmt(stats['p50_ms'])}ms p95={_fmt(stats['p95_ms'])}ms "
-                f"throughput={_fmt(stats['throughput_req_s'])}req/s"
-            )
+            _record_and_report(results, entry_extra, stats, results_path)
     finally:
         _stop_server(ssh_direct, ssh_key)
     print(f"Bench complete -- wrote {len(results)} result(s) to {results_path}")
+
+
+def _run_load_test_once(
+    ssh_direct: dict, ssh_key: str, *, concurrency: int, duration_s: float, context: str = ""
+) -> dict:
+    remote_command = (
+        f"cd {_REMOTE_DIR} && python load_test.py --concurrency {concurrency} "
+        f"--duration-s {duration_s} --url http://localhost:{_SERVE_PORT} "
+        f"--fixture-path {_REMOTE_FIXTURE_PATH} "
+        f"--request-timeout-s {_LOAD_TEST_REQUEST_TIMEOUT_S}"
+    )
+    run_result = _run_ssh(
+        ssh_direct, ssh_key, remote_command, timeout_s=duration_s + _LOAD_TEST_SSH_MARGIN_S
+    )
+    if run_result.returncode != 0:
+        raise RuntimeError(f"load_test.py failed{context}: {run_result.stderr}")
+    return json.loads(run_result.stdout.strip().splitlines()[-1])
+
+
+def _run_tune(
+    ssh_direct: dict,
+    ssh_key: str,
+    *,
+    configs: list[tuple[int, float]],
+    concurrency: int,
+    duration_s: float,
+    results_path: Path,
+) -> None:
+    """Sweeps `configs` (max_batch_size, batch_wait_timeout_ms) pairs at one fixed `concurrency`,
+    restarting `jlt serve` between configs so each point measures its own tuning in isolation --
+    mirrors `gliner_serve/run_matrix.py`'s restart-per-config pattern. Rewrites `results_path`
+    after each config completes, same crash-safety discipline as `_run_bench`.
+    """
+    results: list[dict] = []
+    for max_batch_size, batch_wait_timeout_ms in configs:
+        print(
+            f"Config max_batch_size={max_batch_size} batch_wait_timeout_ms={batch_wait_timeout_ms}: "
+            f"starting server..."
+        )
+        _start_server(
+            ssh_direct, ssh_key, max_batch_size=max_batch_size, batch_wait_timeout_ms=batch_wait_timeout_ms
+        )
+        try:
+            print(f"  running load test at concurrency={concurrency}, duration={duration_s}s...")
+            stats = _run_load_test_once(
+                ssh_direct,
+                ssh_key,
+                concurrency=concurrency,
+                duration_s=duration_s,
+                context=f" for config max_batch_size={max_batch_size} batch_wait_timeout_ms={batch_wait_timeout_ms}",
+            )
+        finally:
+            _stop_server(ssh_direct, ssh_key)
+        entry_extra = {
+            "concurrency": concurrency,
+            "duration_s": duration_s,
+            "max_batch_size": max_batch_size,
+            "batch_wait_timeout_ms": batch_wait_timeout_ms,
+        }
+        _record_and_report(results, entry_extra, stats, results_path)
+    print(f"Tune sweep complete -- wrote {len(results)} result(s) to {results_path}")
 
 
 def run(
@@ -274,6 +338,8 @@ def run(
     batch_wait_timeout_ms: float | None,
     results_path: Path,
     keep_pod: bool,
+    tune_configs: list[tuple[int, float]] | None = None,
+    tune_concurrency: int = 200,
 ) -> int:
     secrets.load_runpod_key()
     hangar.init(os.environ[secrets.RUNPOD_ENV_VAR])
@@ -303,6 +369,15 @@ def run(
         if mode == "smoke":
             _smoke_test(ssh_direct, ssh_key)
             print("Smoke test passed.")
+        elif mode == "tune":
+            _run_tune(
+                ssh_direct,
+                ssh_key,
+                configs=tune_configs or [],
+                concurrency=tune_concurrency,
+                duration_s=duration_s,
+                results_path=results_path,
+            )
         else:
             _run_bench(
                 ssh_direct,
@@ -330,7 +405,12 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "mode", choices=["smoke", "bench"], help="smoke: one quick default-config check. bench: the concurrency sweep."
+        "mode",
+        choices=["smoke", "bench", "tune"],
+        help=(
+            "smoke: one quick default-config check. bench: the concurrency sweep at one fixed "
+            "tuning config. tune: a batch-tuning sweep (--configs) at one fixed concurrency."
+        ),
     )
     parser.add_argument(
         "--ssh-key", required=True, help="Path to the SSH private key matching a key registered on the RunPod account."
@@ -354,18 +434,65 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--results-path",
         type=Path,
-        default=Path("benchmarks/gliner_batch_service/results.json"),
-        help="Local path to write results.json to (bench mode only).",
+        default=None,
+        help=(
+            "Local path to write results to (bench and tune modes). Defaults to "
+            "benchmarks/gliner_batch_service/results.json for bench mode or tuning_sweep.json for "
+            "tune mode, so running both modes with no override doesn't overwrite one sweep's "
+            "results with the other's."
+        ),
     )
     parser.add_argument(
         "--keep-pod", action="store_true", default=False, help="Don't terminate the pod on exit (debugging only -- the pod keeps billing)."
     )
+    parser.add_argument(
+        "--configs",
+        type=str,
+        default=None,
+        help=(
+            "Comma-separated max_batch_size:batch_wait_timeout_ms pairs to sweep (tune mode only, "
+            "required for it), e.g. '16:20,32:20,64:20,16:10,32:10,64:10'."
+        ),
+    )
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=200,
+        help=(
+            "Single fixed concurrency to hold while sweeping --configs (tune mode only). Default "
+            "200: the low end of this project's real target range, and the point the concurrency "
+            "sweep found missing its latency budget at the placeholder tuning."
+        ),
+    )
     args = parser.parse_args(argv)
+    if args.results_path is None:
+        args.results_path = (
+            Path("benchmarks/gliner_batch_service/tuning_sweep.json")
+            if args.mode == "tune"
+            else Path("benchmarks/gliner_batch_service/results.json")
+        )
     concurrencies = [int(c.strip()) for c in args.concurrencies.split(",") if c.strip()]
     if not concurrencies or any(c < 1 for c in concurrencies):
         parser.error(f"--concurrencies must be a comma-separated list of positive integers, got {args.concurrencies!r}")
     if args.duration_s <= 0:
         parser.error(f"--duration-s must be positive, got {args.duration_s}")
+    tune_configs: list[tuple[int, float]] = []
+    if args.mode == "tune":
+        if not args.configs:
+            parser.error("tune mode requires --configs")
+        for pair in args.configs.split(","):
+            pair = pair.strip()
+            if not pair:
+                continue
+            try:
+                batch_size_str, wait_ms_str = pair.split(":")
+                tune_configs.append((int(batch_size_str), float(wait_ms_str)))
+            except ValueError:
+                parser.error(f"--configs entries must be 'max_batch_size:batch_wait_timeout_ms', got {pair!r}")
+        if any(size < 1 for size, _ in tune_configs) or any(wait < 0 for _, wait in tune_configs):
+            parser.error("--configs values must be positive max_batch_size and non-negative batch_wait_timeout_ms")
+        if args.concurrency < 1:
+            parser.error(f"--concurrency must be positive, got {args.concurrency}")
     return run(
         mode=args.mode,
         ssh_key=args.ssh_key,
@@ -375,6 +502,8 @@ def main(argv: list[str] | None = None) -> int:
         batch_wait_timeout_ms=args.batch_wait_timeout_ms,
         results_path=args.results_path,
         keep_pod=args.keep_pod,
+        tune_configs=tune_configs,
+        tune_concurrency=args.concurrency,
     )
 
 

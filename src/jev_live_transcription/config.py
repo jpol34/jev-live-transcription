@@ -56,17 +56,22 @@ CALL_CONCURRENCY = (RAM_GB - 4) // 4  # 3
 GLINER_SERVING_MODE: Literal["inline", "http"] = "inline"
 GLINER_SERVICE_URL = "http://localhost:8000"
 
-# GlinerBatchEngine tuning. Placeholder defaults -- tune from real A100 pod measurement, matching
-# this project's existing discipline of deciding window size/threshold from measurement rather
-# than guessing.
-GLINER_BATCH_MAX_SIZE = 16
-GLINER_BATCH_WAIT_TIMEOUT_MS = 20.0
+# GlinerBatchEngine tuning, decided from a real A100 batch-tuning sweep at concurrency=200 (the low
+# end of this project's real 200-500 concurrent-call target), matching this project's existing
+# discipline of deciding window size/threshold from measurement rather than guessing
+# (benchmarks/gliner_batch_service/RESULTS.md). Raising max_batch_size dominated the sweep --
+# larger batches monotonically cut both queueing rounds and tail latency up to the point where a
+# batch covers the full concurrent load, with no benefit from going higher (max_batch_size caps
+# naturally at whatever's actually queued). At that point, batch_wait_timeout_ms=0 (grab whatever's
+# immediately queued, don't wait for more) beat any positive wait, since there's nothing left to
+# usefully wait for once one batch already covers the load.
+GLINER_BATCH_MAX_SIZE = 200
+GLINER_BATCH_WAIT_TIMEOUT_MS = 0.0
 
 # Bounds how many ticks may be concurrently in flight toward GlinerBatchEngine at once. Set equal
 # to GLINER_BATCH_MAX_SIZE rather than independently: below that, this semaphore -- not the
 # engine's own batching capacity -- would be the thing capping how large a real batch can ever get,
-# which would silently waste headroom the engine is otherwise willing to use. Placeholder until
-# re-tuned from real batched measurement, same as the batch engine constants above.
+# which would silently waste headroom the engine is otherwise willing to use.
 GLINER_CONCURRENCY = GLINER_BATCH_MAX_SIZE
 
 # Rough cost-per-million-token estimates, USD. These are NOT authoritative —

@@ -1,0 +1,28 @@
+[
+  {
+    "concurrency": 50,
+    "duration_s": 25.0,
+    "max_batch_size": 200,
+    "batch_wait_timeout_ms": 0.0,
+    "n": 7101,
+    "n_failed": 0,
+    "p50_ms": 164.60922360420227,
+    "p95_ms": 201.12797245383263,
+    "p99_ms": 406.2204658985138,
+    "mean_ms": 176.23827071961946,
+    "throughput_req_s": 284.04
+  },
+  {
+    "concurrency": 200,
+    "duration_s": 25.0,
+    "max_batch_size": 200,
+    "batch_wait_timeout_ms": 0.0,
+    "n": 8400,
+    "n_failed": 0,
+    "p50_ms": 560.2223761379719,
+    "p95_ms": 724.7182279825211,
+    "p99_ms": 830.6574001908302,
+    "mean_ms": 599.6910128569497,
+    "throughput_req_s": 336.0
+  }
+]
