@@ -1,4 +1,5 @@
-"""Computes per-field recall for one pipeline in a capture DB against corpus ground truth.
+"""Computes per-field recall, precision, and jev call volume for one pipeline in a capture DB
+against corpus ground truth.
 
 For each of the 11 target fields, recall is the fraction of calls where the corpus's ground
 truth has a non-null value for that field *and* the pipeline's final committed value for that
@@ -7,14 +8,29 @@ extracted values are free text rather than guaranteed to match the ground-truth 
 A field whose ground truth is a list (e.g. `amenities_requested` can disclose several amenities)
 counts as matched if the committed value agrees with any one item in that list.
 
+Precision is the fraction of the pipeline's committed values for a field that are correct. Per
+(call, field): a committed value against non-null ground truth that doesn't match is
+simultaneously a recall miss and a precision false positive; a committed value against null
+ground truth (nothing to have extracted) is always a precision false positive; a list-valued
+ground truth counts as a true positive if the committed value matches any item in the list,
+mirroring recall's treatment of that case.
+
+Jev call volume snapshots, per field, how much of the "jev" resolver's disambiguation work
+(`jev_pipeline.JevFieldResolver`) each field costs across the corpus: the number of jev calls
+that were `Choice` (multi-candidate) questions, versus cheaper single-candidate `Noul` questions,
+and the average/max size of the distinct-candidate set jev had to disambiguate between. This is
+tracked because loosening a field's confidence floor can inflate its candidate sets and trigger
+more (and larger) Choice calls without necessarily changing recall/precision at all.
+
 Usage:
     uv run python scripts/score_recall.py <db_path> [--pipeline gliner_jev]
         [--save <snapshot.json>] [--baseline <snapshot.json>] [--tolerance 0.05]
 
-`--save` writes this run's per-field recall to a JSON snapshot file, for a later `--baseline`
-comparison (e.g. re-verifying GPU-run recall against a saved pre-migration CPU baseline).
-`--baseline` loads a previously saved snapshot and diffs this run against it, exiting non-zero if
-any field's recall dropped by more than `--tolerance`.
+`--save` writes this run's per-field stats (recall, precision, jev call volume) to a JSON
+snapshot file, for a later `--baseline` comparison (e.g. re-verifying GPU-run recall against a
+saved pre-migration CPU baseline). `--baseline` loads a previously saved snapshot and diffs this
+run against it, exiting non-zero if any field's recall or precision dropped by more than
+`--tolerance`, or its jev Choice-call volume rose by more than `--tolerance`.
 """
 
 import argparse
@@ -141,30 +157,167 @@ def score_recall(
     return stats
 
 
+def score_precision(
+    ground_truths: dict[int, dict],
+    committed: dict[int, dict[str, str]],
+    fields: tuple[str, ...] = FIELDS,
+) -> dict[str, dict]:
+    """Return `{field_name: {"n_committed", "n_correct", "n_false_positives", "precision"}}`.
+
+    Precision is `None` (rather than a divide-by-zero) for a field the pipeline never committed a
+    value for. Per the spec in the module docstring: a committed value counts as correct
+    (`n_correct`) only when the ground truth for that call discloses a value for the field (non-
+    null) *and* `is_match` agrees; a committed value against null ground truth, or against
+    non-null ground truth it doesn't match, is a false positive.
+    """
+    stats: dict[str, dict] = {}
+    for field_name in fields:
+        n_committed = 0
+        n_correct = 0
+        for call_id, fields_committed in committed.items():
+            value = fields_committed.get(field_name)
+            if not value:
+                continue
+            n_committed += 1
+            truth = ground_truths.get(call_id, {}).get(field_name)
+            if _disclosed_items(truth) and is_match(value, truth):
+                n_correct += 1
+        stats[field_name] = {
+            "n_committed": n_committed,
+            "n_correct": n_correct,
+            "n_false_positives": n_committed - n_correct,
+            "precision": (n_correct / n_committed) if n_committed else None,
+        }
+    return stats
+
+
+def load_jev_calls(conn: sqlite3.Connection, pipeline: str) -> dict[str, list[dict]]:
+    """Return `{field_name: [raw_output_dict, ...]}` for every successful jev call for `pipeline`.
+
+    A jev call's per-field identity only exists via its `field_extractions` row (`pipeline_runs`
+    itself has no `field_name` column), so this joins the two on `run_id`. A jev call that errored
+    out (see `pipeline_core._run_gliner_jev_step`) never gets a `field_extractions` row and so is
+    excluded here -- it carries no field identity to attribute it to.
+    """
+    rows = conn.execute(
+        """
+        SELECT fe.field_name, pr.raw_output_json
+        FROM field_extractions fe
+        JOIN pipeline_runs pr ON pr.run_id = fe.run_id
+        WHERE pr.pipeline = ? AND pr.stage = 'jev' AND pr.raw_output_json IS NOT NULL
+        """,
+        (pipeline,),
+    ).fetchall()
+    calls: dict[str, list[dict]] = {}
+    for field_name, raw_output_json in rows:
+        calls.setdefault(field_name, []).append(json.loads(raw_output_json))
+    return calls
+
+
+def score_call_volume(jev_calls: dict[str, list[dict]], fields: tuple[str, ...] = FIELDS) -> dict[str, dict]:
+    """Return per-field jev call volume: `Choice`-question count and distinct-candidate-set size.
+
+    `Choice` questions (2+ distinct candidates) are jev's expensive path -- their context is every
+    distinct candidate's snippet concatenated together, vs. a `Noul` question's single snippet --
+    so `n_choice_calls` and the distinct-candidate-set sizes are what a threshold change (inflating
+    or shrinking the sets jev dedups against) would move.
+    """
+    stats: dict[str, dict] = {}
+    for field_name in fields:
+        calls = jev_calls.get(field_name, [])
+        n_choice_calls = sum(1 for call in calls if call.get("question_type") == "choice")
+        distinct_sizes = [len(call.get("distinct_candidates") or []) for call in calls]
+        stats[field_name] = {
+            "n_jev_calls": len(calls),
+            "n_choice_calls": n_choice_calls,
+            "avg_distinct_candidates": (sum(distinct_sizes) / len(distinct_sizes)) if distinct_sizes else None,
+            "max_distinct_candidates": max(distinct_sizes) if distinct_sizes else None,
+        }
+    return stats
+
+
+def merge_stats(*stat_dicts: dict[str, dict], fields: tuple[str, ...] = FIELDS) -> dict[str, dict]:
+    """Merge several `{field_name: {...}}` stat dicts (recall, precision, call volume) into one
+    `{field_name: {**all_their_keys}}` dict, keyed the same way each already is."""
+    merged: dict[str, dict] = {field_name: {} for field_name in fields}
+    for stat_dict in stat_dicts:
+        for field_name, field_stats in stat_dict.items():
+            merged.setdefault(field_name, {}).update(field_stats)
+    return merged
+
+
 def print_table(stats: dict[str, dict]) -> None:
-    print(f"{'field':<22} {'matched/expected':<18} {'recall':<8}")
+    header = (
+        f"{'field':<22} {'matched/expected':<18} {'recall':<8} "
+        f"{'correct/committed':<20} {'precision':<10} "
+        f"{'jev calls':<10} {'choice calls':<13} {'avg distinct':<13}"
+    )
+    print(header)
     for field_name, field_stats in stats.items():
-        recall = field_stats["recall"]
+        recall = field_stats.get("recall")
         recall_str = f"{recall:.2%}" if recall is not None else "n/a"
-        ratio_str = f"{field_stats['n_matched']}/{field_stats['n_expected']}"
-        print(f"{field_name:<22} {ratio_str:<18} {recall_str:<8}")
+        ratio_str = f"{field_stats.get('n_matched', 0)}/{field_stats.get('n_expected', 0)}"
+
+        precision = field_stats.get("precision")
+        precision_str = f"{precision:.2%}" if precision is not None else "n/a"
+        precision_ratio_str = f"{field_stats.get('n_correct', 0)}/{field_stats.get('n_committed', 0)}"
+
+        n_jev_calls = field_stats.get("n_jev_calls", 0)
+        n_choice_calls = field_stats.get("n_choice_calls", 0)
+        avg_distinct = field_stats.get("avg_distinct_candidates")
+        avg_distinct_str = f"{avg_distinct:.2f}" if avg_distinct is not None else "n/a"
+
+        print(
+            f"{field_name:<22} {ratio_str:<18} {recall_str:<8} "
+            f"{precision_ratio_str:<20} {precision_str:<10} "
+            f"{n_jev_calls:<10} {n_choice_calls:<13} {avg_distinct_str:<13}"
+        )
 
 
 def diff_against_baseline(stats: dict[str, dict], baseline: dict[str, dict], tolerance: float) -> list[str]:
-    """Return a list of human-readable regression messages, one per field whose recall dropped by
-    more than `tolerance` relative to `baseline`. Empty if there's no regression past tolerance."""
+    """Return a list of human-readable regression messages vs. `baseline`, empty if none.
+
+    Flags, per field: recall dropped by more than `tolerance`; precision dropped by more than
+    `tolerance`; or jev Choice-call volume rose by more than a `tolerance` fraction relative to
+    the baseline's count (more Choice calls means more cost/latency, so an *increase* is the
+    regression direction here, unlike recall/precision). Any of the three is skipped for a field
+    where the relevant metric is missing on either side (e.g. a field neither run ever committed
+    a value for has no precision to compare).
+    """
     regressions = []
     for field_name, field_stats in stats.items():
-        base_recall = baseline.get(field_name, {}).get("recall")
-        recall = field_stats["recall"]
-        if base_recall is None or recall is None:
-            continue
-        drop = base_recall - recall
-        if drop > tolerance:
-            regressions.append(
-                f"{field_name}: recall dropped from {base_recall:.2%} to {recall:.2%} "
-                f"(-{drop:.2%}, tolerance {tolerance:.2%})"
-            )
+        base = baseline.get(field_name, {})
+
+        base_recall = base.get("recall")
+        recall = field_stats.get("recall")
+        if base_recall is not None and recall is not None:
+            drop = base_recall - recall
+            if drop > tolerance:
+                regressions.append(
+                    f"{field_name}: recall dropped from {base_recall:.2%} to {recall:.2%} "
+                    f"(-{drop:.2%}, tolerance {tolerance:.2%})"
+                )
+
+        base_precision = base.get("precision")
+        precision = field_stats.get("precision")
+        if base_precision is not None and precision is not None:
+            drop = base_precision - precision
+            if drop > tolerance:
+                regressions.append(
+                    f"{field_name}: precision dropped from {base_precision:.2%} to {precision:.2%} "
+                    f"(-{drop:.2%}, tolerance {tolerance:.2%})"
+                )
+
+        base_choice_calls = base.get("n_choice_calls")
+        choice_calls = field_stats.get("n_choice_calls")
+        if base_choice_calls is not None and choice_calls is not None:
+            allowed = base_choice_calls * (1 + tolerance)
+            if choice_calls > allowed:
+                regressions.append(
+                    f"{field_name}: jev choice-call volume rose from {base_choice_calls} to "
+                    f"{choice_calls} (tolerance {tolerance:.2%} vs. baseline)"
+                )
+
     return regressions
 
 
@@ -172,7 +325,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("db_path", type=Path)
     parser.add_argument("--pipeline", default="gliner_jev", help="Pipeline to score (default: gliner_jev).")
-    parser.add_argument("--save", type=Path, default=None, help="Write this run's recall table to a JSON snapshot.")
+    parser.add_argument(
+        "--save", type=Path, default=None, help="Write this run's recall/precision/call-volume table to a JSON snapshot."
+    )
     parser.add_argument(
         "--baseline", type=Path, default=None, help="A previously saved snapshot to diff this run against."
     )
@@ -180,7 +335,10 @@ def main() -> int:
         "--tolerance",
         type=float,
         default=DEFAULT_TOLERANCE,
-        help=f"Max allowed per-field recall drop vs. --baseline before exiting non-zero (default: {DEFAULT_TOLERANCE}).",
+        help=(
+            "Max allowed per-field recall/precision drop, or jev Choice-call volume increase, "
+            f"vs. --baseline before exiting non-zero (default: {DEFAULT_TOLERANCE})."
+        ),
     )
     args = parser.parse_args()
 
@@ -191,16 +349,21 @@ def main() -> int:
     try:
         ground_truths = load_ground_truths(conn)
         committed = load_final_committed_values(conn, args.pipeline)
+        jev_calls = load_jev_calls(conn, args.pipeline)
     finally:
         conn.close()
 
-    stats = score_recall(ground_truths, committed)
+    stats = merge_stats(
+        score_recall(ground_truths, committed),
+        score_precision(ground_truths, committed),
+        score_call_volume(jev_calls),
+    )
     print_table(stats)
 
     if args.save is not None:
         args.save.parent.mkdir(parents=True, exist_ok=True)
         args.save.write_text(json.dumps(stats, indent=2), encoding="utf-8")
-        print(f"\nSaved recall snapshot -> {args.save}")
+        print(f"\nSaved snapshot -> {args.save}")
 
     if args.baseline is not None:
         if not args.baseline.exists():
@@ -211,11 +374,11 @@ def main() -> int:
             parser.error(f"baseline snapshot at {args.baseline} is not valid JSON: {exc}")
         regressions = diff_against_baseline(stats, baseline, args.tolerance)
         if regressions:
-            print(f"\nRecall regressed past tolerance ({args.tolerance:.2%}) vs. {args.baseline}:")
+            print(f"\nRegressed past tolerance ({args.tolerance:.2%}) vs. {args.baseline}:")
             for message in regressions:
                 print(f"  {message}")
             return 1
-        print(f"\nNo recall regression past tolerance ({args.tolerance:.2%}) vs. {args.baseline}.")
+        print(f"\nNo regression past tolerance ({args.tolerance:.2%}) vs. {args.baseline}.")
 
     return 0
 
