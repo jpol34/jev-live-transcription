@@ -143,6 +143,31 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Don't terminate the pod on exit (debugging only -- the pod keeps billing).",
     )
 
+    serve_parser = subparsers.add_parser(
+        "serve",
+        help=(
+            "Run GlinerBatchEngine as a standalone HTTP service (POST /extract, GET /healthz), "
+            "for config.GLINER_SERVING_MODE=\"http\" callers."
+        ),
+    )
+    serve_parser.add_argument("--host", default="0.0.0.0", help="Host to bind (default: 0.0.0.0).")
+    serve_parser.add_argument("--port", type=int, default=8000, help="Port to bind (default: 8000).")
+    serve_parser.add_argument(
+        "--max-batch-size",
+        type=int,
+        default=None,
+        help=f"Override config.GLINER_BATCH_MAX_SIZE (default: {config.GLINER_BATCH_MAX_SIZE}).",
+    )
+    serve_parser.add_argument(
+        "--batch-wait-timeout-ms",
+        type=float,
+        default=None,
+        help=(
+            "Override config.GLINER_BATCH_WAIT_TIMEOUT_MS (default: "
+            f"{config.GLINER_BATCH_WAIT_TIMEOUT_MS})."
+        ),
+    )
+
     return parser
 
 
@@ -203,6 +228,25 @@ def _run_gpu_run(args: argparse.Namespace) -> int:
     )
 
 
+def _run_serve(args: argparse.Namespace) -> int:
+    if args.max_batch_size is not None and args.max_batch_size < 1:
+        print(f"error: --max-batch-size must be positive, got {args.max_batch_size}")
+        return 2
+    if args.batch_wait_timeout_ms is not None and args.batch_wait_timeout_ms < 0:
+        print(f"error: --batch-wait-timeout-ms must be non-negative, got {args.batch_wait_timeout_ms}")
+        return 2
+
+    import uvicorn
+
+    from .serving import app as serving_app
+
+    app = serving_app.create_app(
+        max_batch_size=args.max_batch_size, batch_wait_timeout_ms=args.batch_wait_timeout_ms
+    )
+    uvicorn.run(app, host=args.host, port=args.port)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     parser = _build_parser()
@@ -213,6 +257,8 @@ def main(argv: list[str] | None = None) -> int:
         return _run_tui(args)
     if args.command == "gpu-run":
         return _run_gpu_run(args)
+    if args.command == "serve":
+        return _run_serve(args)
     parser.error(f"unknown command: {args.command!r}")
     return 2
 
