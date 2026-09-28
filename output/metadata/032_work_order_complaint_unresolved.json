@@ -18,17 +18,16 @@
     "phone_number": "347-555-0101",
     "unit_number": "3B",
     "work_order_issue": "Leaky faucet; bathroom light flickering",
-    "permission_to_enter": "no",
+    "permission_to_enter": "yes",
     "outcome": "Complaint escalated",
     "fields_disclosed": [
       "caller_name",
       "phone_number",
       "unit_number",
-      "work_order_issue"
-    ],
-    "fields_withheld_or_unknown": [
+      "work_order_issue",
       "permission_to_enter"
     ],
+    "fields_withheld_or_unknown": [],
     "estimated_call_seconds": 250
   }
 }

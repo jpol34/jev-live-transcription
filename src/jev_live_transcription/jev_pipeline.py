@@ -50,6 +50,7 @@ from typesafe_sdk import (
 )
 
 from jev_live_transcription import config
+from jev_live_transcription.gliner_pipeline import FIELD_TAXONOMY
 from jev_live_transcription.settle_gate import SettleGate
 
 CallId = int | str
@@ -63,6 +64,16 @@ _FIELD_DESCRIPTIONS = {
     "phone_number": "phone number",
     "email": "email address",
     "unit_number": "unit number",
+}
+
+# Taxonomy-gated ("determination"-tagged, see `gliner_pipeline.FIELD_TAXONOMY`) direct yes/no
+# question for each such field, used in place of `_FIELD_DESCRIPTIONS`'s "is X the correct
+# {description}" phrasing -- that phrasing reads naturally for a span ("is 'Jane' the caller's
+# correct name?") but not for a yes/no judgment ("is 'yes' the caller's correct permission to
+# enter?"). Generalizes to any future determination field by adding its own entry here; a
+# determination field without one falls back to `field_description`'s own generic phrasing.
+_DETERMINATION_QUESTIONS = {
+    "permission_to_enter": "did the caller give permission to enter the unit",
 }
 
 _DIGITS_RE = re.compile(r"\D+")
@@ -146,6 +157,24 @@ def normalize_email_span(value: str) -> str:
 
     candidate = "".join(_EMAIL_SYMBOL_WORDS.get(token, token) for token in collapsed)
     return candidate if _LITERAL_EMAIL_RE.match(candidate) else value
+
+
+def _noul_instructions(field_name: str, candidate: str) -> str:
+    """Build the Noul question text for confirming one field's single candidate value.
+
+    A `"determination"`-taxonomy field (per `FIELD_TAXONOMY`) asks its direct yes/no question
+    from `_DETERMINATION_QUESTIONS` (falling back to the generic field description for a future
+    determination field with no entry yet), grounded against the specific candidate value being
+    confirmed. Every other field keeps the original "is X the correct {description}" phrasing.
+    """
+    if FIELD_TAXONOMY.get(field_name) == "determination":
+        question = _DETERMINATION_QUESTIONS.get(field_name, field_description(field_name))
+        return (
+            f"Based only on the given context, {question}? Does the evidence support the "
+            f"determination {candidate!r}?"
+        )
+    description = field_description(field_name)
+    return f"Based only on the given context, is {candidate!r} the caller's correct {description}?"
 
 
 def normalize_candidate(field_name: str, value: str) -> str:
@@ -365,18 +394,12 @@ class JevFieldResolver:
     async def _resolve_noul(
         self, call_id: CallId, field_name: str, candidate: str, context_window: str
     ) -> JevResolution:
-        description = field_description(field_name)
         response = await self._call_with_retry(
             call_id=call_id,
             field_name=field_name,
             state={"context_window": context_window},
             questions={
-                "field": Noul(
-                    instructions=(
-                        f"Based only on the given context, is {candidate!r} the caller's "
-                        f"correct {description}?"
-                    ),
-                ),
+                "field": Noul(instructions=_noul_instructions(field_name, candidate)),
             },
         )
         confidence = response.nouls["field"].noul
