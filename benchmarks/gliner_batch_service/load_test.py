@@ -149,7 +149,13 @@ async def run_load_test(
     latencies: list[float] = []
     failures: list[bool] = []
     timeout = aiohttp.ClientTimeout(total=request_timeout_s)
-    async with aiohttp.ClientSession(timeout=timeout) as session:
+    # aiohttp.TCPConnector defaults to a 100-connection pool cap -- with `concurrency` above that,
+    # extra workers would queue for a connection slot before ever reaching the server, inflating
+    # tail latency with client-side contention that has nothing to do with the server under test.
+    # Each worker holds at most one connection at a time (closed-loop), so `concurrency` is exactly
+    # the number needed.
+    connector = aiohttp.TCPConnector(limit=concurrency)
+    async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
         end_time = time.monotonic() + duration_s
         await asyncio.gather(
             *(

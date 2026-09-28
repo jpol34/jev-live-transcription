@@ -160,3 +160,35 @@ async def test_run_load_test_excludes_failed_request_latency_from_percentiles():
     # be a fast local success, far below it.
     assert result["p99_ms"] < 100
     assert result["mean_ms"] < 100
+
+
+async def test_run_load_test_configures_connector_limit_to_match_concurrency(monkeypatch):
+    # aiohttp.TCPConnector's default limit (100) would silently bottleneck any --concurrency above
+    # that with client-side connection-pool contention instead of measuring the server -- each
+    # closed-loop worker holds at most one connection at a time, so the limit must scale with
+    # --concurrency rather than stay at the library default.
+    import aiohttp
+
+    captured = {}
+    real_connector = aiohttp.TCPConnector
+
+    def tracking_connector(*args, **kwargs):
+        captured["limit"] = kwargs.get("limit")
+        return real_connector(*args, **kwargs)
+
+    monkeypatch.setattr(load_test.aiohttp, "TCPConnector", tracking_connector)
+
+    async def handler(request: web.Request) -> web.Response:
+        return web.json_response({"entities": []})
+
+    app = web.Application()
+    app.router.add_post(load_test.ROUTE_PREFIX, handler)
+    server = TestServer(app)
+    await server.start_server()
+    try:
+        url = f"http://{server.host}:{server.port}"
+        await load_test.run_load_test(url, concurrency=150, duration_s=0.2, windows=["hello"])
+    finally:
+        await server.close()
+
+    assert captured["limit"] == 150

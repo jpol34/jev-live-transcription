@@ -133,9 +133,11 @@ def _start_server(
     # The `&` must sit directly after the single command being backgrounded, not after a `&&`
     # chain: `A && nohup B &` backgrounds the *whole* `A && B` compound as one job, so `nohup B`
     # still runs synchronously inside it and the SSH channel blocks until B exits (forever, for a
-    # server).
+    # server). `jlt serve` needs no cwd-relative files (unlike `_run_bench`'s `load_test.py`
+    # invocation), so there's no `cd` to work around this trap with -- `mkdir -p` uses `;`, not
+    # `&&`, and every path below is already absolute.
     remote_command = (
-        f"cd {_REMOTE_DIR} && nohup {cmd} < /dev/null > {_REMOTE_LOG_PATH} 2>&1 & "
+        f"mkdir -p {_REMOTE_DIR}; nohup {cmd} < /dev/null > {_REMOTE_LOG_PATH} 2>&1 & "
         f"echo $! > {_REMOTE_PID_PATH}; disown; echo STARTED"
     )
     result = _run_ssh(ssh_direct, ssh_key, remote_command)
