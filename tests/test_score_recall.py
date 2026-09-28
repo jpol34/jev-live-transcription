@@ -63,6 +63,20 @@ def test_is_match_true_for_whole_numeric_token_within_longer_text():
     assert score_recall.is_match("apartment 204", "204")
 
 
+def test_is_match_true_for_dollar_prefixed_value_preceded_by_whitespace():
+    # Regression: `\b` never matches immediately before a `$` preceded by whitespace (both are
+    # non-word characters, so there's no word/non-word transition) -- "$950" would silently fail
+    # to match inside "around $950" even though it's a correct substring.
+    assert score_recall.is_match("around $950", "$950")
+    assert score_recall.is_match("$950", "the price quoted was $950")
+
+
+def test_is_match_false_for_unrelated_dollar_values():
+    # The boundary-check rewrite must not turn into unbounded substring containment -- two
+    # genuinely different dollar amounts still don't match.
+    assert not score_recall.is_match("$950", "$1,900")
+
+
 def test_is_match_false_for_empty_values():
     assert not score_recall.is_match("", "Tim Barker")
     assert not score_recall.is_match("Tim Barker", "")
