@@ -159,22 +159,52 @@ def normalize_email_span(value: str) -> str:
     return candidate if _LITERAL_EMAIL_RE.match(candidate) else value
 
 
+def _determination_question(field_name: str) -> str:
+    """Direct yes/no question for a `"determination"`-taxonomy field (per `FIELD_TAXONOMY`),
+    from `_DETERMINATION_QUESTIONS` -- falling back to the generic field description for a
+    future determination field with no entry there yet.
+    """
+    return _DETERMINATION_QUESTIONS.get(field_name, field_description(field_name))
+
+
 def _noul_instructions(field_name: str, candidate: str) -> str:
     """Build the Noul question text for confirming one field's single candidate value.
 
-    A `"determination"`-taxonomy field (per `FIELD_TAXONOMY`) asks its direct yes/no question
-    from `_DETERMINATION_QUESTIONS` (falling back to the generic field description for a future
-    determination field with no entry yet), grounded against the specific candidate value being
-    confirmed. Every other field keeps the original "is X the correct {description}" phrasing.
+    A `"determination"`-taxonomy field asks its direct yes/no question, grounded against the
+    specific candidate value being confirmed. Every other field keeps the original "is X the
+    correct {description}" phrasing.
     """
     if FIELD_TAXONOMY.get(field_name) == "determination":
-        question = _DETERMINATION_QUESTIONS.get(field_name, field_description(field_name))
+        question = _determination_question(field_name)
         return (
             f"Based only on the given context, {question}? Does the evidence support the "
             f"determination {candidate!r}?"
         )
     description = field_description(field_name)
     return f"Based only on the given context, is {candidate!r} the caller's correct {description}?"
+
+
+def _choice_instructions(field_name: str) -> str:
+    """Build the Choice question text for disambiguating between a field's 2+ distinct
+    candidate values.
+
+    A `"determination"`-taxonomy field asks its direct yes/no question rather than the generic
+    "which of these is the caller's correct {description}" phrasing, which reads oddly for a
+    yes/no judgment (e.g. "which of these is the caller's correct permission to enter? {'yes',
+    'no'}"). The criteria dict still carries the candidate values (including "none_of_these") for
+    jev to choose between either way.
+    """
+    if FIELD_TAXONOMY.get(field_name) == "determination":
+        question = _determination_question(field_name)
+        return (
+            f"Based only on the given context, {question}? If the caller corrected themselves, "
+            f"favor what they most recently confirmed."
+        )
+    description = field_description(field_name)
+    return (
+        f"Based only on the given context, which of these is the caller's correct {description}? "
+        f"If the caller corrected themselves, favor the value they most recently confirmed."
+    )
 
 
 def normalize_candidate(field_name: str, value: str) -> str:
@@ -419,7 +449,6 @@ class JevFieldResolver:
     async def _resolve_choice(
         self, call_id: CallId, field_name: str, distinct: list[str], context_window: str
     ) -> JevResolution:
-        description = field_description(field_name)
         criteria: dict[str, None] = {value: None for value in distinct}
         criteria[_NONE_OF_THESE] = None
         response = await self._call_with_retry(
@@ -428,11 +457,7 @@ class JevFieldResolver:
             state={"context_window": context_window},
             questions={
                 "field": Choice(
-                    instructions=(
-                        f"Based only on the given context, which of these is the caller's "
-                        f"correct {description}? If the caller corrected themselves, favor the "
-                        f"value they most recently confirmed."
-                    ),
+                    instructions=_choice_instructions(field_name),
                     criteria=criteria,
                 ),
             },

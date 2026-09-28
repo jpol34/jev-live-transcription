@@ -43,6 +43,14 @@ def test_must_be_present_is_negative():
     assert determination_classifier.classify("permission_to_enter", window) == "no"
 
 
+def test_explicit_no_permission_is_negative_not_uncertain():
+    # Regression: "no permission to enter" is a superset of the bare "permission to enter"
+    # positive pattern -- without excluding it, this would hit both the yes and no lists and
+    # fall back to "uncertain" instead of the unambiguous "no" it actually is.
+    window = "Caller: No, I'm giving no permission to enter the unit while I'm away."
+    assert determination_classifier.classify("permission_to_enter", window) == "no"
+
+
 def test_callers_own_question_about_being_present_is_not_a_refusal():
     # Regression: call 005's caller asks "should I... need to be there when they come over?"
     # before ever answering -- this must not read as a negative determination just because the

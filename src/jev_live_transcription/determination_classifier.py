@@ -45,7 +45,10 @@ def _compile(patterns: list[str]) -> tuple[re.Pattern[str], ...]:
 _PERMISSION_TO_ENTER_RULES = _DeterminationRules(
     yes=_compile(
         [
-            r"permission to enter",
+            # Negative lookbehind excludes "no permission to enter" -- without it, that phrase
+            # (an explicit refusal) would also match this bare positive pattern, so `classify`
+            # would see both a yes-hit and a no-hit and fall back to "uncertain" instead of "no".
+            r"(?<!no )permission to enter",
             r"guess it'?s fine",
             r"fine if i'?m not (?:there|home|around)",
             r"go ahead and (?:enter|come (?:in|on in)|let (?:yourself|yourselves) in)",
