@@ -106,7 +106,8 @@ uv run python scripts/score_recall.py data/benchmark.sqlite3
 
 `--save <path>` writes a JSON snapshot for a later `--baseline <path>` comparison, which exits
 non-zero if any field's recall or precision drops by more than `--tolerance` (default 5%), or its
-jev Choice-call volume rises by more than that.
+jev Choice-call volume rises by more than that. `benchmarks/score_recall/baseline.json` is the
+checked-in baseline (full 100-call corpus, `gliner_jev` pipeline) that later work diffs against.
 
 ## Stakeholder demo web page
 
