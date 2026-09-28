@@ -25,7 +25,7 @@ from pathlib import Path
 
 import hangar
 
-from . import config, secrets
+from . import config, corpus, secrets
 from . import db as db_module
 
 _LOGGER = logging.getLogger(__name__)
@@ -216,52 +216,80 @@ def _wait_for_completion(ssh_direct: dict, ssh_key: str | None) -> int:
         time.sleep(_COMPLETION_POLL_S)
 
 
-def _integrity_check_ok(db_path: Path) -> bool:
-    """True if `db_path` passes SQLite's own `PRAGMA integrity_check`.
+def _verify_db(db_path: Path, expected_calls: int) -> str | None:
+    """Return `None` if `db_path` looks like a complete, uncorrupted capture DB for
+    `expected_calls` calls, else a human-readable reason it doesn't.
 
-    A capture DB can scp over successfully (exit code 0) while still being a structurally
-    corrupted SQLite file -- the pod's disk durability under a high `--call-concurrency` write
-    rate isn't guaranteed the way a local SSD's would be. Silently handing back a corrupted DB is
-    worse than failing loud here, immediately after retrieval, rather than as an opaque
-    `sqlite3.DatabaseError` several steps later during scoring.
+    A capture DB can scp over successfully (exit code 0) while still being unusable in two
+    different ways: structurally corrupted (`PRAGMA integrity_check` catches this -- the pod's
+    disk durability under a high `--call-concurrency` write rate isn't guaranteed the way a local
+    SSD's would be), or structurally fine but silently incomplete (a well-formed but empty or
+    partial DB, e.g. from a scp that copied nothing, passes `integrity_check` trivially, so the
+    `calls` row count is checked against what this run actually asked for). Silently handing back
+    either is worse than failing loud here, immediately after retrieval, rather than as a
+    confusing `DatabaseError` or an inexplicably empty results table several steps later during
+    scoring.
     """
     try:
         conn = db_module.connect(db_path)
         try:
-            result = conn.execute("PRAGMA integrity_check").fetchall()
+            if conn.execute("PRAGMA integrity_check").fetchall() != [("ok",)]:
+                return "failed PRAGMA integrity_check"
+            (n_calls,) = conn.execute("SELECT COUNT(*) FROM calls").fetchone()
         finally:
             conn.close()
     except sqlite3.DatabaseError:
-        return False
-    return result == [("ok",)]
+        return "is not a readable SQLite database"
+    if n_calls != expected_calls:
+        return f"has {n_calls} calls, expected {expected_calls}"
+    return None
 
 
-def _retrieve_db(ssh_direct: dict, ssh_key: str | None, local_db_path: Path) -> None:
+def _retrieve_db(
+    ssh_direct: dict, ssh_key: str | None, local_db_path: Path, expected_calls: int | None
+) -> None:
+    """Copy the pod's capture DB to `local_db_path`.
+
+    `expected_calls` is `None` when the remote `jlt batch` itself reported a failure -- the DB is
+    then retrieved best-effort, for debugging, on a single attempt with no verification, since a
+    failed run's DB is expected to be incomplete and shouldn't be held to the same bar (or block
+    retrieval entirely) the way a DB from a *successful* run should. When given, it's the number
+    of `calls` rows a successful, complete DB must have, and a mismatch is retried once before
+    raising -- see `_verify_db`.
+    """
     local_db_path.parent.mkdir(parents=True, exist_ok=True)
     scp_args = ["-o", "StrictHostKeyChecking=accept-new", "-o", "BatchMode=yes", "-P", str(ssh_direct["port"])]
     if ssh_key:
         scp_args += ["-i", ssh_key]
     source = f"{ssh_direct['username']}@{ssh_direct['host']}:{_REMOTE_DB_PATH}"
 
-    # One retry on an integrity-check failure: cheap insurance against a transient transfer/flush
-    # issue, distinct from a genuinely corrupted source DB on the pod (which would fail again).
+    if expected_calls is None:
+        result = subprocess.run(["scp", *scp_args, source, str(local_db_path)], capture_output=True, text=True)
+        if result.returncode != 0:
+            raise RuntimeError(f"failed to retrieve capture DB from pod: {result.stderr}")
+        return
+
+    # One retry on a verification failure: cheap insurance against a transient transfer/flush
+    # issue, distinct from a genuinely bad source DB on the pod (which would fail again).
     for attempt in (1, 2):
         result = subprocess.run(["scp", *scp_args, source, str(local_db_path)], capture_output=True, text=True)
         if result.returncode != 0:
             raise RuntimeError(f"failed to retrieve capture DB from pod: {result.stderr}")
-        if _integrity_check_ok(local_db_path):
+        problem = _verify_db(local_db_path, expected_calls)
+        if problem is None:
             return
         _LOGGER.warning(
-            "retrieved capture DB at %s failed PRAGMA integrity_check (attempt %d/2)%s",
+            "retrieved capture DB at %s %s (attempt %d/2)%s",
             local_db_path,
+            problem,
             attempt,
             "" if attempt == 1 else " -- giving up",
         )
 
     raise RuntimeError(
-        f"capture DB retrieved from the pod at {local_db_path} failed PRAGMA integrity_check twice "
-        "in a row -- likely corrupted on the pod itself rather than a transient transfer issue. "
-        "Re-run with --keep-pod to inspect the pod's own copy before it's torn down."
+        f"capture DB retrieved from the pod at {local_db_path} {problem} twice in a row -- likely "
+        "a real problem on the pod itself rather than a transient transfer issue. Re-run with "
+        "--keep-pod to inspect the pod's own copy before it's torn down."
     )
 
 
@@ -334,7 +362,8 @@ def run_gpu(
         exit_code = _wait_for_completion(ssh_direct, ssh_key)
         print(f"Remote jlt batch finished with exit code {exit_code}")
 
-        _retrieve_db(ssh_direct, ssh_key, db_path)
+        expected_calls = (subset if subset is not None else len(corpus.load_all())) if exit_code == 0 else None
+        _retrieve_db(ssh_direct, ssh_key, db_path, expected_calls)
         print(f"Capture DB retrieved to {db_path}")
 
         return exit_code

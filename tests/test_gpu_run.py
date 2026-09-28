@@ -6,6 +6,7 @@ be terminated, success or failure, unless `--keep-pod`) and the pod-readiness/co
 loops, since those are the parts a real pod can't be used to test cheaply.
 """
 
+from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
@@ -44,11 +45,29 @@ def _patch_hangar(monkeypatch, *, pod_id="pod-123"):
 
 
 def _patch_ssh_flow(monkeypatch, *, exit_code=0):
-    """Makes `_run_ssh` succeed for preflight/launch and immediately report completion."""
+    """Makes `_run_ssh` succeed for preflight/launch and immediately report completion.
+
+    On the `scp` step, writes a `calls` table sized to match `run_gpu`'s own `expected_calls`
+    computation (the real corpus's full size, since every caller here passes `subset=None`) --
+    `_retrieve_db` verifies row count against that on a successful (`exit_code=0`) run, so a fake
+    scp that wrote nothing would fail verification even though nothing about the run under test
+    actually went wrong.
+    """
 
     def fake_run(cmd, **kwargs):
         joined = " ".join(cmd)
         if cmd[0] == "scp":
+            dest = Path(cmd[-1])
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.unlink(missing_ok=True)
+            conn = gpu_run.db_module.connect(dest)
+            try:
+                n_calls = len(gpu_run.corpus.load_all())
+                conn.execute("CREATE TABLE calls (call_id INTEGER PRIMARY KEY)")
+                conn.executemany("INSERT INTO calls (call_id) VALUES (?)", [(i,) for i in range(n_calls)])
+                conn.commit()
+            finally:
+                conn.close()
             return Mock(returncode=0, stdout="", stderr="")
         if joined.endswith(" true"):
             return Mock(returncode=0, stdout="", stderr="")
@@ -372,18 +391,18 @@ def test_write_remote_env_raises_on_failure(monkeypatch):
         gpu_run._write_remote_env(ssh_direct, None, {"FOO": "bar"})
 
 
-# --- retrieved-DB integrity check -----------------------------------------------------------
+# --- retrieved-DB verification ----------------------------------------------------------------
 
 
-def _write_valid_db(path):
-    # scp overwrites the destination wholesale, so these helpers do too -- a stale corrupt file
-    # left at `path` from a prior "attempt" would otherwise make sqlite3 error opening it, rather
-    # than exercising the retry path each test actually means to simulate.
+def _write_db_with_calls(path, n_calls):
+    # scp overwrites the destination wholesale, so this helper does too -- a stale file left at
+    # `path` from a prior "attempt" would otherwise make sqlite3 error opening it, rather than
+    # exercising the retry path each test actually means to simulate.
     path.unlink(missing_ok=True)
     conn = gpu_run.db_module.connect(path)
     try:
-        conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
-        conn.execute("INSERT INTO t (v) VALUES ('x')")
+        conn.execute("CREATE TABLE calls (call_id INTEGER PRIMARY KEY)")
+        conn.executemany("INSERT INTO calls (call_id) VALUES (?)", [(i,) for i in range(n_calls)])
         conn.commit()
     finally:
         conn.close()
@@ -396,32 +415,54 @@ def _write_corrupt_db(path):
     path.write_bytes(b"not a sqlite database")
 
 
-def test_integrity_check_ok_true_for_valid_db(tmp_path):
+def test_verify_db_none_for_complete_matching_db(tmp_path):
     db_path = tmp_path / "valid.sqlite3"
-    _write_valid_db(db_path)
+    _write_db_with_calls(db_path, 5)
 
-    assert gpu_run._integrity_check_ok(db_path) is True
+    assert gpu_run._verify_db(db_path, expected_calls=5) is None
 
 
-def test_integrity_check_ok_false_for_corrupt_db(tmp_path):
+def test_verify_db_reports_integrity_failure_for_corrupt_file(tmp_path):
     db_path = tmp_path / "corrupt.sqlite3"
     _write_corrupt_db(db_path)
 
-    assert gpu_run._integrity_check_ok(db_path) is False
+    problem = gpu_run._verify_db(db_path, expected_calls=5)
+
+    assert problem is not None and "not a readable" in problem
 
 
-def test_retrieve_db_succeeds_when_scp_output_passes_integrity_check(monkeypatch, tmp_path):
+def test_verify_db_reports_call_count_mismatch_for_empty_db(tmp_path):
+    # Structurally valid (passes integrity_check trivially) but empty -- the scenario an
+    # integrity-check-only verification would miss.
+    db_path = tmp_path / "empty.sqlite3"
+    _write_db_with_calls(db_path, 0)
+
+    problem = gpu_run._verify_db(db_path, expected_calls=5)
+
+    assert problem is not None and "0 calls, expected 5" in problem
+
+
+def test_verify_db_reports_call_count_mismatch_for_partial_db(tmp_path):
+    db_path = tmp_path / "partial.sqlite3"
+    _write_db_with_calls(db_path, 3)
+
+    problem = gpu_run._verify_db(db_path, expected_calls=5)
+
+    assert problem is not None and "3 calls, expected 5" in problem
+
+
+def test_retrieve_db_succeeds_when_scp_output_verifies_clean(monkeypatch, tmp_path):
     ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
     local_db_path = tmp_path / "out.sqlite3"
 
     def fake_scp(cmd, **kwargs):
-        _write_valid_db(local_db_path)
+        _write_db_with_calls(local_db_path, 5)
         return Mock(returncode=0, stdout="", stderr="")
 
     run_mock = Mock(side_effect=fake_scp)
     monkeypatch.setattr(gpu_run.subprocess, "run", run_mock)
 
-    gpu_run._retrieve_db(ssh_direct, None, local_db_path)
+    gpu_run._retrieve_db(ssh_direct, None, local_db_path, expected_calls=5)
 
     assert run_mock.call_count == 1
 
@@ -436,18 +477,18 @@ def test_retrieve_db_retries_once_then_succeeds_after_a_bad_first_copy(monkeypat
         if len(attempts) == 1:
             _write_corrupt_db(local_db_path)
         else:
-            _write_valid_db(local_db_path)
+            _write_db_with_calls(local_db_path, 5)
         return Mock(returncode=0, stdout="", stderr="")
 
     monkeypatch.setattr(gpu_run.subprocess, "run", Mock(side_effect=fake_scp))
 
-    gpu_run._retrieve_db(ssh_direct, None, local_db_path)
+    gpu_run._retrieve_db(ssh_direct, None, local_db_path, expected_calls=5)
 
     assert len(attempts) == 2
-    assert gpu_run._integrity_check_ok(local_db_path)
+    assert gpu_run._verify_db(local_db_path, expected_calls=5) is None
 
 
-def test_retrieve_db_raises_after_two_consecutive_integrity_failures(monkeypatch, tmp_path):
+def test_retrieve_db_raises_after_two_consecutive_verification_failures(monkeypatch, tmp_path):
     ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
     local_db_path = tmp_path / "out.sqlite3"
 
@@ -458,13 +499,13 @@ def test_retrieve_db_raises_after_two_consecutive_integrity_failures(monkeypatch
     run_mock = Mock(side_effect=fake_scp)
     monkeypatch.setattr(gpu_run.subprocess, "run", run_mock)
 
-    with pytest.raises(RuntimeError, match="failed PRAGMA integrity_check twice"):
-        gpu_run._retrieve_db(ssh_direct, None, local_db_path)
+    with pytest.raises(RuntimeError, match="not a readable SQLite database.*twice"):
+        gpu_run._retrieve_db(ssh_direct, None, local_db_path, expected_calls=5)
 
     assert run_mock.call_count == 2
 
 
-def test_retrieve_db_still_raises_on_scp_failure_before_any_integrity_check(monkeypatch, tmp_path):
+def test_retrieve_db_still_raises_on_scp_failure_before_any_verification(monkeypatch, tmp_path):
     ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
     local_db_path = tmp_path / "out.sqlite3"
     monkeypatch.setattr(
@@ -472,4 +513,23 @@ def test_retrieve_db_still_raises_on_scp_failure_before_any_integrity_check(monk
     )
 
     with pytest.raises(RuntimeError, match="failed to retrieve capture DB"):
-        gpu_run._retrieve_db(ssh_direct, None, local_db_path)
+        gpu_run._retrieve_db(ssh_direct, None, local_db_path, expected_calls=5)
+
+
+def test_retrieve_db_skips_verification_when_expected_calls_is_none(monkeypatch, tmp_path):
+    # expected_calls=None signals the remote jlt batch itself already failed -- retrieval is
+    # best-effort, for debugging, on a single attempt, with no row-count or integrity bar to clear.
+    ssh_direct = {"host": "1.2.3.4", "port": 2222, "username": "root"}
+    local_db_path = tmp_path / "out.sqlite3"
+
+    def fake_scp(cmd, **kwargs):
+        _write_corrupt_db(local_db_path)
+        return Mock(returncode=0, stdout="", stderr="")
+
+    run_mock = Mock(side_effect=fake_scp)
+    monkeypatch.setattr(gpu_run.subprocess, "run", run_mock)
+
+    gpu_run._retrieve_db(ssh_direct, None, local_db_path, expected_calls=None)
+
+    assert run_mock.call_count == 1
+    assert local_db_path.exists()

@@ -244,6 +244,17 @@ class CaptureStore:
                                     RuntimeError("capture store writer batch failed")
                                 )
         finally:
+            # WAL mode (`init_schema`) keeps recent commits in a `-wal` sidecar file until a
+            # checkpoint folds them back into the main database file; SQLite normally does this
+            # automatically as the last connection closes, but a tool that copies just the main
+            # file elsewhere (e.g. `gpu_run._retrieve_db`'s scp, which never touches `-wal`/`-shm`)
+            # cannot rely on that timing. An explicit checkpoint here, before the connection ever
+            # closes, guarantees the main file alone is always complete and self-contained for
+            # whatever reads it next.
+            try:
+                conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            except sqlite3.Error:
+                _LOGGER.exception("final WAL checkpoint failed; closing anyway")
             conn.close()
 
     @staticmethod

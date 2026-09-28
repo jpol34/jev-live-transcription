@@ -159,6 +159,34 @@ def test_full_row_chain_commits_successfully(tmp_path):
         conn.close()
 
 
+def test_close_checkpoints_wal_so_main_file_alone_is_self_contained(tmp_path):
+    # A tool that copies just the main `.sqlite3` file elsewhere (e.g. `gpu_run._retrieve_db`'s
+    # scp, which never touches `-wal`/`-shm`) needs the main file to already hold every committed
+    # write by the time `close()` returns -- no separate `-wal` sidecar left behind to lose.
+    db_path = tmp_path / "capture.db"
+    store = db.CaptureStore(db_path)
+    try:
+        store.insert_call(**_make_call_fields(1))
+        for i in range(50):
+            store.enqueue_tick(
+                call_id=1,
+                tick_number=i,
+                wall_clock_ts=float(i),
+                transcript_char_offset=i,
+                transcript_snapshot=f"tick {i}",
+            ).result(timeout=5)
+    finally:
+        store.close()
+
+    assert not db_path.with_name(db_path.name + "-wal").exists()
+    conn = db.connect(db_path)
+    try:
+        assert conn.execute("PRAGMA integrity_check").fetchall() == [("ok",)]
+        assert conn.execute("SELECT COUNT(*) FROM ticks").fetchone()[0] == 50
+    finally:
+        conn.close()
+
+
 def test_duplicate_tick_number_for_same_call_raises_integrity_error(tmp_path):
     store = db.CaptureStore(tmp_path / "capture.db")
     try:
