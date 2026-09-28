@@ -52,6 +52,44 @@ GLINER_ZERO_SHOT_THRESHOLD = 0.05
 # candidate for jev to weigh and reject.
 GLINER_DEFAULT_FIELD_THRESHOLD = 0.30
 
+# gliner_only pipeline arm: local commit-policy constants for `gliner_only_resolver`. Unlike
+# jev's own thresholds above, these gate a purely local decision made from GLiNER's own candidate
+# scores -- no jev/typesafe.ai call. All six are explicit starting-point guesses, not yet
+# empirically tuned against the real corpus (same discipline as `gliner_pipeline.PER_FIELD_THRESHOLDS`).
+
+# Default minimum GLiNER confidence a field's single top candidate must clear to commit. Distinct
+# from `gliner_pipeline.PER_FIELD_THRESHOLDS`/`GLINER_DEFAULT_FIELD_THRESHOLD` (which gate whether a
+# candidate ever reaches the resolver at all) and from `JEV_COMMIT_THRESHOLD` above (which gates a
+# hosted jev call's own confidence, a different scale entirely).
+GLINER_ONLY_COMMIT_THRESHOLD = 0.40
+
+# Per-field overrides of `GLINER_ONLY_COMMIT_THRESHOLD`, seeded low rather than left at the 0.40
+# default: `price_quoted`/`budget_amount`'s correct spans are already documented
+# (`gliner_pipeline.PER_FIELD_THRESHOLDS`) to score in the 0.05-0.30 band, so a flat 0.40 floor
+# would silently near-zero their commit rate.
+GLINER_ONLY_PER_FIELD_COMMIT_THRESHOLDS = {"price_quoted": 0.12, "budget_amount": 0.15}
+
+# Minimum score gap between the top-ranked and runner-up candidate, once a 2+-candidate set has
+# settled, to treat the top one as a confident winner rather than an ambiguous ("none of these")
+# rejection.
+GLINER_ONLY_MARGIN_THRESHOLD = 0.15
+
+# Separate commit floor for determination-taxonomy fields (`gliner_pipeline.FIELD_TAXONOMY`),
+# used in place of `GLINER_ONLY_COMMIT_THRESHOLD`/`GLINER_ONLY_PER_FIELD_COMMIT_THRESHOLDS` --
+# a determination field's candidate score comes from `determination_classifier`'s hand-assigned
+# confidence tiers, not GLiNER's span-score distribution, so it isn't comparable to either.
+GLINER_ONLY_DETERMINATION_COMMIT_FLOOR = 0.55
+
+# Consecutive observations a field's distinct-candidate set must persist unchanged before
+# `GlinerOnlyResolver` re-decides it, same purpose as `JEV_RECONFIRM_SETTLE_TICKS` for jev's Choice
+# path but independently tunable -- defaults to that constant's value.
+GLINER_ONLY_SETTLE_TICKS = JEV_RECONFIRM_SETTLE_TICKS
+
+# One-tick-only additive score bonus for whichever candidate a lexical self-correction cue (e.g.
+# "actually", "scratch that") points to this tick, applied before ranking a settled candidate set.
+# Set above `GLINER_ONLY_MARGIN_THRESHOLD` so it can flip an otherwise-too-close decision.
+GLINER_ONLY_SELF_CORRECTION_SCORE_BONUS = 0.20
+
 # This machine's installed RAM, used to size call-level concurrency: reserve
 # 4GB headroom for the OS/other sessions and budget ~4GB per concurrent call.
 RAM_GB = 16
