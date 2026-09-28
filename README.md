@@ -97,14 +97,17 @@ windows measured and rejected -- see that constant's comment; a separate, higher
 contention, not in isolation), against a ~226ms/tick CPU baseline
 for the same model.
 
-Score per-field recall against the corpus's ground truth from any capture DB:
+Score per-field recall, precision, and jev call volume against the corpus's ground truth from any
+capture DB:
 
 ```
 uv run python scripts/score_recall.py data/benchmark.sqlite3
 ```
 
 `--save <path>` writes a JSON snapshot for a later `--baseline <path>` comparison, which exits
-non-zero if any field's recall drops by more than `--tolerance` (default 5%).
+non-zero if any field's recall or precision drops by more than `--tolerance` (default 5%), or its
+jev Choice-call volume rises by more than that. `benchmarks/score_recall/baseline.json` is the
+checked-in baseline (full 100-call corpus, `gliner_jev` pipeline) that later work diffs against.
 
 ## Stakeholder demo web page
 
