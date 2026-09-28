@@ -87,6 +87,20 @@ def test_normalize_email_span_already_literal_is_noop_passthrough():
     assert normalize_email_span(once) == once
 
 
+def test_normalize_email_span_preserves_real_hyphen_in_address():
+    # Only a hyphen-joined run of single-character segments ("e-t-h-a-n") is a letter-spelling
+    # separator; a real hyphen that's part of the address itself must survive.
+    assert normalize_email_span("mary-jane at gmail dot com") == "mary-jane@gmail.com"
+    assert normalize_email_span("jordan at big-corp dot com") == "jordan@big-corp.com"
+
+
+def test_normalize_email_span_literal_case_is_lowercased_for_consistency():
+    # The same address must normalize to the same literal string whether it arrives already
+    # typed (mixed case) or spoken letter-by-letter (always lowercased by the tokenizing path) --
+    # otherwise the two phrasings would commit as different strings.
+    assert normalize_email_span("Ethan.Roberts@Mail.com") == "ethan.roberts@mail.com"
+
+
 def test_normalize_email_span_literal_with_surrounding_whitespace_and_punctuation():
     assert normalize_email_span("  ethan.roberts@mail.com. ") == "ethan.roberts@mail.com"
 
