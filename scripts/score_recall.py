@@ -74,17 +74,12 @@ def is_match(extracted: str, truth: str | list[str]) -> bool:
     numeric/ID-like fields (unit_number, phone digits, prices), where every digit string is a
     substring of many other digit strings that share no actual value.
 
-    The boundary check only requires a non-word lookaround on a side whose own edge character is
-    itself a word character -- not the blanket `\b...\b` this replaced. `\b` only matches at a
-    word/non-word transition, so it never matches immediately before a `$`-prefixed value preceded
-    by whitespace (space and `$` are both non-word, so there's no transition) -- `"$950"` would
-    fail to match inside `"around $950"` even though it's a correct substring. But a blanket
-    `(?<!\w)...(?!\w)` overcorrects: it then also rejects `"$950"` directly abutting a word
-    character with no separator (e.g. `"...was$950 total"`), a case `\b` correctly allowed (the
-    `s`-to-`$` transition satisfies it). Requiring the lookaround only where the pattern's own edge
-    char is a word char handles both: `$` never needs it (the symbol itself unambiguously delimits
-    the value, whatever's adjacent), while a bare-digit edge (e.g. "212") still needs it on both
-    sides to block the same digit-collision cases `\b` was guarding against ("212" inside "3212").
+    The boundary check requires a non-word lookaround only on a side whose own edge character is
+    itself a word character. A bare-digit edge (e.g. "212") needs it on both sides to block a
+    digit-collision false positive ("212" inside "3212"). A symbol-prefixed edge (e.g. "$950")
+    needs no lookaround at all: the symbol itself unambiguously delimits the value regardless of
+    what's adjacent to it, so "$950" correctly matches whether it's preceded by whitespace
+    ("around $950") or abuts a word with no separator ("was$950 total").
 
     `truth` can be a list (e.g. `amenities_requested`, where a call's ground truth can disclose
     several amenities) since the pipeline only ever commits a single value per field -- a hit

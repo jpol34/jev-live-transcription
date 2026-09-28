@@ -64,26 +64,19 @@ def test_is_match_true_for_whole_numeric_token_within_longer_text():
 
 
 def test_is_match_true_for_dollar_prefixed_value_preceded_by_whitespace():
-    # Regression: `\b` never matches immediately before a `$` preceded by whitespace (both are
-    # non-word characters, so there's no word/non-word transition) -- "$950" would silently fail
-    # to match inside "around $950" even though it's a correct substring.
     assert score_recall.is_match("around $950", "$950")
     assert score_recall.is_match("$950", "the price quoted was $950")
 
 
 def test_is_match_false_for_unrelated_dollar_values():
-    # The boundary-check rewrite must not turn into unbounded substring containment -- two
-    # genuinely different dollar amounts still don't match.
+    # Substring matching for a symbol-prefixed value stays bounded -- two genuinely different
+    # dollar amounts still don't match.
     assert not score_recall.is_match("$950", "$1,900")
 
 
 def test_is_match_true_for_dollar_value_directly_abutting_a_word_with_no_separator():
-    # Regression (caught in review of the fix above): a blanket `(?<!\w)...(?!\w)` overcorrects --
-    # it also rejects "$950" directly abutting a word character with no space ("...was$950 total"),
-    # a case the original `\b...\b` correctly matched (the transition from "s" to "$" satisfies
-    # `\b`). Only requiring the lookaround on a side whose own edge char is a word char fixes both
-    # directions at once: `$` never needs it, since the symbol itself unambiguously delimits the
-    # value regardless of what's adjacent.
+    # A symbol-prefixed value like "$950" is unambiguously delimited by the symbol itself, so it
+    # matches whether it's preceded by whitespace or abuts a word with no separator at all.
     assert score_recall.is_match("$950", "the offer was$950 total")
 
 
