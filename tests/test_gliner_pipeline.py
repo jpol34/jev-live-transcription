@@ -3,6 +3,7 @@ import threading
 import time
 
 from jev_live_transcription import config, gliner_pipeline
+from jev_live_transcription.determination_classifier import DeterminationResult
 
 
 class FakeZeroShotModel:
@@ -46,12 +47,17 @@ def test_determination_field_gets_a_candidate_even_with_zero_gliner_entities(mon
     # rationale for this classifier), yet the locally classified determination still surfaces as
     # a candidate -- proof the classifier isn't gated on GLiNER locating a span first.
     _install_fake(monkeypatch, responses=[[]])
+    monkeypatch.setattr(
+        gliner_pipeline.determination_classifier,
+        "classify_with_confidence",
+        lambda field_name, window_text: DeterminationResult("yes", 0.55, "guess it'?s fine"),
+    )
     snapshot = "Caller: I guess it's fine if I'm not there. Just, uh, fix the leak, please."
 
     result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-determination"))
 
     assert result["permission_to_enter"] == [
-        {"text": "yes", "score": None, "start": None, "end": None}
+        {"text": "yes", "score": 0.55, "start": None, "end": None}
     ]
 
 
@@ -72,12 +78,17 @@ def test_determination_field_candidate_combines_with_gliner_entities(monkeypatch
             ]
         ],
     )
+    monkeypatch.setattr(
+        gliner_pipeline.determination_classifier,
+        "classify_with_confidence",
+        lambda field_name, window_text: DeterminationResult("yes", 0.55, "guess it'?s fine"),
+    )
     snapshot = "Caller: I guess it's fine if I'm not there. Just, uh, fix the leak, please."
 
     result = asyncio.run(gliner_pipeline.extract_candidates(snapshot, "call-both"))
 
     assert {"text": "yes", "score": 0.4, "start": 0, "end": 3} in result["permission_to_enter"]
-    assert {"text": "yes", "score": None, "start": None, "end": None} in result[
+    assert {"text": "yes", "score": 0.55, "start": None, "end": None} in result[
         "permission_to_enter"
     ]
     assert model.calls[0]["texts"][0] == snapshot[-config.GLINER_ZERO_SHOT_WINDOW_CHARS :]
