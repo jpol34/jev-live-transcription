@@ -52,7 +52,14 @@ def wait_for_ssh_connectable(
     deadline = time.monotonic() + timeout_s
     last_result: subprocess.CompletedProcess | None = None
     while time.monotonic() < deadline:
-        last_result = run_ssh(ssh_direct, ssh_key, "true", timeout_s=10.0)
+        try:
+            last_result = run_ssh(ssh_direct, ssh_key, "true", timeout_s=10.0)
+        except subprocess.TimeoutExpired:
+            # A single slow probe (sshd accepting the TCP connection but stalling mid-handshake --
+            # exactly the condition this loop polls through) must not abort the whole retry window;
+            # `_start_server`'s own healthz poll uses the same catch-and-continue pattern.
+            time.sleep(poll_s)
+            continue
         if last_result.returncode == 0:
             return
         time.sleep(poll_s)
@@ -61,7 +68,13 @@ def wait_for_ssh_connectable(
 
 
 def scp_up(
-    ssh_direct: dict, ssh_key: str, local_path, remote_path: str, *, recursive: bool = False
+    ssh_direct: dict,
+    ssh_key: str,
+    local_path,
+    remote_path: str,
+    *,
+    recursive: bool = False,
+    timeout_s: float = 300.0,
 ) -> None:
     target = f"{ssh_direct['username']}@{ssh_direct['host']}:{remote_path}"
     args = [
@@ -77,7 +90,11 @@ def scp_up(
     if recursive:
         args.append("-r")
     result = subprocess.run(
-        ["scp", *args, str(local_path), target], capture_output=True, encoding="utf-8", errors="replace"
+        ["scp", *args, str(local_path), target],
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=timeout_s,
     )
     if result.returncode != 0:
         raise RuntimeError(f"failed to upload {local_path} -> {remote_path}: {result.stderr}")

@@ -88,11 +88,16 @@ def _install_deps(ssh_direct: dict, ssh_key: str) -> None:
     repo_root = _THIS_DIR.parent.parent
     _run_ssh(ssh_direct, ssh_key, f"mkdir -p {_REMOTE_DIR}")
     _scp_up(ssh_direct, ssh_key, repo_root / "pyproject.toml", f"{_REMOTE_DIR}/pyproject.toml")
-    _scp_up(ssh_direct, ssh_key, repo_root / "src", f"{_REMOTE_DIR}/src", recursive=True)
+    _scp_up(ssh_direct, ssh_key, repo_root / "src", f"{_REMOTE_DIR}/src", recursive=True, timeout_s=120.0)
 
+    # This project's own pyproject.toml depends on `hangar @ git+https://...` -- pip needs the
+    # `git` binary on PATH to resolve that VCS URL, unrelated to whether hangar is ever used by
+    # the served app itself. Installed unconditionally rather than probed first: `apt-get install`
+    # on an already-present package is a fast no-op, cheaper than a separate `which git` round trip.
     result = _run_ssh(
         ssh_direct,
         ssh_key,
+        f"apt-get update -qq && apt-get install -y -qq git && "
         f"pip install --no-cache-dir --break-system-packages uv && "
         f"cd {_REMOTE_DIR} && uv pip install --system --break-system-packages --no-cache -e .",
         timeout_s=600.0,
