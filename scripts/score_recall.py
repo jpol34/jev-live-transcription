@@ -74,13 +74,17 @@ def is_match(extracted: str, truth: str | list[str]) -> bool:
     numeric/ID-like fields (unit_number, phone digits, prices), where every digit string is a
     substring of many other digit strings that share no actual value.
 
-    The boundary check uses `(?<!\w)...(?!\w)` rather than `\b...\b`: `\b` only matches at a
-    transition between a word and non-word character, so it never matches immediately before a
-    `$`-prefixed value preceded by whitespace (space and `$` are both non-word, so there's no
-    transition) -- `"$950"` would fail to match inside `"around $950"` even though it's a correct
-    substring. `(?<!\w)`/`(?!\w)` matches whenever the substring isn't directly adjacent to a word
-    character, regardless of what (if any) non-word character sits there, while still blocking the
-    same digit-collision cases `\b` was guarding against.
+    The boundary check only requires a non-word lookaround on a side whose own edge character is
+    itself a word character -- not the blanket `\b...\b` this replaced. `\b` only matches at a
+    word/non-word transition, so it never matches immediately before a `$`-prefixed value preceded
+    by whitespace (space and `$` are both non-word, so there's no transition) -- `"$950"` would
+    fail to match inside `"around $950"` even though it's a correct substring. But a blanket
+    `(?<!\w)...(?!\w)` overcorrects: it then also rejects `"$950"` directly abutting a word
+    character with no separator (e.g. `"...was$950 total"`), a case `\b` correctly allowed (the
+    `s`-to-`$` transition satisfies it). Requiring the lookaround only where the pattern's own edge
+    char is a word char handles both: `$` never needs it (the symbol itself unambiguously delimits
+    the value, whatever's adjacent), while a bare-digit edge (e.g. "212") still needs it on both
+    sides to block the same digit-collision cases `\b` was guarding against ("212" inside "3212").
 
     `truth` can be a list (e.g. `amenities_requested`, where a call's ground truth can disclose
     several amenities) since the pipeline only ever commits a single value per field -- a hit
@@ -94,7 +98,9 @@ def is_match(extracted: str, truth: str | list[str]) -> bool:
     if norm_extracted == norm_truth:
         return True
     shorter, longer = sorted((norm_extracted, norm_truth), key=len)
-    return re.search(rf"(?<!\w){re.escape(shorter)}(?!\w)", longer) is not None
+    lead = r"(?<!\w)" if re.match(r"\w", shorter[0]) else ""
+    trail = r"(?!\w)" if re.match(r"\w", shorter[-1]) else ""
+    return re.search(f"{lead}{re.escape(shorter)}{trail}", longer) is not None
 
 
 def load_ground_truths(conn: sqlite3.Connection) -> dict[int, dict]:

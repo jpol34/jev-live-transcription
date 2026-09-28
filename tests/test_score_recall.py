@@ -77,6 +77,16 @@ def test_is_match_false_for_unrelated_dollar_values():
     assert not score_recall.is_match("$950", "$1,900")
 
 
+def test_is_match_true_for_dollar_value_directly_abutting_a_word_with_no_separator():
+    # Regression (caught in review of the fix above): a blanket `(?<!\w)...(?!\w)` overcorrects --
+    # it also rejects "$950" directly abutting a word character with no space ("...was$950 total"),
+    # a case the original `\b...\b` correctly matched (the transition from "s" to "$" satisfies
+    # `\b`). Only requiring the lookaround on a side whose own edge char is a word char fixes both
+    # directions at once: `$` never needs it, since the symbol itself unambiguously delimits the
+    # value regardless of what's adjacent.
+    assert score_recall.is_match("$950", "the offer was$950 total")
+
+
 def test_is_match_false_for_empty_values():
     assert not score_recall.is_match("", "Tim Barker")
     assert not score_recall.is_match("Tim Barker", "")
