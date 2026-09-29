@@ -200,25 +200,30 @@ def score_precision(
     return stats
 
 
-def load_jev_calls(conn: sqlite3.Connection, pipeline: str) -> dict[str, list[dict]]:
-    """Return `{field_name: [raw_output_dict, ...]}` for every successful jev call for `pipeline`.
+def load_field_run_rows(conn: sqlite3.Connection, pipeline: str, stage: str) -> list[tuple[str, str]]:
+    """Return `[(field_name, raw_output_json), ...]` for every `pipeline`/`stage` row that has one.
 
-    A jev call's per-field identity only exists via its `field_extractions` row (`pipeline_runs`
-    itself has no `field_name` column), so this joins the two on `run_id`. A jev call that errored
-    out (see `pipeline_core._run_gliner_jev_step`) never gets a `field_extractions` row and so is
-    excluded here -- it carries no field identity to attribute it to.
+    A pipeline run's per-field identity only exists via its `field_extractions` row (`pipeline_runs`
+    itself has no `field_name` column), so this joins the two on `run_id`. A run that errored out
+    before persisting a `field_extractions` row is excluded here -- it carries no field identity to
+    attribute it to. Shared by `load_jev_calls` (stage `"jev"`) and
+    `scripts/score_decision_reasons.py`'s `load_decision_reasons` (stage `"gliner_only_commit"`).
     """
-    rows = conn.execute(
+    return conn.execute(
         """
         SELECT fe.field_name, pr.raw_output_json
         FROM field_extractions fe
         JOIN pipeline_runs pr ON pr.run_id = fe.run_id
-        WHERE pr.pipeline = ? AND pr.stage = 'jev' AND pr.raw_output_json IS NOT NULL
+        WHERE pr.pipeline = ? AND pr.stage = ? AND pr.raw_output_json IS NOT NULL
         """,
-        (pipeline,),
+        (pipeline, stage),
     ).fetchall()
+
+
+def load_jev_calls(conn: sqlite3.Connection, pipeline: str) -> dict[str, list[dict]]:
+    """Return `{field_name: [raw_output_dict, ...]}` for every successful jev call for `pipeline`."""
     calls: dict[str, list[dict]] = {}
-    for field_name, raw_output_json in rows:
+    for field_name, raw_output_json in load_field_run_rows(conn, pipeline, "jev"):
         calls.setdefault(field_name, []).append(json.loads(raw_output_json))
     return calls
 
