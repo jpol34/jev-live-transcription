@@ -12,10 +12,12 @@ def _span(text: str, score: float | None, start: int | None = None, end: int | N
 
 
 def test_gliner_only_constants_match_spec():
-    assert config.GLINER_ONLY_COMMIT_THRESHOLD == 0.40
+    assert config.GLINER_ONLY_COMMIT_THRESHOLD == 0.50
     assert config.GLINER_ONLY_PER_FIELD_COMMIT_THRESHOLDS == {
-        "price_quoted": 0.12,
+        "price_quoted": 0.18,
         "budget_amount": 0.15,
+        "pet_info": 0.40,
+        "work_order_issue": 0.40,
     }
     assert config.GLINER_ONLY_MARGIN_THRESHOLD == 0.15
     assert config.GLINER_ONLY_DETERMINATION_COMMIT_FLOOR == 0.55
@@ -104,14 +106,14 @@ def test_single_candidate_determination_field_uses_its_own_floor():
 
 
 def test_per_field_commit_threshold_override_takes_precedence_over_default():
-    # price_quoted's override (0.12) is well below the 0.40 default -- a score that would fail
+    # price_quoted's override (0.18) is well below the 0.50 default -- a score that would fail
     # the default floor must still commit under the override.
     resolver = GlinerOnlyResolver(settle_ticks=1)
 
     result = resolver.resolve_field(
         call_id=1,
         field_name="price_quoted",
-        candidate_spans=[_span("$1,200", 0.15)],
+        candidate_spans=[_span("$1,200", 0.2)],
         context_window="ctx",
     )
 

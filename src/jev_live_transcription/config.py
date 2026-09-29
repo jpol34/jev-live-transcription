@@ -54,30 +54,72 @@ GLINER_DEFAULT_FIELD_THRESHOLD = 0.30
 
 # gliner_only pipeline arm: local commit-policy constants for `gliner_only_resolver`. Unlike
 # jev's own thresholds above, these gate a purely local decision made from GLiNER's own candidate
-# scores -- no jev/typesafe.ai call. All six are explicit starting-point guesses, not yet
-# empirically tuned against the real corpus (same discipline as `gliner_pipeline.PER_FIELD_THRESHOLDS`).
+# scores -- no jev/typesafe.ai call. Empirically tuned against the real 100-call corpus via
+# `scripts/score_recall.py --pipeline gliner_only` (same discipline as
+# `gliner_pipeline.PER_FIELD_THRESHOLDS`) -- see each constant's comment below for what the data
+# showed. The dominant pattern across nearly every field: a settled 2+-candidate commit
+# (`margin_winner`) is far more reliable than a single-candidate commit (`single_above_floor`,
+# which has no settle-gate or margin check at all -- it fires the instant one candidate clears its
+# floor) -- e.g. `caller_name`'s single-candidate commits were 0% correct (0/15) against
+# `margin_winner`'s 65% (55/85) in the tuning run; `email` and `unit_number` showed the same shape.
+# `GLINER_ONLY_COMMIT_THRESHOLD` gates both paths identically (no separate single-candidate floor
+# exists among these four constants), so raising it trades away the worst single-candidate noise at
+# the cost of also raising the bar for `margin_winner`.
 
 # Default minimum GLiNER confidence a field's single top candidate must clear to commit. Distinct
 # from `gliner_pipeline.PER_FIELD_THRESHOLDS`/`GLINER_DEFAULT_FIELD_THRESHOLD` (which gate whether a
 # candidate ever reaches the resolver at all) and from `JEV_COMMIT_THRESHOLD` above (which gates a
-# hosted jev call's own confidence, a different scale entirely).
-GLINER_ONLY_COMMIT_THRESHOLD = 0.40
+# hosted jev call's own confidence, a different scale entirely). 0.50 costs
+# `caller_name`/`email`/`unit_number`/`amenities_requested` no recall -- every correct
+# `margin_winner` commit for these fields scores at or above 0.50 in the real corpus -- while
+# filtering out a large share of low-scoring, always-wrong single-candidate commits (e.g.
+# `caller_name`'s wrong single-candidate commits cluster at 0.46-0.54). `pet_info` and
+# `work_order_issue` are the exception -- their correct single-candidate commits score as low as
+# 0.41 -- and are carved out below via `GLINER_ONLY_PER_FIELD_COMMIT_THRESHOLDS` so this default
+# doesn't regress them.
+GLINER_ONLY_COMMIT_THRESHOLD = 0.50
 
-# Per-field overrides of `GLINER_ONLY_COMMIT_THRESHOLD`, seeded low rather than left at the 0.40
-# default: `price_quoted`/`budget_amount`'s correct spans are already documented
-# (`gliner_pipeline.PER_FIELD_THRESHOLDS`) to score in the 0.05-0.30 band, so a flat 0.40 floor
-# would silently near-zero their commit rate.
-GLINER_ONLY_PER_FIELD_COMMIT_THRESHOLDS = {"price_quoted": 0.12, "budget_amount": 0.15}
+# Per-field overrides of `GLINER_ONLY_COMMIT_THRESHOLD`.
+#   - `price_quoted`: correct and wrong single-candidate commits overlap heavily in the low-score
+#     band (both cluster around 0.12-0.35 -- the same label-collision behavior
+#     `gliner_pipeline.PER_FIELD_THRESHOLDS` documents), so no floor cleanly separates them, but
+#     0.18 clears the densest cluster of wrong commits for a modest recall cost.
+#   - `budget_amount`: this field's correct commits (score 0.16-0.20) sit inside the same dense
+#     wrong-commit cluster (0.15-0.45) as `price_quoted`, but with far fewer correct examples to
+#     preserve -- a floor high enough to meaningfully cut wrong commits would cost roughly half of
+#     this field's already-small recall for a negligible precision gain, so 0.15 stays: this
+#     field's imprecision looks like candidate-level ambiguity, not a threshold miscalibration a
+#     floor change can fix.
+#   - `pet_info`, `work_order_issue`: both fields' correct single-candidate commits score as low as
+#     0.41/0.46 -- well under `GLINER_ONLY_COMMIT_THRESHOLD` -- so each needs its own floor to avoid
+#     near-zero recall.
+GLINER_ONLY_PER_FIELD_COMMIT_THRESHOLDS = {
+    "price_quoted": 0.18,
+    "budget_amount": 0.15,
+    "pet_info": 0.40,
+    "work_order_issue": 0.40,
+}
 
 # Minimum score gap between the top-ranked and runner-up candidate, once a 2+-candidate set has
 # settled, to treat the top one as a confident winner rather than an ambiguous ("none of these")
-# rejection.
+# rejection. 0.15 has no strong signal against it: the capture DB doesn't record a settled
+# decision's runner-up score (only the winner's), so the margin actually applied per decision isn't
+# directly recoverable from real data for a targeted comparison; what is directly visible --
+# per-field final-outcome misses attributable to a locked `margin_too_close` rejection -- is
+# consistently small (1-3 calls per field) next to the bigger, clearly-attributable problems the
+# other three constants address (single-candidate noise, and price_quoted/budget_amount's
+# candidate-level ambiguity).
 GLINER_ONLY_MARGIN_THRESHOLD = 0.15
 
 # Separate commit floor for determination-taxonomy fields (`gliner_pipeline.FIELD_TAXONOMY`),
 # used in place of `GLINER_ONLY_COMMIT_THRESHOLD`/`GLINER_ONLY_PER_FIELD_COMMIT_THRESHOLDS` --
 # a determination field's candidate score comes from `determination_classifier`'s hand-assigned
-# confidence tiers, not GLiNER's span-score distribution, so it isn't comparable to either.
+# confidence tiers, not GLiNER's span-score distribution, so it isn't comparable to either. 0.55
+# has no strong signal against it: `permission_to_enter` (the only determination field) has
+# correct and wrong single-candidate commits clustering at the same score (0.9) in the real corpus,
+# so no floor value separates them -- its dominant miss mode is GLiNER/`determination_classifier`
+# never producing a candidate at all (16 of 38 expected calls), a recall gap this floor can't
+# address either way.
 GLINER_ONLY_DETERMINATION_COMMIT_FLOOR = 0.55
 
 # Consecutive observations a field's distinct-candidate set must persist unchanged before
